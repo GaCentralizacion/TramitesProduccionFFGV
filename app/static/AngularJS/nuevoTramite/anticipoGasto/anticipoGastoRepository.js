@@ -1323,6 +1323,22 @@ registrationModule.factory('anticipoGastoRepository', function ($http) {
                 }
 
             });
+        },
+        ActualizaTramitePoliza:(id_perTra,poliza,documentoConcepto,incremental)=>{
+            return $http({
+                url: `${anticipoGasto}ActualizaTramitePoliza`,
+                method: "GET",
+                params: {
+                    id_perTra,
+                    poliza,
+                    documentoConcepto,
+                    incremental
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+
+            });
         }
     };
 });
