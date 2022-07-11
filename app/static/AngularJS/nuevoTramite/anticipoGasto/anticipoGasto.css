@@ -1,0 +1,113 @@
+
+.picture-src:hover{
+    cursor: pointer;
+}
+
+.labelIdCliente{
+    padding-left: 5px;
+    font-size: 15px;
+    color: #666363;
+    font-weight: bold;
+}
+
+.botonVisible {
+    display: none;
+}
+
+.labelDataCliente{
+    padding-left: 5px;
+    font-size: 15px;
+    color: #666363;
+    font-weight: normal;
+}
+
+.labelIdDataCliente{
+    padding-left: 5px;
+    font-size: 18px;
+    color: #666363;
+    font-weight: bold;
+}
+
+  /* Estilos de tabla */
+  .btn-circle {
+    width: 55px;
+    height: 55px;
+    padding: 10px 16px;
+    font-size: 24px;
+    line-height: 1.33;
+    border-radius: 35px;
+}
+
+.btn-circleTable {
+    width: 30px;
+    height: 30px;
+    padding: 6px 0px;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.42857;
+}
+
+.misTramieslbl{
+    margin-left: 60%; 
+    font-size: 45px; 
+    color: #2B425B;
+}
+
+#tableMisTramite {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+  
+#tableMisTramite td, #tableMisTramite th {
+    border: 1px solid rgb(136, 136, 136) !important;
+    padding: 8px;
+    vertical-align: bottom;
+    text-align: left;
+    color: black !important;
+}
+  
+#tableMisTramite tr:nth-child(even){background-color: #f2f2f2;}
+  
+#tableMisTramite tr:hover {background-color: #ddd;}
+  
+#tableMisTramite th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #005A9A;
+    color: white !important;
+    vertical-align: bottom;
+    text-align: left;
+} 
+
+  /* Fin de estilos de tabla */
+
+ .divWizard {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px; 
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px; 
+  text-align: center; 
+  font-size: 10px;
+  border: solid 1px;
+  height: 70px;
+  width: 70px;
+  margin-left: 2.5%
+}
+
+.wizardActive{
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px; 
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px; 
+  text-align: center; 
+  font-size: 10px;
+  border: solid 1px;
+  height: 70px;
+  width: 70px;
+  margin-left: 2.5%;
+  background-color: #006AAF;
+  color: white
+}

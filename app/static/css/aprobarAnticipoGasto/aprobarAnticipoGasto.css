@@ -1,0 +1,139 @@
+.labelIdCliente {
+    padding-left: 5px;
+    font-size: 12px;
+    color: #666363;
+    font-weight: bold;
+}
+
+.labelDataCliente {
+    padding-left: 5px;
+    font-size: 13px;
+    font-weight: normal;
+}
+
+.labelIdDataCliente {
+    padding-left: 5px;
+    font-size: 13px;
+    color: #666363;
+    font-weight: bold;
+}
+
+.col-md-12 {
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+.headerModal {
+    background-color: #005F9F;
+}
+
+.modal-title {
+    margin: 0;
+    line-height: 1.42857143;
+    color: white;
+}
+
+.text-white {
+    color: #fff !important;
+}
+
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    line-height: 1.428571429;
+    border-radius: 15px;
+    background-color: transparent !important;
+    color: black !important;
+}
+.btn-circle:hover{
+    background-color: #5AB7CD !important;
+    color: white !important;
+}
+.botonVisible {
+    display: none;
+}
+
+.picture-container {
+    position: relative !important;
+    cursor: pointer !important;
+    text-align: center !important;
+    display: inline-flex;
+}
+
+.picture {
+    width: 25px !important;
+    height: 25px !important;
+    /* background-color: #999999 !important;
+    border: 1px solid #CCCCCC !important; */
+    color: #FFFFFF !important;
+    border-radius: 50% !important;
+    margin: 5px auto !important;
+    overflow: hidden !important;
+    transition: all 0.2s !important;
+    -webkit-transition: all 0.2s !important;
+    
+}
+
+.picture input[type="file"] {
+    cursor: pointer !important;
+    display: block !important;
+    height: 100% !important;
+    left: 0 !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    top: 0 !important;
+    width: 100% !important;
+ }
+ 
+.picture-src {
+    width: 79% !important;
+ }
+ 
+.DivToScroll {
+    border-radius: 4px 0 4px 0;
+    font-size: 12px;
+}
+
+.DivWithScroll {
+    height: 300px;
+    width: 98%;
+    overflow: scroll;
+    overflow-x: hidden;
+}
+
+.modalImage .image-wrapper {
+    text-align: center;
+  }
+ .modalImage .image-wrapper img {
+    max-width: 560px;
+    max-height: 560px;
+ }
+ .modalImage .image-description {
+   text-align: center;
+   margin-top: 10px;
+ }
+ .ErrorControl {
+    border-bottom: solid 1px #E53935!important;
+}
+.porcentaje {
+    color: #E53935;
+}
+
+.btn-circleNoti {
+    background-color: #EB2A26;
+    color: white;
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    padding: 2px 0px;
+    border-radius: 15px;
+    font-size: 10px;
+    line-height: 1.42857;
+    margin: -3px 0 0 6%;
+    text-align: center;
+}

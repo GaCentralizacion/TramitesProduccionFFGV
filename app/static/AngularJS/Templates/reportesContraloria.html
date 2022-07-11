@@ -1,0 +1,1233 @@
+<link rel="stylesheet" href="css/misTramites/misTramites.css">
+<link rel="stylesheet" href="css/generic.css">
+<link rel="stylesheet" href="css/home/home.css">
+<link rel="stylesheet" href="css/reportesCss/style.css">
+<div ng-init="init()">
+    <div class="col-md-12 subheader">
+        <div class="col-md-6 pull-left">
+            <label class="labelDocs">
+                <span>
+                    <img class="imgSubHeader" src="../../img/iconos/tramite@2x.png">
+                </span>
+                Reportes Fondo Fijo
+            </label>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="divPrincipal col-md-10">
+            <div class="middle-box">
+                <div class="row">
+                    <div ng-show = "dataUsuario.idRol == 10 || dataUsuario.idRol == 1 || dataUsuario.idRol == 13" class="col-sm-2">
+                        <button class="btn btnNuevos" style="border-radius: 50px !important;border:none;  width: 95%"
+                        ng-click="openModalReembolsos()">Estatus Reembolsos</button>
+                    </div>
+                    <div ng-show = "dataUsuario.idRol == 1 || dataUsuario.idRol == 13" class="col-sm-2">
+                        <button class="btn btnNuevos" style="border-radius: 50px !important;border:none; width: 90%"
+                        ng-click="openModalRechazos()">Rechazos Finanzas</button>
+                    </div>
+                    <div ng-show = "dataUsuario.idRol == 1 || dataUsuario.idRol == 13" class="col-sm-2">
+                        <button class="btn btnNuevos" style="border-radius: 50px !important;border:none; width: 95%"
+                        ng-click="openModalDescuentos()">Descuentos Nomina</button>
+                    </div>
+                    <div ng-show = "dataUsuario.idRol == 10 || dataUsuario.idRol == 1 || dataUsuario.idRol == 13" class="col-sm-2">
+                        <button class="btn btnNuevos" style="border-radius: 50px !important;border:none; width: 90%"
+                        ng-click="openModalEstatusVales()">Estatus Vales</button>
+                    </div>
+                    <div ng-show = "dataUsuario.idRol == 10 || dataUsuario.idRol == 1 || dataUsuario.idRol == 13" class="col-sm-2">
+                        <button class="btn btnNuevos" style="border-radius: 50px !important;border:none; width: 95%"
+                        ng-click="openModalCajeroEspejo()">Cajero Espejo</button>
+                    </div>
+                    <div ng-show = "dataUsuario.idRol == 10 || dataUsuario.idRol == 1 || dataUsuario.idRol == 13" class="col-sm-2">
+                        <button class="btn btnNuevos" style="border-radius: 50px !important;border:none; width: 95%"
+                        ng-click="openModalEstatusFF()">Estatus Fondos</button>
+                    </div>
+                </div>
+                    <div class="row">
+                    <div class="col-sm-12">
+                        <br>
+                        <table id="tableMisTramite" class="table table-striped table-bordered" cellspacing="0"
+                            width="100%">
+                            <thead>
+                                <tr>
+                                    <th width="10px">Id</th>
+                                    <th width="10px">FondoFijo</th>
+                                    <th width="10px">Fecha</th>
+                                    <th width="10px" hidden>Hora</th>
+                                    <th width="10px">Agencia</th>
+                                    <th width="10px">Sucursal</th>
+                                    <th width="10px">Departamento</th>
+                                    <th width="10px">Responsable</th>
+                                    <th width="10px">Monto</th>
+                                    <th width="5px"></th>
+                                    <th width="5px"></th>
+                                    <th width="5px"></th>
+                                    <th width="5px"></th>
+                                    <th width="5px"></th>
+                                    <th width="10px">Usuario  </th>
+                                    <th width="10px">Monto arqueo </th>
+                                    <th width="10px">Fecha arqueo </th>
+                                    <th width="10px"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="ff in listaFondoFijo">
+                                    <td width="10px">{{ff.id}}</td>
+                                    <td width="10px">{{ff.idFondoFijo}}</td>
+                                    <td width="10px">{{ff.fecha}}</td>
+                                    <td width="10px" hidden>{{ff.hora}}</td>
+                                    <td width="10px">{{ff.agencia}}</td>
+                                    <td width="10px">{{ff.sucursal}}</td>
+                                    <td width="10px">{{ff.departamento}}</td>
+                                    <td width="10px">{{ff.responsable}}</td>
+                                    <td width="10px">{{ff.monto | currency}}</td>
+                                    <td width="5px">
+                                        <div style="width: 100%;">
+                                            <center>
+                                                <button class="btn btn-circle" ng-click="goReporte(ff.id)" title="Visualiza reporte">
+                                                    <i class="fa fa-file-pdf-o fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </center>
+                                        </div>
+                                    </td>
+                                    <td width="5px">
+                                        <div style="width: 100%;">
+                                            <center>
+                                                <!-- ff.id, ff.idFondoFijo, ff.idEmpresa, ff.idSucursal, ff.idDepartamento, ff.idResponsable -->
+                                                <!-- ff.idFondoFijo,ff.id -->
+                                                <button class="btn btn-circle" ng-click="capturaArqueo(ff.idFondoFijo,ff.id, ff.idEmpresa, ff.idSucursal, ff.idDepartamento, ff.idResponsable)"
+                                                    title="Captura arqueo">
+                                                    <i class="fa fa-money fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </center>
+                            
+                                        </div>
+                                    </td>
+                                    <td width="5px">
+                                        <div style="width: 100%;">
+                                            <center>
+                                                <button class="btn btn-circle" ng-click="viewVales(ff.id)" title="ver vales">
+                                                    <i class="fa fa-credit-card fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </center>
+                            
+                                        </div>
+                                    </td>
+                                    <td width="5px">
+                                        <div style="width: 100%;">
+                                            <center>
+                                                <button class="btn btn-circle" ng-click="viewComprobaciones(ff.id)" title="ver comprobantes">
+                                                    <i class="fa fa-check-square-o fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </center>
+                                        </div>
+                                    </td>
+                                    <td width="5px">
+                                        <div style="width: 100%;">
+                                            <center>
+                                                <button class="btn btn-circle" ng-click="viewReembolsos(ff.id)" title="ver reembolsos">
+                                                    <i class="fa fa-usd fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </center>
+                                        </div>
+                                    </td>
+                                    <td width="10px">{{ff.usuario_captura}}</td>
+                                    <td width="10px">{{ff.MontoSaldoCaja | currency}}</td>
+                                    <td width="10px">{{ff.fecha_ultimo_arqueo}}</td>
+                                    <td width="5px">
+                                        <div style="width: 100%;">
+                                            <center>
+                                                <button class="btn btn-circle" ng-click="subirEvidencia(ff.id, ff.idFondoFijo, ff.idEmpresa, ff.idSucursal, ff.idDepartamento, ff.idResponsable)" title="Carga evidencia">
+                                                    <i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                                <button class="btn btn-circle" ng-click="loadEvidenciaReporte(ff.id, ff.idFondoFijo, ff.idEmpresa, ff.idSucursal, ff.idDepartamento, ff.idResponsable)" title="Ver reporte firmado">
+                                                    <i class="fa fa-book fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </center>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Inicia modal spinner -->
+<!--===================================================-->
+<div id="loading" class="modal fade" tabindex="-1" data-focus-on="input:first">
+    <div class="modal-dialog modal-lg">
+        <div class="spinner">
+            <div class="cube1"></div>
+            <div class="cube2"></div>
+        </div>
+    </div>
+</div>
+<!--Termina modal spinner -->
+<!--================================ Modal para colocar PDF ================================-->
+<div class="modal fade" id="mostrarPdf" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true" style="z-index: 2048;">
+    <div class="modal-dialog" style="width: 90%; height: 700px;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">{{modalTitle}}</h4>
+            </div>
+            <div class="modal-body" id="pdfReferenceContent" style="height: 750px;"></div>
+
+        </div>
+    </div>
+</div>
+<!--================================ End Modal para para colocar PDF ================================-->
+<!-- --------------------------     -- ARQUEO ---------------------------- -->
+<div class="modal fade" id="arqueo" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal" aria-hidden="true">
+    <div class="modal-dialog" style="width: 60%;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Arqueo de caja Folio: {{modalTitle}}</h4>
+            </div>
+            <div class="modal-body" id="cuerpoArqueo" style="">
+                <div class="row" ng-show="!enFirma">
+                    <div class="col-sm-6">
+                        <section id="cajas">
+                            <div class="caja" ng-repeat="moneda in tipoMonedas">
+                                <center><img class="tamanioMoneda" src="{{moneda.imagen}}" alt="{{moneda.nombre}}">
+                                </center>
+                                <center>{{moneda.nombre}}</center> <br>
+                                <input type="number" name="{{moneda.nombre}}" id="{{moneda.id}}" min="0"
+                                    ng-change="datosArqueo(moneda.id, cantidad)" ng-model="cantidad"
+                                    value="0"><br><label for="{{moneda.nombre}}">total =
+                                    {{moneda .suma | currency}}</label>
+                            </div>
+                        </section>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <center>
+                                    <!-- <button type="button"  class="btn btn-info" ng-click="guardarArqueo()">
+                                        <i class="fa fa-floppy-o fa-lg" aria-hidden="true"> &nbsp; Guardar</i>
+                                    </button> -->
+
+                                    <button type="button"  class="btn btn-primary" ng-click="getToken(1, 0)">
+                                        <i class="fa fa-key" aria-hidden="true"></i> &nbsp; Firmar</i>
+                                    </button>
+                                </center>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="row">
+                            <div class="col-11">
+                                <h4> <strong>RESUMEN</strong></h4>
+                                <hr>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <strong>Usuario que realizo el arqueo:</strong>
+                            </div>
+                            <div class="col-sm-7">
+                                {{dataUsuario.nombre}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <strong>Folio del fondo fijo:</strong>
+                            </div>
+                            <div class="col-sm-7">
+                                {{modalFolio}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <strong>Fecha y hora de arqueo:</strong>
+                            </div>
+                            <div class="col-sm-7">
+                                {{modalFecha}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-11">
+                                <h4> <strong> Monto en efectivo:</strong></h4>
+                                <hr>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-11">
+                                <table id="tableArqueo" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Moneda</th>
+                                            <th>Cantidad</th>
+                                            <th>Monto Total</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr ng-repeat="moneda in tipoMonedas">
+                                            <td>{{moneda.nombre}}</td>
+                                            <td>{{moneda.cantidad}}</td>
+                                            <td>{{moneda.suma | currency}}</td>
+                                        </tr>
+                                    </tbody>
+
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="2">Total Arqueo:</td>
+                                            <td> {{sumatoriaArqueo | currency}}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- <div class="row">
+                            <div class="col-sm-3">
+                                <strong>Total Arqueo:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                {{sumatoriaArqueo | currency}}
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+
+                <div class="row" ng-show="enFirma">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-11">
+                                <h4> <strong>RESUMEN</strong></h4>
+                                <hr>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <strong>Usuario que realizo el arqueo:</strong>
+                            </div>
+                            <div class="col-sm-7">
+                                {{dataUsuario.nombre}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <strong>Folio del fondo fijo:</strong>
+                            </div>
+                            <div class="col-sm-7">
+                                {{modalFolio}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <strong>Fecha y hora de arqueo:</strong>
+                            </div>
+                            <div class="col-sm-7">
+                                {{modalFecha}}
+
+                                <br><br>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <table id="tableArqueo" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Moneda</th>
+                                    <th>Cantidad</th>
+                                    <th>Monto Total</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="moneda in tipoMonedas">
+                                    <td>{{moneda.nombre}}</td>
+                                    <td>{{moneda.cantidad}}</td>
+                                    <td>{{moneda.suma | currency}}</td>
+                                </tr>
+                            </tbody>
+
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2">Total Arqueo:</td>
+                                    <td> {{sumatoriaArqueo | currency}}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="col-sm-12" ng-show="!arqueoFirmado">
+                        <div class="row">
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-8">
+                                <p>¿Quieres agregar alguna observación?</p>
+                                <textarea style="width: 100%;" rows="3" ng-model="comentarios"></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-4" style="color: black;">
+                                <p>Token</p>
+                                <p style="font-weight: 600; font-size: 26px;">
+                                    {{ token.token }}<br>
+                                    <span style="font-size: 14px;"><i class="fa fa-clock-o" aria-hidden="true"></i> {{ tiempoRestante }}</span>
+                                    
+                                </p>
+                            </div>
+                            <div class="col-sm-4" style="color: black;">
+                                <p>Introduce tu token</p>
+                                <input class="form-control" style="font-size: 26px; color: black; margin-bottom: 5px;" ng-model="tokenUsuario">
+                                <p>Introduce tu token como una prueba del consentimiento y de verificación de la integridad y aprobación de la información contenida en este documento.</p>
+                                <br><br>
+                            </div>
+                            <div class="col-sm-2">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-8">
+                                <div class="alert alert-{{ panelError.type }}" role="alert" ng-show="panelError.success">
+                                    {{ panelError.msg }}
+                                </div>
+                            </div>
+                            <div class="col-sm-2"></div>
+                        </div>
+                    
+                        <div class="row">
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-4">
+                                <button type="button" class="btn btn-primary" ng-click="editArqueo()">
+                                    <i class="fa fa-chevron-left" aria-hidden="true"></i> &nbsp; Regresar</i>
+                                </button>
+                            </div>
+                            <div class="col-sm-4" style="text-align: right;">
+                                <button type="button"  class="btn btn-success" ng-click="validateToken()" style="float: right; right: 0; position: absolute;">
+                                    <i class="fa fa-floppy-o fa-lg" aria-hidden="true"> &nbsp; Guardar</i>
+                                </button>
+                            </div>
+                            <div class="col-sm-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12" ng-show="arqueoFirmado">
+                        <div class="row">
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-8" style="color: black; text-align: center;">
+                                <p>Firma por token</p>
+                                <p style="font-weight: 600; font-size: 26px;">
+                                    {{ datosFirma.token }}<br>
+                                    <span style="font-size: 14px;">{{ datosFirma.firmante }}</span><br>
+                                    <span style="font-size: 14px;">{{ datosFirma.fechaFirma }}</span>
+                                </p>
+                                <br><br>
+                            </div>
+                            <div class="col-sm-2">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-8">
+                                <div class="alert alert-{{ panelError.type }}" role="alert" ng-show="panelError.success">
+                                    {{ panelError.msg }}
+                                </div>
+                            </div>
+                            <div class="col-sm-2"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- VISUALIZACION DE VALES -->
+<div class="modal fade" id="viewVales" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width: 90%; height: 700px;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">{{modalTitle}}</h4>
+            </div>
+            <div class="modal-body" id="pdfReferenceContentTable" style="max-height: 350px;">
+                <div class="row">
+                    <div class="col-sm-2">
+                        <label for="tipoVale">Selecciona el estatus de vale a consultar</label>
+                    </div>
+                    <div class="col-sm-2">
+                        <select class="form-control" ng-model="tipoVale" id="tipoVale"
+                            ng-options="cat.id as cat.descripcion for cat in catalogoVales"
+                            ng-change="buscaTipoVale()">
+                        </select>
+                    </div>
+                    
+                </div>
+                <div class="row">
+                    <div class="col-11">
+                        <table id="valesEvidencia" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Id vale</th>
+                                    <th>Fecha expedición</th>
+                                    <th>Solicitante</th>
+                                    <th> <center>Cantidad</center> </th>
+                                    <th> <center>Comprobada</center> </th>
+                                    <th> <center>Por comprobar</center> </th>
+                                    <th> <center>Reembolso</center> </th>
+                                    <th> <center>Evidencia</center> </th>
+                                    <th> <center>Vale</center> </th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="ev in evidenciasVales">
+                                    <td>{{ev.idVale}}</td>
+                                    <td>{{ev.fechaExpedicion}}</td>
+                                    <td>{{ev.solicitante}}</td>
+                                    <td> <center>{{ev.cantidad | currency}}</center> </td>
+                                    <td> <center>{{ev.comprobada | currency}}</center> </td>
+                                    <td> <center>{{ev.porComprobar | currency}}</center> </td>
+                                    <td> <center>{{ev.reembolso}}</center> </td>
+                                    <td> 
+                                        <center>
+                                            <div style="width: 100%; text-align: center;">
+                                                <button class="btn btn-circle" ng-click="verEvidencia(ev.url)">
+                                                    <i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </div>     
+                                        </center>
+                                    </td>
+                                    <td> 
+                                        <center>
+                                            <div style="width: 100%; text-align: center;">
+                                                <button class="btn btn-circle" ng-click="verEvidencia(ev.urlVale)">
+                                                    <i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </div>     
+                                        </center>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row" ng-if="urlEvidencia !== ''">
+                <div class="col-11" style="padding: 15px;">
+                    <button class="btn " ng-click="cerrarEvidencia()"><i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>Cerrar</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-11" id="viewEvidencia" style="height: 50px;">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- VISUALIZACION DE COPROBACIONES -->
+<div class="modal fade" id="viewComprobaciones" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width: 90%; height: 700px;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">{{modalTitle}}</h4>
+            </div>
+            <div class="modal-body" id="pdfReferenceContentView" style="max-height: 350px;">
+                <div class="row">
+                    <div class="col-sm-2">
+                        <label for="tipoVale">Selecciona el estatus de la comprobación a consultar</label>
+                    </div>
+                    <div class="col-sm-2">
+                        <select class="form-control" ng-model="tipoComprobacion" id="tipoComprobacion"
+                            ng-options="cat.id as cat.descripcion for cat in catalogoCompmrobaciones"
+                            ng-change="buscaTipoComprobacion()">
+                        </select>
+                    </div>
+                    
+                </div>
+                <div class="row">
+                    <div class="col-11">
+                        <table id="comprobacionEvidencia" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Factura o vale</th>
+                                    <th>Concepto</th>
+                                    <th>Proveedor</th>
+                                    <th>Fecha</th>
+                                    <th> <center>Cantidad</center> </th>
+                                    <th></th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="ev in evidenciasComprobaciones">
+                                    <td>{{ev.factura}}</td>
+                                    <td>{{ev.concepto}}</td>
+                                    <td>{{ev.proveedor}}</td>
+                                    <td> <center>{{ev.fecha}}</center> </td>
+                                    <td> <center>{{ev.cantidad | currency}}</center> </td>
+                                    <td> 
+                                        <center>
+                                            <div style="width: 100%; text-align: center;">
+                                                <button class="btn btn-circle" ng-click="verEvidenciaCompro(ev.url)">
+                                                    <i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </div>     
+                                        </center>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row" ng-if="urlEvidencia !== ''">
+                <div class="col-11" style="padding: 15px;">
+                    <button class="btn " ng-click="cerrarEvidenciaCompro()"><i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>Cerrar</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-11" id="viewEvidenciaCompro" style="height: 50px;">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- VISUALIZACION DE REEEMBOLSOS -->
+<div class="modal fade" id="viewReembolsos" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width: 90%; height: 700px;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">{{modalTitle}}</h4>
+            </div>
+            <div class="modal-body" id="pdfReferenceContentView" style="max-height: 1550px;">
+                <div class="row">
+                    <div class="col-11">
+                        <table id="Reembolsos" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Id Reembolso</th>
+                                    <th>Monto</th>
+                                    <th>Fecha Solicitud</th>
+                                    <th></th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="ev in reembolsosFondo">
+                                    <td>{{ev.idReembolso}}</td>
+                                    <td>{{ev.monto  | currency}}</td>
+                                    <td>{{ev.fecha}}</td>
+                                    <td> 
+                                        <center>
+                                            <div style="width: 100%; text-align: center;">
+                                                <button class="btn btn-circle" ng-click="obtieneEvidenciasReembolsoTramite(ev.idReembolso)">
+                                                    <i class="fa fa-bars fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </div>     
+                                        </center>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row" ng-if="tablaReembolso == 1">
+                    <h3 class="pull-left" style="padding: 15px;">Evidencias Reembolso N° {{idTramiteReembolso}}</h3>
+                    <div class="pull-right" style="padding: 15px;">
+                        <button class="btn " ng-click="cerrarReembolso()"><i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>Cerrar</button>
+                    </div>
+                                <table id="tableEvidencias" class="table table-bordered" cellspacing="0"
+                                width="100%">
+                                  <thead>
+                                    <tr>
+                                        <th>Tipo Gasto</th>
+                                        <th>Estatus</th>
+                                        <th>Importe</th>
+                                        <th>IVA</th>
+                                        <th>Total</th>
+                                        <th>Motivo</th>
+                                        <th>Correción</th>
+                                        <th> </th>
+                                        <th> </th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr ng-repeat="item in evidenciasReembolso">
+                                        <td>{{item.tipoGasto}}</td>
+                                        <td>{{item.estatusReembolsoFinanzas}}</td>
+                                        <td>{{item.importe | currency}}</td>
+                                        <td>{{item.IVA | currency}}</td>
+                                        <td>{{item.monto | currency}}</td>
+                                        <td>{{item.motivo}}</td>
+                                        <td>{{item.correccion}}</td>
+                                        <td>
+                                        <button class="btn btn-circle btn-cir-view" ng-click="verEvidenciaReembolso(item.urlEvidencia)">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                        </button>
+                                       </td>              
+                                    </tr>      
+                                  </tbody>
+                                </table>
+                </div>
+                <div class="row" ng-if="urlReembolso !== ''">
+                    <div class="col-11" style="padding: 15px;">
+                        <button class="btn " ng-click="cerrarEvidenciaReembolso()"><i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>Cerrar</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-11" id="viewEvidenciaReembolso" style="height: 50px;">
+                    </div>
+                </div>
+
+            </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Carga reporte firmado -->
+<div class="modal fade" id="viewCargaReporte" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width: 50%; height: 700px;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">{{modalTitle}}</h4>
+            </div>
+            <div class="modal-body" id="pdfReferenceContentRep" style="max-height: 350px;">
+                <div class="row">
+                    <div class="col-sm-12 form-inline">
+                        <label class="labelIdCliente">Reporte de arqueo:</label>
+                        <br>
+                        <div>
+                            <div class="col-md-2">
+                                <button class="btn btn-circle btn-cir-view" ng-click="verPdf(documento)" ng-disabled = "documento.archivo === '' " title="Ver reporte firmado">
+                                    <i style="color: #62A3EB;" class="fa fa-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <div class="col-md-7">
+                                <center>
+                                    <span ng-class="{adjuntado: documento.archivo == '', noadjuntado: documento.archivo != ''}">*</span>&nbsp;
+                                    <label class="documentosLabel" style="margin: 0; padding-top: 5px;">Subir reporte de arqueo firmado</label>    
+                                </center>
+                                
+                            </div>
+                            <div class="col-md-2 picture-container">
+                                <div class="picture ">
+
+                                    <img style="width: 100%" src="../images/autorizacion@2x.png" title="Documento Adjuntado"
+                                        ng-show="documento.archivo !== '' " />
+                                    <img style="width: 100%" src="../images/subir@2x.png" class="picture-src"
+                                        ng-show="documento.archivo === '' " title="Subir Archivo" />
+                                    <input type="file" ng-model="documento.archivo" id="wizard-picture"
+                                        ng-file-select="onFileSelect($files)" class="picture"
+                                        accept="{{documento.ext_nombre == 'pdf' ? 'application/pdf': 'image/'+ documento.ext_nombre  }}">
+                                </div>                   
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <center>
+                            <button class="btn btnNuevos" style="width: 18%" ng-disabled ="documento.archivo === ''"
+                            ng-click="guardarEvidencia()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Guardar
+                        </button>
+                        </center>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="row" ng-if="urlEvidencia !== ''">
+                <div class="col-11" style="padding: 15px;">
+                    <button class="btn " ng-click="cerrarEvidenciaCompro()"><i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>Cerrar</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-11" id="viewEvidenciaCompro" style="height: 50px;">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="viewhistoricoCargado" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width: 90%; height: 700px;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Arqueos Guardados</h4>
+            </div>
+            <div class="modal-body" id="body" style="max-height: auto;">
+                <div class="row">
+                    <div class="col-11">
+                        <div ng-show="loadPDF">
+                            <h1 style="text-align: center;">Cargando PDF... </h1>
+                        </div>
+
+                        <table ng-show="!loadPDF" id="historicoEvidencias" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="width: 15px;"><center>No.</center></th>
+                                    <th> <center>Fecha de carga</center></th>
+                                    <th> <center>Subio arqueo</center> </th>
+                                    <th> <center>archivo</center> </th>
+                                    <th> <center>Responsable</center></th>
+                                    <th> <center>Consultar</center></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="his in historico">
+                                    <td> <center>{{his.Row}}</center> </td>
+                                    <td> <center>{{his.fecha}}</center> </td>
+                                    <td> <center>{{his.usuarioCarga}}</center> </td>
+                                    <td> <center>{{his.nombreArchivo}}</center> </td>
+                                    <td> <center>{{his.usuarioResponsable}}</center> </td>
+                                    <td> 
+                                        <center>
+                                            <div style="width: 100%; text-align: center;">
+                                                <button ng-show="his.tipoDocumento == 0" class="btn btn-circle" ng-click="verEvidenciaHistorico(his.ruta, his.nombreArchivo)">
+                                                    <i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>
+                                                </button>
+
+                                                <button ng-show="his.tipoDocumento == 1" class="btn btn-circle" ng-click="viewArqueo(his.id)">
+                                                    <i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </div>     
+                                        </center>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+                <!-- <div class="row" ng-if="urlEvidenciaHistorico !== ''">
+                    <div class="col-11" style="padding: 15px;">
+                        <button class="btn " ng-click="cerrarEvidenciaCompro()"><i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>Cerrar</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-11" id="viewEvidenciaCompro" style="height: 50px;">
+                    </div>
+                </div> -->
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalReembolsos" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width: 90%; height: 700px;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Estatus Reembolsos</h4>
+            </div>
+            <div class="modal-body" id="body" style="max-height: auto;">
+                <div class="row">
+                    <div class="col-11">
+                        <h3  >Finanzas</h3>
+                        <div  class="form-group col-sm-12" style="height:200px; overflow:auto;"> 
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                   
+                                    <th> <center>Reembolso</center></th>
+                                    <th> <center>Estatus Finanzas</center> </th>
+                                    <th> <center>Fecha Reembolso</center> </th>
+                                    <th> <center>Solicitante</center></th>
+                                    <th> <center>Motivo</center></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="est in reembolsosFinanzas">
+                                    
+                                    <td> <center>{{est.id_perTraReembolso}}</center> </td>
+                                    <td> <center>{{est.estatusfinanzas}}</center> </td>
+                                    <td> <center>{{est.fechatramite}}</center> </td>
+                                    <td> <center>{{est.nombre}}</center> </td>
+                                    <td> <center>{{est.motivo}}</center> </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    </div>
+                    <div class="col-11">
+                        <h3>Tesorería</h3>
+                        <div  class="form-group col-sm-12" style="height:200px; overflow:auto;"> 
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                   
+                                    <th> <center>Tramite</center></th>
+                                    <th> <center>Nombre Tramite</center> </th>
+                                    <th> <center>Fecha Tramite</center> </th>
+                                    <th> <center>Solicitante</center></th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="est in reembolsosTesoreria">
+                                    
+                                    <td> <center>{{est.id_perTra}}</center> </td>
+                                    <td> <center>{{est.tra_nomTramite}}</center> </td>
+                                    <td> <center>{{est.petr_fechaTramite}}</center> </td>
+                                    <td> <center>{{est.nombre}}</center> </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalRechazosFinanzas" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width: 90%; height: 700px;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Rechazos Finanzas</h4>
+            </div>
+            <div class="modal-body" id="body" style="max-height: auto;">
+                <div class="row">             
+                    <div class="col-11">
+                        <div  class="form-group col-sm-12" style="height:400px; overflow:auto;"> 
+                        <table id="rechazosdeFinanzas" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                   
+                                    <th> <center>Empresa</center></th>
+                                    <th> <center>Sucursal</center> </th>
+                                    <th> <center>Vale</center> </th>
+                                    <th> <center>Solicitante</center></th>
+                                    <th> <center>Monto Solicitado</center></th>
+                                    <th> <center>Monto Rechazado</center></th>
+                                    <th> <center>Fecha Vale</center></th>
+                                    <th> <center>Corrección</center></th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="est in RechazosFinanzas">
+                                    
+                                    <td> <center>{{est.empresa}}</center> </td>
+                                    <td> <center>{{est.sucursal}}</center> </td>
+                                    <td> <center>{{est.vale}}</center> </td>
+                                    <td> <center>{{est.solicitante}}</center> </td>
+                                    <td> <center>{{est.solicitado | currency}}</center> </td>
+                                    <td> <center>{{est.montoRechazo | currency}}</center> </td>
+                                    <td> <center>{{est.FechaVale}}</center> </td>
+                                    <td> <center>{{est.correccion}}</center> </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalDescuentoNomina" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width: 90%; height: 700px;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Descuento Nomina</h4>
+            </div>
+            <div class="modal-body" id="body" style="max-height: auto;">
+                <div class="row">        
+                    <div class="col-11">
+                        <div  class="form-group col-sm-12" style="height:400px; overflow:auto;"> 
+                        <table id="descuentoNominaVales" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                   
+                                    <th> <center>Vale</center></th>
+                                    <th> <center>Empleado</center> </th>
+                                    <th> <center>ID_RH</center> </th>
+                                    <th> <center>RFC</center></th>
+                                    <th> <center>Lugar de Trabajo</center></th>
+                                    <th> <center>Por Descontar</center></th>
+                                    <th> <center>Referencia</center></th>
+                                    <th> <center>Fecha Vale</center></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="est in descuentoNomina">
+                                    
+                                    <td> <center>{{est.vale}}</center> </td>
+                                    <td> <center>{{est.empleado}}</center> </td>
+                                    <td> <center>{{est.id_rh}}</center> </td>
+                                    <td> <center>{{est.rfc}}</center> </td>
+                                    <td> <center>{{est.lugarTrabajo}}</center> </td>
+                                    <td> <center>{{est.pordescontar | currency}}</center> </td>
+                                    <td> <center>{{est.referencia}}</center> </td> 
+                                    <td> <center>{{est.FechaVale}}</center> </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEstatusVales" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width: 90%; height: 700px;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Estatus Vales</h4>
+            </div>
+            <div class="modal-body" id="body" style="max-height: auto;">
+                <div class="row">             
+                    <div class="col-11">
+                        <div  class="form-group col-sm-12" style="height:400px; overflow:auto;"> 
+                        <table id="estatusVales" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                   
+                                    <th> <center>Empresa</center></th>
+                                    <th> <center>Sucursal</center> </th>
+                                    <th> <center>Vale</center> </th>
+                                    <th> <center>Monto Vale</center></th>
+                                    <th> <center>Estatus Vale</center></th>
+                                    <th> <center>Fecha Entrega Efectivo</center></th>
+                                    <th> <center>Comprobación</center></th>
+                                    <th> <center>Monto Comprobación</center></th>
+                                    <th> <center>Estatus Comprobación</center></th>
+                                    <th> <center>Fecha Comprobación</center></th>
+                                    <th> <center>Fecha Aceptación Caja</center></th>
+                                    <th> <center>Fecha Rechazo Caja</center></th>
+                                    <th> <center>Fecha Renuncia</center></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="est in EstatusVales">
+                                    
+                                    <td> <center>{{est.empresa}}</center> </td>
+                                    <td> <center>{{est.sucursal}}</center> </td>
+                                    <td> <center>{{est.vale}}</center> </td>
+                                    <td> <center>{{est.montoVale | currency}}</center> </td>
+                                    <td> <center>{{est.estatus}}</center> </td>
+                                    <td> <center>{{est.fechaEntregaEfectivo}}</center> </td>
+                                    <td> <center>{{est.idComprobacionVale}}</center> </td>
+                                    <td> <center>{{est.montoComprobacion | currency}}</center> </td>
+                                    <td> <center>{{est.estatusComprobacion}}</center> </td>
+                                    <td> <center>{{est.fechaComprobacion}}</center> </td>
+                                    <td> <center>{{est.fechaAprobacionCaja}}</center> </td>
+                                    <td> <center>{{est.fechaRechazoCaja}}</center> </td>
+                                    <td> <center>{{est.fechaRenunciaComprobacion}}</center> </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalCajeroEspejo" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width: 90%; height: 700px;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Configuración Cajero Espejo</h4>
+            </div>
+            <div class="modal-body" id="body" style="max-height: auto;">
+                <div class="row">             
+                    <div class="col-11">
+                        <div  class="form-group col-sm-12" style="height:400px; overflow:auto;"> 
+                        <table id="cajeroEspejo" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                   
+                                    <th> <center>Empresa</center></th>
+                                    <th> <center>Sucursal</center> </th>
+                                    <th> <center>Fondo Fijo</center> </th>
+                                    <th> <center>Responsable</center></th>
+                                    <th> <center>Espejo</center></th>
+                                    <th> <center>Estatus</center></th>
+                                    <th> <center>Fecha</center></th>
+                                    <th> </th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="est in cajeroEspejo">
+                                    
+                                    <td> <center>{{est.empresa}}</center> </td>
+                                    <td> <center>{{est.sucursal}}</center> </td>
+                                    <td> <center>{{est.idFondoFijo}}</center> </td>
+                                    <td> <center>{{est.Responsable}}</center> </td>
+                                    <td> <center>{{est.Espejo}}</center> </td>
+                                    <td> <center>{{est.estatus}}</center> </td>
+                                    <td> <center>{{est.Fecha}}</center> </td>
+                                    <td> 
+                                        <center>
+                                            <div style="width: 100%; text-align: center;">
+                                                <input ng-disabled="autoriza == 0" type="button" class="btn btn-primary" value ={{est.boton}}  ng-click="actualizaUsuarioEspejo(est)">
+                                            </div>     
+                                        </center>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalEstatusFF" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width: 90%; height: 700px;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Estatus Fondos Fijos</h4>
+            </div>
+            <div class="modal-body" id="body" style="max-height: auto;">
+                <div class="row">             
+                    <div class="col-11">
+                        <div  class="form-group col-sm-12" style="height:400px; overflow:auto;"> 
+                        <table id="estatusFF" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                   
+                                    <th> <center>Empresa</center></th>
+                                    <th> <center>Sucursal</center> </th>
+                                    <th> <center>Tramite</center> </th>
+                                    <th> <center>Fondo Fijo</center> </th>
+                                    <th> <center>Importe</center> </th>
+                                    <th> <center>Responsable</center></th>
+                                    <th> <center>Salida</center></th>
+                                    <th> <center>Estatus</center></th>
+                                    <th> <center>Comprobante</center></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="est in estatusFF">
+                                    
+                                    <td> <center>{{est.empresa}}</center> </td>
+                                    <td> <center>{{est.sucursal}}</center> </td>
+                                    <td> <center>{{est.idtramite}}</center> </td>
+                                    <td> <center>{{est.fondofijo}}</center> </td>
+                                    <td> <center>{{est.monto | currency}}</center> </td>
+                                    <td> <center>{{est.resposable}}</center> </td>
+                                    <td> <center>{{est.salida}}</center> </td>
+                                    <td> <center>{{est.estatus}}</center> </td>
+                                    <td> 
+                                        <center>
+                                            <div ng-show= "est.comprobante != ''" style="width: 100%; text-align: center;">
+                                                <button class="btn btn-circle" ng-click="verEvidenciaOP(est.comprobante)">
+                                                    <i class="fa fa-bars fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </div>     
+                                        </center>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+                <div class="row" ng-if="urlEvidenciaOP !== ''">
+                    <div class="col-11" style="padding: 15px;">
+                        <button class="btn " ng-click="cerrarEvidenciaOP()"><i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>Cerrar</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-11" id="viewEvidenciaOP" style="height: 50px;">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

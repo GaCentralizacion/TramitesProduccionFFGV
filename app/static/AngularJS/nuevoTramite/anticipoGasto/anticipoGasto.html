@@ -1,0 +1,52 @@
+<div ng-init="init()">
+    <div class="row">
+        <div class="col-md-12">
+            <newcomprobacion-Gasto ng-if="accionFormulario == 1"></newcomprobacion-Gasto>
+            <newsolicitud-Gasto ng-if="accionFormulario == 0"></newsolicitud-Gasto>
+        </div>
+    </div>
+</div>
+
+<!--Inicia modal Deptos -->
+<!--===================================================-->
+<div class="modal fade" id="modalConfirmarAccion" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                <h4 class="modal-title text-white">¿Que desea hacer?</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="margin-top: 1%; margin-left:0%; margin-bottom:1%;">
+                    <div class="col-sm-6 form-inline" style="text-align: left;">
+                        Puede seguir modificando la solicitud.
+                    </div>
+                    <div class="col-sm-6 form-inline" style="text-align: left;">
+                        Al iniciar la comprobación de gasto, ya no podra volver a modificar la solicitud.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 0%; margin-right:1%;">
+                <div class="row" style="margin-top: 1%; margin-left:0%; margin-bottom:1%;">
+                    <div class="col-sm-6 form-inline" style="text-align: left;">
+                        <button class="btn btnNuevos" ng-click="confirmarAccion(0)">
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            Modificar Solicitud
+                        </button>
+                    </div>
+                    <div ng-show = "comprobar == 1 || comprobar == 2 || comprobar == 3" class="col-sm-6 form-inline" style="text-align: right;">
+                        <button class="btn btnNuevos" ng-click="confirmarAccion(1)">
+                            <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                            Comprobar Gasto
+                        </button>
+                    </div>
+                    <div  ng-show = "comprobar == 0" class="col-sm-6 form-inline" style="text-align: left;">
+                            No se a indicado la salida de Efectivo.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

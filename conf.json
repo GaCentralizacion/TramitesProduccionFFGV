@@ -1,0 +1,16 @@
+{
+    "port": 4010,
+    "SQL_user": "sa",
+    "SQL_password": "S0p0rt3",
+    "SQL_server": "192.168.20.123",
+    "SQL_database": "Tramites",
+    "SQL_connectionTimeout": 60000,
+    "apiNotificaciones": "http://192.168.20.123:5007/",
+    "enviaDescuentoNomina": "*/1 * * * 1-6",
+    "urlCORS": "http://192.168.20.123:4010/",
+    "WSGeneraPdf": "http://192.168.20.123:8091/WS_Gen_Pdf.asmx?WSDL",
+    "envioCorreoAM": "01 9 * * 1-6",
+    "envioCorreoPM": "01 18 * * 1-5",
+    "envioCorreoTesoreria": "01 17 * * 1-5",
+    "obtenerDetalleOCPendientesFF": "30 11 * * 1-5"
+}
