@@ -1,0 +1,62 @@
+<link rel="stylesheet" href="css/documentos/documento.css">
+<link rel="stylesheet" href="css/generic.css">
+<div ng-init="init()" class="col-md-12" style="height: 100px; background-color: white;">
+    <label class="labelDocs"> 
+        <span> 
+            <img class="imgSubHeader" src="../../img/iconos/alta@2x.png"> 
+        </span> Alta de documentos
+    </label>
+</div>
+
+<div class="col-md-12">
+    <div class="divPrincipal col-md-4">
+        <div class="middle-box">
+            <form class="m-t" role="form">
+                <div class="form-group">
+                    <label class="labelDocumentos">Nombre del documento</label>
+                    <input type="text" class="form-control" placeholder="Nombre" ng-model="doc.nombre">
+                </div>
+                <div class="form-group">
+                    <label class="labelDocumentos">Extensión</label>
+                    <select class="form-control" ng-model="doc.extension"
+                        ng-options="extension.id_extension as extension.ext_nombre for extension in extensiones">
+                        <option value="">Seleccioné extensión</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="container"> ¿Requiere revisar fecha de expiracion?
+                        <input type="checkbox" ng-model="doc.expiracion">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="container"> ¿Requiere informacion adicional?
+                        <input type="checkbox" ng-model="doc.plusInfo">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <div class="form-group" ng-show="doc.plusInfo">
+                    <label class="labelDocumentos">Informacion adicional</label>
+                    <input type="text" class="form-control" placeholder="Informacion adicional"
+                        ng-model="doc.infAdicional">
+                </div>
+                <button type="submit" class="btn save-button" ng-click="saveDocumento()"
+                    ng-disabled="doc.nombre == ''">
+                    Guardar Documento
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--Inicia modal spinner -->
+<!--===================================================-->
+<div id="loading" class="modal fade" tabindex="-1" data-focus-on="input:first">
+    <div class="modal-dialog modal-lg">
+        <div class="spinner">
+            <div class="cube1"></div>
+            <div class="cube2"></div>
+        </div>
+    </div>
+</div>
+<!--Termina modal spinner -->

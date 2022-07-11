@@ -1,0 +1,405 @@
+﻿<link rel="stylesheet" href="css/generic.css">
+<link rel="stylesheet" href="css/nuevoTramite/nuevoTramite.css">
+<style>
+        .form-control {
+            width: 100% !important;
+            border-radius: 20px;
+        }
+        #btnBuscar
+        {
+            border-radius: 10px;
+        }
+        </style>
+<div ng-init="init()">
+        <div class="col-md-12" style="height: 100px; background-color: white;">
+                <label class="labelDocs" ng-show="frmlistVales">
+                        <span>
+                            <img class="imgSubHeader" src="../../img/iconos/resumen@2x.png">
+                        </span>
+                        Resumen de Vales
+                </label>
+                <label class="labelDocs" ng-show="aprobarVale">
+                    <span>
+                        <img class="imgSubHeader" src="../../img/iconos/devolucion@2x.png">
+                    </span> Aprobar Vale
+                </label>
+            </div>
+    <div class="row">
+    <div class="col-md-12">
+        <div class="divPrincipal col-md-10">
+            <div class="middle-box">
+                <div class="row">
+                    <div class="col-sm-12" ng-show="frmlistVales">
+                            <table id="tableVale" class="table table-striped table-bordered" cellspacing="0"
+                                    width="100%">
+                                    <thead>
+                                      <tr>
+                                        <th>Responsable del vale</th>
+                                        <th>Id Vale</th>
+                                        <th>Id Fondo Fijo</th>
+                                        <th>Fecha vale</th>
+                                        <th>Importe solicitado</th>
+                                        <th>Importe comprobado</th>
+                                        <th>Estatus</th>
+                                        <th>Atender</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                          <tr ng-repeat="item in listaVF">
+                                                  <td>{{item.responsble}}</td>
+                                                  <td>{{item.nombreVale}}</td>
+                                                  <td>{{item.idFondoFijo}}</td>
+                                                  <td>{{item.fechaCreacion}}</td>
+                                                  <td> {{item.montoSolicitado}} &nbsp;&nbsp;
+                                                  <span style="font-size: large; color: orange;" ng-show="item.montoSolicitado > 2000" class="fa fa-exclamation-triangle" aria-hidden="true"></span>
+                                                  </td>
+                                                  <td>{{item.Justificar}}</td>
+                                                  <td>{{item.estatus}}</td>
+                                                  <!-- <td><button type="button" ng-click="autorizarVale(item)" data-toggle="tooltip" title="Autorización" class="btn btn-info btn-icon"><i class="fa fa-check-square-o"></i></button></td> -->
+                                                  <td>
+                                                        <div style="width: 100%; text-align: center;">
+                                                            <button class="btn btn-circle" ng-click="autorizarVale(item)">
+                                                                <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                                                            </button>
+                                                        </div>
+                                                  </td>
+                                                </tr>    
+                                    </tbody>
+                            </table>
+                    </div> 
+                    <div class="col-sm-12" ng-show="aprobarVale">                   
+                            <div class="row" >
+                                    <div class="col-md-4" style="border-bottom: 1px solid #A0C9F7; margin-top: 15px;">
+                                        <div class="col-sm-11 form-inline" style="margin-bottom: 5px;">
+                                            <label class="labelIdClienteText">{{modalTitleAV}}</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="pull-right">
+                                                <h4>Proceso:</h4>
+                                                <div ng-repeat="estatus in allEstatusVales"
+                                                    ng-class="{arrowRightActive: idestatus >= estatus.idEstatus, arrowRight: idestatus < estatus.idEstatus}">
+                                                    <div class="row">
+                                                        <div class="col-md-5">
+                                                            <img style="width: 90%; margin-top: 10px; margin-left:15px;" ng-src="{{estatus.icono}}">
+                                                        </div>
+                                                        <div class="col-md-7">
+                                                            <div class="divPadreCenter">
+                                                                <div class="divHijoCenter">
+                                                                    <label style="font-size:10px; text-align: left;">{{estatus.descripcion}}</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div> 
+                                    </div>
+                            </div> 
+                        <div class="modal-body">
+                                                <div class="col-sm-12 form-inline" > 
+                                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6"> 
+                                                                <div class="form-group col-sm-12">
+                                                                    <label class="col-md-4">Fondo Fijo</label>
+                                                                    <div class="col-md-8">
+                                                                            <input disabled class="form-control" ng-model="FondoFijoVale" type="text">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group col-sm-12">  
+                                                                        <label class="col-md-4">Importe a solicitar</label>
+                                                                            <div class="col-md-8">
+                                                                                <input disabled currency-mask class="form-control" ng-model="importeValeFF" type="text">
+                                                                        </div>
+                                                                </div>
+                                                                <!-- <div class="form-group col-sm-12"  ng-hide="idestatus == 5">  
+                                                                        <label class="col-md-4">Evidencia</label>
+                                                                        <div class="col-md-8">
+                                                                                <div ng-show="idestatus == 1" class="col-md-2 picture-container">
+                                                                                        <div class="picture">
+                                                                                            <img ng-hide="EvidenciaVale != ''" style="width: 100%" src="../images/autorizacion@2x.png" title="Documento Adjuntado"/> 
+                                                                                            <img ng-hide="EvidenciaVale == ''" style="width: 100%" src="../images/subir@2x.png" class="picture-src"
+                                                                                                title="Subir Archivo" />
+                                                                                            <input type="file" ng-model="EvidenciaVale" id="wizard-picture"
+                                                                                                ng-file-select="onFileSelect($files)" class="picture"
+                                                                                                accept="application/pdf">
+                                                                                        </div>
+                                                                                </div>
+                                                                                <button class="btn btn-circle btn-cir-view" ng-click="verPdfValeAutorizado(urlValeAutorizadoEvidencia)"
+                                                                                ng-show="idestatus != 1" data-toggle="tooltip" title="Ver" >
+                                                                                <i style="color: #62A3EB;" class="fa fa-eye" aria-hidden="true"></i>
+                                                                                </button>
+                                                                        </div>
+                                                                </div> -->
+                                                                <div  class="form-group col-sm-12" ng-show="idestatus == 5" >  
+                                                                        <label class="col-md-4">Motivo rechazo
+                                                                        </label>
+                                                                            <div class="col-md-8">
+                                                                                    <textarea disabled ng-model="motivoRechazo"  class="form-control"></textarea>
+                                                                        </div>
+                                                                </div>
+
+                                                        </div>
+                                                        
+                                                     
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6"> 
+                                                            <!-- <div class="form-group col-sm-12">
+                                                                <label class="col-md-4">Tipo de gasto</label>
+                                                                <div class="col-md-8">
+                                                                        <input disabled class="form-control" ng-model="tipoGastoVale" type="text">
+                                                                </div>
+                                                            </div> -->
+                                                            <div class="form-group col-sm-12">
+                                                                    <label class="col-md-4">Razón Solicitud</label>
+                                                                    <div class="col-md-8">
+                                                                        <textarea disabled ng-model="razonVale"   class="form-control"></textarea>
+                                                                    </div>
+                                                            </div>
+                                                    </div>
+                                                    </div>
+                                                    
+                                                    <div ng-show= "verEvidencias" class="col-sm-12 form-inline">
+                                                        <div class="col-sm-12" style="text-align: center">
+                                                            <h3>Evidencias</h3>
+                                                        <br>
+                                                        </div>     
+                                                        <table ng-show="verComprobacion" class="table table-bordered">
+                                                              <thead>
+                                                                <tr> 
+                                                                  <th>Id Comprobación</th>
+                                                                  <th>Estatus</th>
+                                                                  <th>Tipo de Evidencia</th>
+                                                                  <th>IVA</th>
+								  <th>Importe</th>
+                                                                  <th>Fecha</th>
+                                                                  <th>¿Es factura?</th>
+                                                                  <th> </th>
+                                                                </tr>
+                                                              </thead>
+                                                              <tbody>
+                                                                <tr ng-repeat="item in listaVales">
+                                                                  <td>{{item.idComprobacionVale}}</td>
+                                                                  <td>{{item.estatus}}</td>
+                                                                  <td>{{item.tipoEvidencia}}</td>
+								  <td>{{item.monto / 1.16}}</td>
+                                                                  <td>{{item.monto}}</td>
+                                                                  <td>{{item.fechaCreacion}}</td>
+                                                                  <td>{{item.esFactura}}</td>
+                                                                  <td>
+                                                                    <button class="btn btn-circle btn-cir-view" ng-click="verPdf(item)"
+                                                                        ng-if="item.tipoEvidencia == pdf">
+                                                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                                                    </button>
+                                                                    <button class="btn btn-circle btn-cir-view" ng-click="verImagenModal(item)"
+                                                                        ng-if="item.tipoEvidencia != pdf">
+                                                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                                                    </button>
+                                                                    <!-- <button type="button" ng-show="item.idestatus == 1" ng-click="AutorizarRechazarEvidencia(item,2)" data-toggle="tooltip" title="Autorización" class="btn btn-info btn-icon">
+                                                                        <i class="fa fa-check-square-o"></i>
+                                                                    </button>
+                                                                    <button type="button" ng-show="item.idestatus == 1" ng-click="modalComentarios(item,3)" data-toggle="tooltip" title="Rechazar" class="btn btn-info btn-icon">
+                                                                        <i class="fa fa-times"></i>
+                                                                    </button> -->
+                                                                  </td>
+                                                                </tr> 
+                                                              </tbody>
+                                                            </table>
+                                                            <table ng-show="verComprobacionMas" class="table table-bordered">
+                                                                <thead>
+                                                                  <tr>
+                                                                    <th>Id Comprobación</th>
+                                                                    <th>Estatus</th>
+                                                                    <th>Tipo de Evidencia</th>
+                                                                    <th>IVA</th>
+								    <th>Importe</th>
+                                                                    <th>Monto en exceso por autorizar</th>
+                                                                    <th>Fecha</th>
+                                                                    <th>¿Es factura?</th>
+                                                                    <th> </th>
+                                                                  </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                  <tr ng-repeat="item in listaVales">
+                                                                    <td>{{item.idComprobacionVale}}</td>
+                                                                    <td>{{item.estatus}}</td>
+                                                                    <td>{{item.tipoEvidencia}}</td>
+                                                                    <td>{{item.monto}}</td>
+								    <td>{{item.monto / 1.16}}</td>
+                                                                    <td>{{item.comprbacionMas}}</td>
+                                                                    <td>{{item.fechaCreacion}}</td>
+                                                                    <td>{{item.esFactura}}</td>
+                                                                    <td>
+                                                                      <button class="btn btn-circle btn-cir-view" ng-click="verPdf(item)"
+                                                                          ng-if="item.tipoEvidencia == pdf">
+                                                                          <i class="fa fa-eye" aria-hidden="true"></i>
+                                                                      </button>
+                                                                      <button class="btn btn-circle btn-cir-view" ng-click="verImagenModal(item)"
+                                                                          ng-if="item.tipoEvidencia != pdf">
+                                                                          <i class="fa fa-eye" aria-hidden="true"></i>
+                                                                      </button>
+                                                                      <!-- <button type="button" ng-show="item.idestatus == 1" ng-click="AutorizarRechazarEvidencia(item,2)" data-toggle="tooltip" title="Autorización" class="btn btn-info btn-icon">
+                                                                          <i class="fa fa-check-square-o"></i>
+                                                                      </button>
+                                                                      <button type="button" ng-show="item.idestatus == 1" ng-click="modalComentarios(item,3)" data-toggle="tooltip" title="Rechazar" class="btn btn-info btn-icon">
+                                                                          <i class="fa fa-times"></i>
+                                                                      </button> -->
+                                                                    </td>
+                                                                  </tr> 
+                                                                </tbody>
+                                                              </table>
+                                                              <table ng-show="verComprobacionFactura" class="table table-bordered">
+                                                                <thead>
+                                                                  <tr> 
+                                                                    <th>Id Comprobación</th>
+                                                                    <th>Estatus</th>
+                                                                    <th>Tipo de Evidencia</th>
+								    <th>IVA</th>
+                                                                    <th>Importe</th>
+                                                                    <th>Fecha</th>
+                                                                    <th>¿Es factura?</th>
+                                                                    <th> </th>
+                                                                  </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                  <tr ng-repeat="item in listaVales">
+                                                                    <td>{{item.idComprobacionVale}}</td>
+                                                                    <td>{{item.estatus}}</td>
+                                                                    <td>{{item.tipoEvidencia}}</td>
+								    <td>{{item.monto / 1.16}}</td>
+                                                                    <td>{{item.monto}}</td>
+                                                                    <td>{{item.fechaCreacion}}</td>
+                                                                    <td>{{item.esFactura}}</td>
+                                                                    <td>
+                                                                      <button class="btn btn-circle btn-cir-view" ng-click="verPdf(item)"
+                                                                          ng-if="item.tipoEvidencia == pdf">
+                                                                          <i class="fa fa-eye" aria-hidden="true"></i>
+                                                                      </button>
+                                                                      <button class="btn btn-circle btn-cir-view" ng-click="verImagenModal(item)"
+                                                                          ng-if="item.tipoEvidencia != pdf">
+                                                                          <i class="fa fa-eye" aria-hidden="true"></i>
+                                                                      </button>
+                                                                    </td>
+                                                                  </tr> 
+                                                                </tbody>
+                                                              </table>
+                                                        </div>
+                                            <div class="row">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"> 
+                                                            <div class="row" style="margin-top: 2%;  border-top: 0.5px solid #A0C9F7">             
+                                                                    <div class="col-md-12" style="margin-top:8px; text-align: center;">
+                                                                        <button ng-show="ShowExit" class="btn btnNuevosChico" ng-click="regresarmisVales()">
+                                                                            Salir
+                                                                        </button>
+                                                                       <!--  <button ng-show="idestatus == 1" class="btn btnNuevosChico" ng-click="modalComentarios()">
+                                                                            Rechazar
+                                                                        </button>
+                                                                        <button ng-show="idestatus == 1"  class="btn btnNuevosChico" ng-click="actualizarVale(2)">
+                                                                            Autorizar
+                                                                        </button>
+                                                                        <button ng-show="idestatus == 2"  class="btn btnNuevosChico" ng-click="actualizarVale(3)">
+                                                                                Efectivo Entrega
+                                                                        </button> -->
+                                                                    </div>
+                                                                </div>
+                                                </div>
+                                                </div>
+                                            </div>
+                    </div>    
+                </div>
+            </div>
+        </div>
+    </div>
+ </div>
+</div>
+
+<!--Inicia modal spinner -->
+<!--===================================================-->
+<div id="loading" class="modal fade" tabindex="-1" data-focus-on="input:first">
+    <div class="modal-dialog modal-lg">
+        <div class="spinner">
+            <div class="cube1"></div>
+            <div class="cube2"></div>
+        </div>
+    </div>
+</div>
+<!--Termina modal spinner -->
+
+<!--================================ Modal para colocar imagen ================================-->
+<div class="modal fade" id="mostrarImagen" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">{{modalTitle}}</h4>
+            </div>
+            <div class="divComentariosError" ng-if="verComentarios">
+                    <label> Motivo de el Rechazo: "{{comentario}}"</label>
+            </div>
+            <div class="modal-body">
+                <img class="imgDocumento" ng-src="{{verImagen}}" />
+            </div>
+        </div>
+    </div>
+</div>
+<!--================================ Modal para colocar imagen ================================-->
+
+<!--================================ Modal para colocar PDF ================================-->
+<div class="modal fade" id="mostrarPdf" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">{{modalTitle}}</h4>
+            </div>
+            <div class="divComentariosError" ng-if="verComentarios">
+                    <label> Motivo de el Rechazo: "{{comentario}}"</label>
+            </div>
+            <div class="modal-body" id="pdfReferenceContent"></div>
+        </div>
+    </div>
+</div>
+<!--================================ End Modal para para colocar PDF ================================-->
+
+<!--================================ Modal para colocar los comentario ================================-->
+<div class="modal fade" id="rechazar" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Rechazar Vale</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <h4>¿Por que rechaza el vale?</h4>
+                </div>
+                <div class="row">
+                    <textarea ng-model="razonesRechazo" formControlName="texto2" style="resize: none" cols="120"
+                        rows="3"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2"></div>
+                    <div class="col-md-3">
+                        <button class="btn btnNuevos" ng-click="cancelRechazo()">
+                            Cancelar
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btnNuevos" ng-click="sendRechazo()">
+                            Rechazar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--================================ End Modal para los comentario ================================-->

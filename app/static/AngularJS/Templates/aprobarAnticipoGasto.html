@@ -1,0 +1,1555 @@
+
+<link rel="stylesheet" href="css/aprobarAnticipoGasto/aprobarAnticipoGasto.css">
+<link rel="stylesheet" href="css/generic.css">
+<style type="text/css">
+    .labelIdCliente {
+        font-size: 15px;
+    }
+
+    .estatus{
+        font-size: 20px;
+        font-weight: bold;
+    }
+</style>
+
+<!-- <div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4" style="text-align: center">
+        <h2>{{titulo}}</h2>
+        <h4>{{numeroSolicitud}}</h4>
+    </div>
+    <div class="col-md-4"></div>
+</div> -->
+<div ng-init="init()">
+    <div class="divPrincipal" ng-if="accionForm == 'solicitud'">
+        <div class="middle-box" style="margin-top: 1%; margin-left:2%; margin-right: 2%">
+                <div class="row">
+                        <div class="col-sm-12 form-inline" >
+                            <div class="col-md-3" style="border-bottom: 1px solid #A0C9F7;">
+                                <div class="col-sm-11 form-inline" style="margin-bottom: 5px;">
+                                    <label class="labelIdCliente">{{titulo}} {{numeroSolicitud}}</label>
+                                </div>
+                            </div>
+                            <div class="col-md-9" >
+                                    <div class="pull-right">
+                                            <h4>Proceso:</h4>
+                                            <div ng-repeat="estatus in allEstatusAnticipo"
+                                                ng-class="{arrowRightActive: estatusAnticipo >= estatus.idEstatus, arrowRight: estatusAnticipo < estatus.idEstatus}">
+                                                <div class="row">
+                                                    <div class="col-md-5">
+                                                        <img style="width: 90%; margin-top: 10px; margin-left:15px;" ng-src="{{estatus.icono}}">
+                                                    </div>
+                                                    <div class="col-md-7">
+                                                        <div class="divPadreCenter">
+                                                            <div class="divHijoCenter">
+                                                                <label style="font-size:10px; text-align: left;">{{estatus.descripcion}}</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+                </div>
+            <div class="row" style="margin-top: 1%; margin-left:2%;">
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Empresa:</label>
+                    <label class="labelDataCliente">{{tramite.empresa}}</label>
+                </div>
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Sucursal:</label>
+                    <label class="labelDataCliente">{{tramite.sucursal}}</label>
+                </div>
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Departamento:</label>
+                    <label class="labelDataCliente">{{tramite.departamentoArea}}</label>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 1%; margin-left:2%;">
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Viaje a:</label>
+                    <label class="labelDataCliente">{{tramite.concepto}}</label>
+                </div>
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Inicio de viaje:</label>
+                    <label class="labelDataCliente">{{tramite.fechaInicio}}</label>
+                </div>
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Fin de viaje:</label>
+                    <label class="labelDataCliente">{{tramite.fechaFin}}</label>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 1%; margin-left:2%;">
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Motivo:</label>
+                    <label class="labelDataCliente">{{tramite.motivo}}</label>
+                </div>
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Nombre cliente:</label>
+                    <label class="labelDataCliente">{{tramite.nombreCliente}}</label>
+                </div>
+            </div>
+
+            
+
+            <div class="row" style="margin-top: 1%; margin-left:2%;">
+                <div class="col-sm-9 form-inline" style="text-align: left;">
+                    <button class="btn btn-plus" ng-click="frmModalConceptoGastos(0)" ng-show="tramite.idEstatus === 1"
+                        ng-class="{botonVisible: accionTramite < 1 }" title="Agregar Concepto">
+                        <i class="fa fa-plus" aria-hidden="true"></i>
+                        Agregar Concepto
+                    </button>
+                </div>
+                <div class="row" style="margin-top: 1%; margin-left:1%;">
+                    <div class="col-sm-10 form-inline ">
+                        <table class="table table-striped" cellspacing="0"
+                            style="width: 100% !important; margin-top: 0%; margin-left: 0%;">
+                            <thead>
+                                <tr>
+                                    <th class="col-sm-3" style="width: 20% !important;">Concepto</th>
+                                    <th class="col-sm-2" style="width: 8% !important;">Solicitado</th>
+                                    <th class="col-sm-2" style="width: 8% !important;">Aprobado</th>
+                                    <th class="col-sm-2" style="width: 10% !important;">Estatus</th>
+                                    <th class="col-sm-2" style="width: 20% !important;">Comentario
+                                        Solicitud</th>
+                                    <th class="col-sm-2" style="width: 20% !important;">Comentario
+                                        Aprobación</th>
+                                    <th class="col-sm-2" style="width: 20% !important;"> <center>Acción</center> </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="concepto in conceptosSolicitud">
+                                    <td>{{concepto.concepto}}</td>
+                                    <td>{{concepto.importeSolicitado | currency }}</td>
+                                    <td>{{concepto.importeAprobado | currency }}</td>
+                                    <td>{{concepto.estatus}}</td>
+                                    <td>{{concepto.comentarioSolicitud}}</td>
+                                    <td>{{concepto.comentarioComprobacion}}</td>
+                                    <td style="text-align: center;">
+                                        <center>
+                                            <button class="btn btn-circle" data-toggle="tooltip" data-placement="top" ng-show="tramite.idEstatus === 1"
+                                                title="Editar" ng-click="editarConcepto(concepto)" ng-disabled="concepto.idEstatus !== 1">
+                                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                            </button>
+                                            <button ng-disabled="concepto.idEstatus !== 1" class="btn btn-circle" data-toggle="tooltip" data-placement="top" ng-show="tramite.idEstatus === 1"
+                                                title="Eliminar" ng-click="eliminarConcepto(concepto)">
+                                                <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                            </button>
+
+                                            <button class="btn btn-circle" data-toggle="tooltip" ng-show="tramite.idEstatus === 1" ng-disabled="concepto.idEstatus !== 1"
+                                                data-placement="top" title="Aprobar"
+                                                ng-click="aprobarRechazarConcepto(concepto, 2)">
+                                                <i class="fa fa-thumbs-o-up " aria-hidden="true"></i>
+                                            </button>
+                                            <button  class="btn btn-circle"  data-toggle="tooltip" ng-show="tramite.idEstatus === 1"
+                                                data-placement="top" title="Rechazar"
+                                                ng-click="aprobarRechazarConcepto(concepto, 3)">
+                                                <i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
+                                            </button>     
+                                        </center>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-sm-2 form-inline ">
+                        <table class="table table-striped table-bordered" cellspacing="0"
+                            style="width: 100% !important; margin-top: 0%; margin-left: 0%;">
+                            <thead>
+                                <tr>
+                                    <th class="col-sm-3" style="width: 100% !important;">Empleados</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="empleado in empleados">
+                                    <td>{{empleado.nombreEmpleado}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 0%; margin-left:2%; margin-bottom: 1%; margin-right:1%;">
+                <div class="col-sm-6 form-inline" style="text-align: left;">
+                    <button ng-show= "idestatus!=-1" class="btn btnNuevos" style="width: 15% !important;" ng-click="salirSolicitud()">
+                        <i class="fa fa-reply" aria-hidden="true"></i>
+                        Regresar
+                    </button>
+                </div>
+                <div class="col-sm-6 form-inline" style="text-align: right;">
+                    <button ng-show= "rol != 10 && idestatus!=-1" class="btn btnNuevos" ng-class="{ botonVisible: tramite.idEstatus != 1 }"
+                        style="width: 20% !important;" ng-click="aprobacionSolicitud(2)">
+                        <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                        Aprobar
+                    </button>
+                    <button  ng-show= "rol != 10 && idestatus!=-1" class="btn btnNuevos" ng-class="{ botonVisible: tramite.idEstatus != 1 }"
+                        style="width: 20% !important;" ng-click="aprobacionSolicitud(3)">
+                        <i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
+                        Rechazar
+                    </button>
+                    <button  ng-show= "(rol == 11 || rol ==10) &&tramite.idEstatus == 2 && Comprobar == 0 " class="btn btnNuevos" ng-disabled="tramite.valePresupuesto === 0"
+                        style="width: 20% !important;" ng-click="aprobacionSalidaEfectivo()">
+                        Salida Efectivo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="divPrincipal" ng-if="accionForm == 'comprobacion'">
+        <div class="middle-box" style="margin-top: 1%; margin-left:2%; margin-right: 2%">
+                <div class="row">
+                        <div class="col-sm-12 form-inline" >
+                            <div class="col-md-3" style="border-bottom: 1px solid #A0C9F7;">
+                                <div class="col-sm-11 form-inline" style="margin-bottom: 5px;">
+                                    <label class="labelIdCliente">{{titulo}} {{numeroSolicitud}}</label>
+                                </div>
+                            </div>
+                            <div class="col-md-9" >
+                                    <div class="pull-right">
+                                            <h4>Proceso:</h4>
+                                            <div ng-repeat="estatus in allEstatusAnticipo"
+                                                ng-class="{arrowRightActive: estatusAnticipo >= estatus.idEstatus, arrowRight: estatusAnticipo < estatus.idEstatus}">
+                                                <div class="row">
+                                                    <div class="col-md-5">
+                                                        <img style="width: 90%; margin-top: 10px; margin-left:15px;" ng-src="{{estatus.icono}}">
+                                                    </div>
+                                                    <div class="col-md-7">
+                                                        <div class="divPadreCenter">
+                                                            <div class="divHijoCenter">
+                                                                <label style="font-size:10px; text-align: left;">{{estatus.descripcion}}</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+                </div>
+            <div class="row" style="margin-top: 1%; margin-left:2%;">
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Empresa:</label>
+                    <label class="labelDataCliente">{{tramite.empresa}}</label>
+                </div>
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Sucursal:</label>
+                    <label class="labelDataCliente">{{tramite.sucursal}}</label>
+                </div>
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Departamento:</label>
+                    <label class="labelDataCliente">{{tramite.departamento}}</label>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 1%; margin-left:2%;">
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Viaje a:</label>
+                    <label class="labelDataCliente">{{tramite.concepto}}</label>
+                </div>
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Inicio de viaje:</label>
+                    <label class="labelDataCliente">{{tramite.fechaInicio}}</label>
+                </div>
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Fin de viaje:</label>
+                    <label class="labelDataCliente">{{tramite.fechaFin}}</label>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 1%; margin-left:2%;">
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Motivo:</label>
+                    <label class="labelDataCliente">{{tramite.motivo}}</label>
+                </div>
+                <div class="col-sm-4 form-inline">
+                    <label class="labelIdCliente">Nombre cliente:</label>
+                    <label class="labelDataCliente">{{tramite.nombreCliente}}</label>
+                </div>
+                <div class="col-sm-2 form-inline">
+                    <label class="labelIdCliente">Regresar Efectivo:</label>
+                    <button   ng-disabled="tramite.idEstatus == 9"  class="btn btn-circle" ng-click="modalDescuento(concepto)" title="Comprobar menos" id="regresaEfec">
+                        <i class="fa fa-minus" aria-hidden="true"></i></button>
+                </div>
+                <div class="col-sm-2 form-inline" style="text-align: right;">
+                    <button class="btn btnNuevos" ng-click="frmModalEmpleado()" style="width: auto;"
+                        title="Ver Empleados">
+                        <i class="fa fa-users" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 1%; margin-left:0%;">
+                <div class="col-sm-2 form-inline">
+                    <label class="labelIdCliente">Conceptos:</label>
+                </div>
+                <!-- <div class="col-sm-2 form-inline" style="text-align: right;">
+                    <button class="btn btn-circle" ng-click="frmModalConceptoGasto(2)" title="Agregar Concepto">
+                        <i class="fa fa-plus" aria-hidden="true"></i></button>
+                </div> -->
+                <div class="col-sm-6 form-inline">
+                    <label class="labelIdCliente">Archivos de: {{ conceptoSeleccionado }}</label>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 1%; margin-left:1%;">
+                <div class="col-sm-6 form-inline">
+                    <table class="table table-striped table-bordered" cellspacing="0"
+                        style="width: 98% !important; margin-top: 0%; margin-left: 0%;">
+                        <thead>
+                            <tr>
+                                <!-- <th style="width: 5% !important;"></th> -->
+                                <th style="width: 35% !important;">Concepto</th>
+                                <th style="width: 10% !important;">Solicitado</th>
+                                <th style="width: 10% !important;">Comprobado</th>
+                                <th style="width: 10% !important;">Aprobado</th>
+                                <th style="width: 10% !important;">Por Comprobar o devolver</th>
+                                <th style="width: 10% !important;">Gasto de más</th>
+                                <!-- <th style="width: 5% !important;"></th> -->
+                                <th width="10px"></th>
+                                <!-- <th width="10px"></th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="concepto in conceptosSolicitud">
+                                    <!-- <td >
+                                         <button ng-disabled="tramite.idEstatus == 9" class="btn btn-circle"
+                                            ng-click="EliminaConcepto(concepto)"
+                                            title="Eliminar Concepto">
+                                            <i class="fa fa-times" aria-hidden="true"></i>
+                                        </button>                               
+                                    </td> -->
+                                <td>{{concepto.concepto}}</td>
+                                <td>{{concepto.importeSolicitado | currency }}</td>
+                                <td>{{concepto.importeComprobado | currency }}</td>
+                                <td>{{concepto.importeAprobado | currency }}</td>
+                                <td>{{(concepto.importeSolicitado - concepto.importeComprobado) > 0 ?concepto.importeSolicitado - concepto.importeComprobado : 0 | currency }}</td>
+                                <td>{{(concepto.importeAprobado - concepto.importeComprobado) > 0 ? concepto.importeAprobado - concepto.importeComprobado: 0 | currency }}</td>
+                                <!-- <td>
+                                    <div ng-show="tramite.idEstatus === 7">
+                                        <div class="picture-container" ng-show="concepto.archivo == null">
+                                            <div class="picture">
+                                                <img style="width: 100%" src="../../../../images/subir@2x.png"
+                                                    class="picture-src"
+                                                    title="Subir Archivo {{documento.ext_nombre}}" />
+                                                <input type="file" ng-model="concepto.archivo" id="wizard-picture"
+                                                    ng-file-select="onFileSelect($files)" class="picture"
+                                                    title="Subir Archivo">
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-circle" ng-click="guardaComprobante(concepto)"
+                                            title="Guardar" ng-show="concepto.archivo != null">
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </td> -->
+                                <!-- <td>
+                                    <button class="btn btn-circle" id="{{concepto.id}}"
+                                        ng-click="getArchivosPorConcepto(concepto.id, 2, concepto.concepto)"
+                                        title="Archivos">
+                                        <i class="fa fa-chevron-right" aria-hidden="true"></i></button>
+                                </td> -->
+                                <td width="10px" >
+                                        <div style="width: 100%; text-align: center;">
+                                            <div ng-if="concepto.revisar == 1"
+                                                title="Trámites por revisar" class="btn-circleNoti"><i
+                                                    class="fa fa-exclamation" aria-hidden="true"></i></div>
+                                                    <button class="btn btn-circle" id="{{concepto.id}}"
+                                                    ng-click="getArchivosPorConcepto(concepto.id, 2, concepto.concepto, concepto.numeroCuenta)"
+                                                    title="Archivos">
+                                                    <i class="fa fa-chevron-right" aria-hidden="true"></i></button>
+                                                
+                                        </div>
+                                </td>
+                                <!-- <td width="10px" >     
+                                    <button   ng-disabled="tramite.idEstatus == 9"  class="btn btn-circle" ng-click="modalDescuento(concepto)" title="Comprobar menos">
+                                    <i class="fa fa-minus" aria-hidden="true"></i></button>
+                            </td> -->
+                            </tr>
+                        </tbody>
+                        <footer ng-show = "conceptosSolicitud.length > 0">
+                            <td>TOTALES</td>
+                            <td>{{ conceptosSolicitud.length > 0 ? sumSolicitado() : 0 | currency  }}</td>
+                            <td>{{ conceptosSolicitud.length > 0 ? sumComprobado() : 0 | currency  }}</td>
+                            <td>{{ conceptosSolicitud.length > 0 ? sumAprobado() : 0 | currency  }}</td>
+                            <td>{{ conceptosSolicitud.length > 0 ? sumPorComprobar() : 0 | currency  }}</td>
+                            <td>{{ conceptosSolicitud.length > 0 ? sumGastoMas() : 0 | currency  }}</td>
+                            <td></td>
+                        </footer>
+                    </table>
+                </div>
+                <div class="col-sm-6 form-inline">
+                    <div class="alert alert-warning" role="alert" style="padding: 5px; margin: 0px; color: black;">
+                        Para activar los botones de aprobar y rechazar es necesario ver la<strong> evidencia, si existen gastos de más deben de estar aprobados </strong>
+                      </div>
+                    <table id="tableArchivos" class="table table-striped table-bordered" cellspacing="0"
+                        style="width: 100% !important; margin-top: 0%; margin-left: 0%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 10% !important;">Estatus</th>
+                                <th style="width: 10% !important;">Iva</th>
+                                <th style="width: 10% !important;">Total</th>
+                                <th style="width: 10% !important;">Fecha</th>
+                                <th style="width: 10% !important;">Comprobación</th>
+                                <th style="width: 10% !important;">Aprobación</th>
+                               <!-- <th style="width: 10% !important;">Deptos</th>-->
+                                <th style="width: 10% !important;">Evidencia</th>
+                                <th style="width: 10% !important;"></th>
+                                <th style="width: 10% !important;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="archivo in archivos">
+                                <td>{{ archivo.estatus }}</td>
+                                <td>{{ archivo.iva | currency }}</td>
+                                <td>{{ archivo.total | currency }}</td>
+                                <td>{{ archivo.fecha }}</td>
+                                <td>{{ archivo.comentarioComprobacion }}</td>
+                                <td>{{ archivo.comentarioAprobacion }}</td>
+                                <!--<td style="text-align: center;">
+                                    <button class="btn btn-circle" ng-click="modalDepartamentos(archivo)"
+                                        ng-show="archivo.porcentaje != 0" title="Ver Departamentos">
+                                        {{ archivo.porcentaje }}%
+                                    </button>
+                                </td>-->
+                                <td>
+                                    <button class="btn btn-circle" ng-click="verArchivo(archivo)"
+                                        style="background-color: aquamarine" title="{{archivo.nombre}}"
+                                        ng-show="archivo.extension == 'xml'">
+                                        <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="btn btn-circle" ng-click="verArchivo(archivo)"
+                                        title="{{archivo.nombre}}" ng-show="archivo.extension == 'pdf'">
+                                        <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="btn btn-circle" ng-click="verArchivo(archivo)"
+                                        title="{{archivo.nombre}}" ng-show="archivo.extension == 'jpg'">
+                                        <i class="fa fa-file-image-o" aria-hidden="true"></i>
+                                    </button>
+                                </td>
+                                <!-- <td>
+                                    <button class="btn btn-circle" ng-click="modalConceptosXml(archivo)"
+                                        title="Conceptos" ng-show="archivo.extension == 'xml'">
+                                        <i class="fa fa-bars" aria-hidden="true"></i>
+                                    </button>
+                                </td> -->
+                                <td>
+                                    <div ng-show="archivo.idEstatus == 8 && (archivo.estatusNotificacionDeMas == 0 || archivo.estatusNotificacionDeMas == 3 || archivo.estatusNotificacionDeMas == 2 || archivo.estatusNotificacionDeMas == 4)">
+                                        
+                                        <button ng-disabled="(!archivo.activaApro) || (archivo.estatusNotificacionDeMas == 2)" 
+                                                ng-show= "archivo.total != 0 && usuario.idRol != 10 && (archivo.estatusNotificacionDeMas == 0 || (archivo.estatusNotificacionDeMas == 3 || archivo.estatusNotificacionDeMas == 2 || archivo.estatusNotificacionDeMas == 4))" class="btn btn-circle" data-toggle="tooltip" data-placement="top"
+                                        title="{{ (archivo.estatusNotificacionDeMas == 2) ? 'Gasto de Mas pendiente de Autorización' : 'Aprobar' }}"
+                                            ng-click="aprobarRechazarArchivo(archivo, 9, 0)">
+                                            <i class="fa fa-thumbs-o-up " aria-hidden="true"></i>
+                                        </button>
+                                        <!-- <button ng-disabled="!archivo.activaApro" ng-show= "usuario.idRol != 10 && archivo.NoAutorizada" class="btn btn-circle" data-toggle="tooltip" data-placement="top"
+                                            ng-show="archivo.total != 0" title="Aprobar No Autorizado"
+                                            ng-click="aprobarRechazarArchivo(archivo, 9, 1)">
+                                            <i class="fa fa-hand-pointer-o " aria-hidden="true"></i>
+                                        </button> -->
+                                        <button 
+                                            ng-disabled="(!archivo.activaApro) || (archivo.estatusNotificacionDeMas == 2)" 
+                                            ng-show= "archivo.total != 0 && usuario.idRol != 10  && (archivo.estatusNotificacionDeMas == 0 || (archivo.estatusNotificacionDeMas == 3 || archivo.estatusNotificacionDeMas == 2 || archivo.estatusNotificacionDeMas == 4))" class="btn btn-circle" data-toggle="tooltip" data-placement="top"
+                                            title="{{ (archivo.estatusNotificacionDeMas == 2) ? 'Gasto de Mas pendiente de Autorización' : 'Rechazar' }}"
+                                            ng-click="aprobarRechazarArchivo(archivo, 10, 0)">
+                                            <i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+
+                                    <div ng-show="archivo.idEstatus == 8 && (archivo.estatusNotificacionDeMas >= 2)">
+                                        <button type="button" ng-click="modalDeMas(archivo)" 
+                                        data-toggle="tooltip" title="Se excede monto comprobado" class="btn btn-circle">
+                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                         </button>
+                                    </div>
+                                    
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 0%; margin-left:1%;" hidden>
+                <div class="col-sm-2 form-inline">
+                    <label class="labelIdCliente">Monto Gastado: </label>
+                    <label class="labelDataCliente">{{ montoGastado | currency }}</label>
+                </div>
+                <div class="col-sm-2 form-inline">
+                    <label class="labelIdCliente">Dif. Cargo/Favor: </label>
+                    <label class="labelDataCliente">{{ montoDiferencia | currency }}</label>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 1%; margin-left:1%; margin-bottom: 1%;">
+                <div class="col-sm-6 form-inline" ng-show="archivoDevolucion !== ''">
+                    <label class="labelIdCliente">{{tipoDev}}:</label>
+                    <!--Devolución con recibo de caj-->
+                    <a href ng-click="verArchivo(archivoDevolucion)"
+                        style="text-decoration: underline; text-decoration-color: royalblue; color: royalblue;">
+                        {{ archivoDevolucion.nombre}}
+                    </a>
+                </div>
+
+                <div class="col-sm-6 form-inline">
+                    <label class="labelIdCliente">{{tipoVale}}:</label>
+                    <!--Devolución con recibo de caj-->
+                    <a href ng-click="verArchivo(archivoRecibo)"
+                        style="text-decoration: underline; text-decoration-color: royalblue; color: royalblue;">
+                        {{ archivoRecibo.nombre}}
+                    </a>
+                </div>
+
+                <div class="row" style="margin-top: 2%; margin-left:0%; margin-bottom: 1%; margin-right:1%;">
+                    <div class="col-sm-6 form-inline" style="text-align: left;">
+                        <button class="btn btnNuevos" style="width: 20%;" ng-click="salirSolicitud()">
+                            <i class="fa fa-reply" aria-hidden="true"></i>
+                            Regresar
+                        </button>
+                    </div>
+                    <!-- <div class="col-sm-6 form-inline" style="text-align: right;">
+                        <button class="btn btnNuevos" ng-show="tramite.idEstatus == 8" style="width: 20% !important;"
+                            ng-click="aprobacionSolicitud(9)">
+                            <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+                            Aprobar
+                        </button>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Inicia modal conceptos de gasto Edicion-->
+    <!--===================================================-->
+    <div class="modal fade" id="modalConceptoGastoEdicion" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                <h4 class="modal-title text-white">Modificar concepto de gasto</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="margin-top: 1%; margin-left: 2%;">
+                    <div class="row" style="margin-top: 1%; margin-left:0%;">
+                        <div class="col-sm-2 form-inline" style="text-align: right;">
+                            <span
+                                ng-class="{adjuntado: selCNC_CONCEPTO1 != '', noadjuntado: selCNC_CONCEPTO1 == ''}">*</span>&nbsp;
+                            <label class="labelIdCliente">Área:</label>
+                        </div>
+                        <div class="col-sm-4 form-inline">
+                                <label class="labelIdCliente">{{concepto.areaDescripcion}}</label>
+                        </div>
+                        
+                    </div>
+
+                    <div class="row" style="margin-top: 1%; margin-left:0%;">
+                        <div class="col-sm-2 form-inline" style="text-align: right;">
+                            <label class="labelIdCliente">Concepto:</label>
+                        </div>
+                        <div class="col-sm-8 form-inline">
+                            <label class="labelIdCliente">{{concepto.concepto}}</label>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 1%; margin-left:0%;" ng-show="mostrarDistancia">
+                        <div class="col-sm-2 form-inline" style="text-align: right;">
+                            <span>*</span>&nbsp;
+                            <label class="labelIdCliente">Distancia(KM):</label>
+                        </div>
+                        <div class="col-sm-4 form-inline" style="text-align: left;">
+                            <input 
+                            type="number"
+                            min="50"
+                            class="form-control"
+                            required
+                            style="width: 100% !important;"
+                            placeholder=""
+                            ng-model="distancia"
+                            minlength="2"
+                            maxlength="10"
+                            ng-change="obtieneMaximoGasolina()">
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 1%; margin-left:0%;">
+                        <div class="col-sm-2 form-inline" style="text-align: right;">
+                            <span
+                                ng-class="{adjuntado: idConceptoSeleccion != '', noadjuntado: idConceptoSeleccion == ''}">*</span>&nbsp;
+                            <label class="labelIdCliente">Nacional:</label>
+                        </div>
+                        <div class="col-sm-4 form-inline" >
+                            <select style="width: 95% !important;" class="form-control" ng-model="idtipoViaje"
+                            ng-change="TipoViaje()" required >
+                            <option value="-1" selected>Seleccione un tipo</option>
+                            <option value="1" >Nacional</option>
+                            <option value="0">Extranjero</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 1%; margin-left:0%;">
+                        <div class="col-sm-2 form-inline" style="text-align: right;">
+                            <label class="labelIdCliente">Importe:</label>
+                        </div>
+                        <div class="col-sm-4 form-inline">
+                            <input type="number" class="form-control" required style="width: 95% !important;" id="montoEdit"
+                                ng-model="concepto.importeSolicitado" minlength="1" maxlength="20" ng-change="validaMontoMaximo()"
+                                ng-class="{ErrorControl: conceptoEdit.importeSolicitado === 0 }">
+                        </div>
+                        <div class="col-sm-2 form-inline" style="text-align: right;">
+                            <label class="labelIdCliente">Cuenta:</label>
+                        </div>
+                        <div class="col-sm-4 form-inline">
+                            <label class="labelIdDataCliente">{{concepto.numeroCuenta}}</label>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 1%; margin-left:0%;">
+                        <div class="col-sm-2 form-inline" style="text-align: right;">
+                            <label class="labelIdCliente">Comentario:</label>
+                        </div>
+                        <div class="col-sm-9 form-inline">
+                            <div class="col-sm-9 form-inline">
+                                <input type="text" class="form-control" required style="width: 99% !important;"
+                                    placeholder="Agregar comentario" ng-model="concepto.comentario" minlength="3"
+                                    maxlength="150">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 0%; margin-right:1%;">
+                <button class="btn btnNuevos" ng-click="actualizaImporteConcepto()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Actualizar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+   
+<div class="modal fade" id="modalConceptoGastoEdicionAp" role="dialog" tabindex="-1"
+        aria-labelledby="demo-default-modal" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header headerModal">
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                        <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                    <h4 class="modal-title text-white">Modificar concepto de gasto A</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row" style="margin-top: 1%; margin-left: 2%;">
+                        <div class="row" style="margin-top: 1%; margin-left:0%;">
+                            <div class="col-sm-2 form-inline" style="text-align: right;">
+                                <label class="labelIdCliente">Concepto:</label>
+                            </div>
+                            <div class="col-sm-10 form-inline">
+                                <label class="labelIdCliente">{{concepto.concepto}}</label>
+
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 1%; margin-left: 2%;">
+                            <div class="col-sm-2 form-inline" style="text-align: right;">
+                                <label class="labelIdCliente">Importe:</label>
+                            </div>
+                            <div class="col-sm-5 form-inline">
+                                <input type="number" class="form-control" required style="width: 95% !important;" disabled="true"
+                                     ng-model="concepto.importeSolicitado"
+                                    minlength="3" maxlength="150"
+                                    ng-class="{ErrorControl: concepto.importeSolicitado === 0 }">
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 1%; margin-left:0%;">
+                            <div class="col-sm-2 form-inline" style="text-align: right;">
+                                <label class="labelIdCliente">Comentario:</label>
+                            </div>
+                            <div class="col-sm-9 form-inline">
+                                <div class="col-sm-9 form-inline">
+                                    <input type="text" class="form-control" required style="width: 99% !important;"
+                                        placeholder="Agregar comentario" ng-model="concepto.comentarioComprobacion"
+                                        minlength="3" maxlength="150">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="margin-top: 0%; margin-right:1%;">
+                    <button class="btn btnNuevos" ng-click="confirmarConcepto()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- CIERRE MODAL EDICION DE CONCEPTO DE GASTOS -->
+
+    <div class="modal fade" id="modalSalidaEfectivo" role="dialog" tabindex="-1"
+    aria-labelledby="demo-default-modal" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                <h4 class="modal-title text-white">Salida Efectivo</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="margin-top: 1%; margin-left: 2%;">
+
+                    <div class="row" style="margin-top: 1%; margin-left:0%;">
+                        <div class="col-sm-2 form-inline" style="text-align: right;">
+                            <label class="labelIdCliente">Tipo de Salida:</label>
+                        </div>
+                        <div class="col-sm-9 form-inline">
+                            <div class="col-sm-9 form-inline">
+                                    <select  class="form-control" ng-model="salidaSelected"
+                                    ng-options="tipo.id as tipo.text for tipo in tipoSalida"
+                                    ng-change="SeleccionaTipo(salidaSelected)">
+                                    <option value="">Seleccione</option>
+                                    </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-show="verTransferencia" class="form-group col-sm-12">
+                        <div class="col-sm-12" hidden> 
+                            <label class="col-md-2" hidden>Banco Salida</label>
+                            <div class="col-md-4">
+                                    <select class="form-control" ng-model="BancoSalidaFFS"
+                                    ng-options="banco as banco.Nombre for banco in bancos">
+                                    <option value="">Seleccione</option>
+                                    </select>
+                            </div>
+                            <div class="col-md-6">  </div>
+                         </div>
+                         <div class="col-sm-12" hidden>
+                            <label class="col-md-2">Banco Entrada</label>
+                            <div class="col-md-4">
+                                    <input type="text" class="form-control" disabled = "true"
+                                    style="width: 100% !important;" ng-model="bancoEmpleado">
+                            </div>
+                            <label class="col-md-2">Cuenta Clabe</label>
+                            <div class="col-md-4">
+                                    <input type="text" class="form-control" maxlength="18" disabled= "true"
+                                    style="width: 100% !important;" ng-model="cuentaClabe">
+                            </div>
+                        </div>
+                        <div class="col-sm-12" ng-show="infoWeb.M4_BANCO !== ''" hidden>
+                            <label class="col-md-2">Banco Meta4</label>
+                            <div class="col-md-4">
+                                    <input type="text" class="form-control" disabled="true"
+                                    style="width: 100% !important;" ng-model="infoWeb.M4_BANCO">
+                            </div>
+                            <label class="col-md-2">Cuenta Nómina Meta4</label>
+                            <div class="col-md-4">
+                                    <input type="text" class="form-control" disabled="true"
+                                    style="width: 100% !important;" ng-model="infoWeb.M4_NUMEROCTA">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 labelIdCliente">
+                                Se generara orden de compra la cual será pagada por el sistema de programación de pagos 
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-sm- 2 labelIdCliente">
+                                <label> solicitante: {{empleadoSolicitante}}</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-show="verOrdenPago" class="form-group col-sm-12">
+                        <br>
+                        <label class="col-md-2">Banco Salida</label>
+                        <div class="col-md-4">
+                                <select class="form-control" ng-model="BancoSalidaFFS"
+                                ng-options="banco as banco.Nombre for banco in bancos">
+                                <option value="">Seleccione</option>
+                                </select>
+                        </div>  
+                        </div>
+                        <div ng-show="verCaja" class="form-group col-md-12">
+                                        <br>
+                                        <label class="col-md-2">Banco Salida</label>
+                                        <div class="col-md-4">
+                                                <select class="form-control" ng-model="BancoSalidaFFS"
+                                                ng-options="banco as banco.Nombre for banco in bancos">
+                                                <option value="">Seleccione</option>
+                                                </select>
+                                        </div>
+                                        <label class="col-md-2">Banco Entrada</label>
+                                        <div class="col-md-4">
+                                                <select  class="form-control" ng-model="BancoEntradaFFS"
+                                                ng-options="banco as banco.Nombre for banco in bancos">
+                                                <option value="">Seleccione</option>
+                                                </select>
+                                        </div>
+                        </div>
+                </div>
+            </div>
+            <div ng-show="verBotonSalida" class="modal-footer" style="margin-top: 0%; margin-right:1%;">
+                <button class="btn btnNuevos" ng-click="confirmarSalida()" id="confirmaSalida">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+    <!--Inicia modal conceptos de gasto Edicion-->
+    <!--===================================================-->
+    <div class="modal fade" id="modalArchivoEdicion" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header headerModal">
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                        <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                    <h4 class="modal-title text-white">Modificar concepto de gasto</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row" style="margin-top: 1%; margin-left: 2%;">
+                        <div class="row" style="margin-top: 1%; margin-left:0%;">
+                            <div class="col-sm-2 form-inline" style="text-align: right;">
+                                <label class="labelIdCliente">Archivo:</label>
+                            </div>
+                            <div class="col-sm-5 form-inline">
+                                <label class="labelIdDataCliente">{{archivo.nombreArchivo}}</label>
+
+                            </div>
+                            <div class="col-sm-2 form-inline" style="text-align: right;">
+                                <label class="labelIdCliente">Importe:</label>
+                            </div>
+                            <div class="col-sm-2 form-inline">
+                                <input type="text" class="form-control" required style="width: 95% !important;"
+                                    ng-disabled="activarImporte == 1" placeholder="0.00" ng-model="archivo.total"
+                                    minlength="3" maxlength="150" 
+                                    ng-class="{ErrorControl: archivo.total === '0' }">
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 1%; margin-left:0%;">
+                            <div class="col-sm-2 form-inline" style="text-align: right;">
+                                <label class="labelIdCliente">Comentario:</label>
+                            </div>
+                            <div class="col-sm-9 form-inline">
+                                <div class="col-sm-9 form-inline">
+                                    <input type="text" class="form-control" required style="width: 99% !important;"
+                                        placeholder="Agregar comentario" ng-model="archivo.comentario" minlength="3"
+                                        maxlength="150">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="margin-top: 0%; margin-right:1%;">
+                    <button class="btn btnNuevos" ng-click="confirmarArchivo()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Enviar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Inicia modal conceptos de gasto Edicion-->
+    <!--===================================================-->
+    <div class="modal fade" id="modalConceptoComentario" role="dialog" tabindex="-1"
+        aria-labelledby="demo-default-modal" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header headerModal">
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                        <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                    <h4 class="modal-title text-white">Agregar Comentario</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row" style="margin-top: 1%; margin-left: 2%;">
+                        <div class="row" style="margin-top: 1%; margin-left:0%;">
+                            <div class="col-sm-2 form-inline" style="text-align: right;">
+                                <label class="labelIdCliente">Comentario:</label>
+                            </div>
+                            <div class="col-sm-9 form-inline">
+                                <div class="col-sm-9 form-inline">
+                                    <input type="text" class="form-control" required style="width: 99% !important;"
+                                        placeholder="Agregar comentario" ng-model="comentarioRechazo" minlength="3"
+                                        maxlength="150">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="margin-top: 0%; margin-right:1%;">
+                    <button class="btn btnNuevos" ng-click="confirmarConcepto()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Aceptar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Inicia modal Deptos -->
+    <!--===================================================-->
+    <div class="modal fade" id="modalEmpleado" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+        aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header headerModal">
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                        <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                    <h4 class="modal-title text-white">Empleados</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-striped table-bordered" cellspacing="0" style="width: 100% !important;">
+                        <thead>
+                            <tr>
+                                <th class="col-sm-3" style="width: 100% !important;">Empleados</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="empleado in empleados">
+                                <td>{{empleado.nombreEmpleado}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer" style="margin-right:1%;">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Inicia modal Empleado -->
+    <!--===================================================-->
+    <div class="modal fade modalDepto" id="modalDepartamento" role="dialog" tabindex="-1"
+        aria-labelledby="demo-default-modal" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header headerModal">
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                        <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                    <h4 class="modal-title text-white">Departamentos</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row" style="margin-top: 1%; margin-left: 2%; margin-right: 2%;">
+                        <table class="table table-striped table-bordered " cellspacing="0"
+                            style="width: 100% !important;">
+                            <thead>
+                                <tr>
+                                    <th class="col-sm-2" style="width: 50% !important;">Departamento</th>
+                                    <th class="col-sm-1" style="width: 20% !important;">Porcentaje</th>
+                                    <th class="col-sm-1" style="width: 10% !important;">Actualizar </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="departamento in departamentosArchivo">
+                                    <td>{{departamento.departamento}}</td>
+                                    <!-- <td>{{departamento.porcentaje}}</td> -->
+                                    <td> <input type="number" name="input" ng-model="departamento.porcentaje" min="1" max="100" ></td>
+                                    <td> 
+                                        <button class="btn btn-circle" style="width: 60%"
+                                        ng-click="actualizaPorcentaje(departamento)">
+                                        <i class="fa fa-refresh" aria-hidden="true"></i>
+                                        </button>  
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer" style="margin-top: 0%; margin-right:1%;">
+                    <label class="labelIdCliente" style="color: red">{{errorMensaje}}</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--================================ Modal para colocar imagen ================================-->
+    <div class="modal fade modalImage" id="mostrarImagen" role="dialog" tabindex="-1"
+        aria-labelledby="demo-default-modal" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header label-mint headerModal">
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                        <i class="pci-cross pci-circle text-white"></i>
+                    </button>
+                    <h4 class="modal-title text-white" style="color: white;">{{modalTitle}}</h4>
+                </div>
+                <div class="modal-body">
+                    <!--<img class="imgDocumento" ng-src="{{verImagen}}" />-->
+                    <div class="image-wrapper">
+                        <a ng-href="{{verImagen}}" target="_blank">
+                            <img ng-src="{{verImagen}}">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--================================ Modal para colocar imagen ================================-->
+
+    <!--================================ Modal para colocar PDF ================================-->
+    <div class="modal fade" id="mostrarPdf" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header label-mint headerModal">
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                        <i class="pci-cross pci-circle text-white"></i>
+                    </button>
+                    <h4 class="modal-title text-white" style="color: white;">{{modalTitle}}</h4>
+
+                </div>
+                <div class="modal-body" id="pdfReferenceContent">
+                    <!--<embed ng-src="{{ urlArchivo }}"
+                    frameborder="0" width="100%" height="400px">-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--================================ End Modal para para colocar PDF ================================-->
+
+    <!--Inicia modal Conceptos -->
+    <!--===================================================-->
+    <div class="modal fade" id="modalConceptosXml" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header headerModal">
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                        <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                    <h4 class="modal-title text-white">Conceptos de Factura</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row" style="margin-top: 1%; margin-left: 2%; margin-right: 2%;">
+                        <table class="table table-striped table-bordered " cellspacing="0"
+                            style="width: 100% !important;">
+                            <thead>
+                                <tr>
+                                    <th class="col-sm-2" style="width: 10% !important;">Clave</th>
+                                    <th class="col-sm-1" style="width: 10% !important;">Cantidad</th>
+                                    <th class="col-sm-1" style="width: 40% !important;">Descripción</th>
+                                    <th class="col-sm-1" style="width: 20% !important;">Precio Unitario</th>
+                                    <th class="col-sm-1" style="width: 20% !important;">Importe</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="concepto in conceptoXmlList">
+                                    <td>{{concepto.numeroIdentificacion}}</td>
+                                    <td>{{concepto.cantidad}}</td>
+                                    <td style="text-align: justify;">{{concepto.descripcion}}</td>
+                                    <td>{{concepto.valorUnitario}}</td>
+                                    <td>{{concepto.importe}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer" style="margin-top: 0%; margin-right:1%;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div class="modal fade" id="modalrechazarSolicitudGasto" role="dialog" tabindex="-1"
+        aria-labelledby="demo-default-modal" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header headerModal">
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                        <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                    <h4 class="modal-title text-white">Motivo de Rechazo</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row" style="margin-top: 1%;">
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-2" style="text-align: right;">
+                            <label class="">Observaciones:</label>
+                        </div>
+                        <div class="col-sm-4" style="text-align: left;">
+                            <textarea ng-model="observaciones" style="resize: none" cols="80"
+                                rows="5"></textarea>
+                        </div>
+                        <div class="col-sm-1"></div>
+                    </div>
+                    <!--<div class="row" style="margin-top: 1%;">
+                    <div class="col-sm-7"></div>
+                    <div class="col-sm-4 form-inline" style="text-align: right;">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
+                        <button class="btn btn-info" ng-click="rechazarSolicitud()">
+                            Rechazar
+                            <i class="fa fa-paper-plane-o" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="col-sm-1"></div>
+                </div>-->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-info" ng-click="rechazarSolicitud()">
+                        Rechazar
+                        <i class="fa fa-paper-plane-o" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Inicia modal conceptos de gasto -->
+    <!--===================================================-->
+    <div class="modal fade" id="modalConceptoGasto" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header headerModal">
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                        <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                    <h4 class="modal-title text-white">Concepto de Gasto</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row" style="margin-top: 1%; margin-left: 0%;">
+                        <div class="col-sm-5">
+                            <label class="labelIdCliente" style="color: #17a2b8 !important;">Conceptos de Gasto a
+                                Aprobar:</label>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 1%; margin-left:0%;">
+                        <table id="tableMisTramite" class="table table-striped table-bordered" cellspacing="0"
+                            style="width: 100% !important;">
+                            <thead>
+                                <tr>
+                                    <!--<th class="col-sm-1" style="width: 5% !important;">No.</th>-->
+                                    <th class="col-sm-2" style="width: 20% !important;">Concepto</th>
+                                    <th class="col-sm-1" style="width: 13% !important;">$ Solicitado</th>
+                                    <th class="col-sm-2" style="width: 13% !important;">$ Aprobar</th>
+                                    <th class="col-sm-2" style="width: 20% !important;">Justificación</th>
+                                    <th class="col-sm-3" style="width: 20% !important;">Comentario</th>
+                                    <th class="col-sm-1" style="width: 15% !important;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="concepto in conceptoGastoList">
+                                    <!--<td>{{concepto.id}}</td>-->
+                                    <td>{{concepto.concepto}}</td>
+                                    <td>{{concepto.importeSolicitado | currency }}</td>
+                                    <td>
+                                        <input type="text" class="form-control" required style="width: 100% !important;"
+                                            ng-model="concepto.importeAutorizado">
+                                    </td>
+                                    <td>{{concepto.justificacion}}</td>
+                                    <td>
+                                        <input type="text" class="form-control" req uired
+                                            style="width: 100% !important;" placeholder=""
+                                            ng-model="concepto.observacion" minlength="3" maxlength="150">
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <button class="btn btn-danger btn-circleTable" data-toggle="tooltip"
+                                            data-placement="top" title="Rechazar" ng-click="rechazarDetalle()">
+                                            <i class="fa fa-times" aria-hidden="true"></i>
+                                        </button>
+                                        <button class="btn btn-primary btn-circleTable" data-toggle="tooltip"
+                                            data-placement="top" title="Aprobar" ng-click="rechazarDetalle()">
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer" style="margin-top: 0%; margin-right:1%;">
+                    <!--<button class="btn btn-primary" ng-click="guardarDetalle()">
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                    Aprobar Todo
+                </button>-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Inicia modal conceptos de gasto -->
+    <!--===================================================-->
+    <div class="modal fade" id="modalConceptoComprobacion" role="dialog" tabindex="-1"
+        aria-labelledby="demo-default-modal" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header headerModal">
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                        <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                    <h4 class="modal-title text-white">Concepto de Gasto</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row" style="margin-top: 1%; margin-left: 0%;">
+                        <div class="col-sm-5">
+                            <label class="labelIdCliente" style="color: #17a2b8 !important;">Comprobantes de Gasto a
+                                Aprobar:</label>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 1%; margin-left:0%;">
+                        <table id="tableMisTramite1" class="table table-striped table-bordered" cellspacing="0"
+                            style="width: 100% !important;">
+                            <thead>
+                                <tr>
+                                    <!--<th class="col-sm-1" style="width: 5% !important;">No.</th>-->
+                                    <th class="col-sm-2" style="width: 20% !important;">Concepto</th>
+                                    <th class="col-sm-1" style="width: 12% !important;">$ Gastado</th>
+                                    <th class="col-sm-3" style="width: 17% !important;">Justificación gasto</th>
+                                    <th class="col-sm-1" style="width: 12% !important;">$ Aprobar</th>
+                                    <th class="col-sm-3" style="width: 20% !important;">Motivo rechazo</th>
+                                    <th class="col-sm-1" style="width: 14% !important;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="concepto in conceptoGastoList">
+                                    <!--<td>{{concepto.id}}</td>-->
+                                    <td>{{concepto.concepto}}</td>
+                                    <td>{{concepto.importeSolicitado | currency }}</td>
+                                    <td>{{concepto.justificacion}}</td>
+                                    <td>
+                                        <input mask-money type="text" class="form-control" required
+                                            style="width: 100% !important;" ng-model="concepto.importeAutorizado">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control" req uired
+                                            style="width: 100% !important;" placeholder=""
+                                            ng-model="concepto.observacion" minlength="3" maxlength="150">
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <button class="btn btn-primary btn-circleTable" data-toggle="tooltip"
+                                            data-placement="top" title="Comprobantes"
+                                            ng-click="mostrarDivDocumentos(concepto.id, !mostrarDocumentos)">
+                                            <i class="fa fa-file" aria-hidden="true"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-circleTable" data-toggle="tooltip"
+                                            data-placement="top" title="Rechazar" ng-click="rechazarDetalle()">
+                                            <i class="fa fa-times" aria-hidden="true"></i>
+                                        </button>
+                                        <button class="btn btn-primary btn-circleTable" data-toggle="tooltip"
+                                            data-placement="top" title="Aprobar" ng-click="rechazarDetalle()">
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row" style="margin-top: 1%; margin-left:2%;"
+                        ng-class="{botonVisible: mostrarDocumentos === false}">
+                        <div class="col-sm-2">
+                            <label class="labelIdCliente">Comprobantes:</label>
+                        </div>
+                        <div class="col-sm-1">
+                            <button type="button" class="btn btn-link">
+                                <i class="fa fa-file" aria-hidden="true"></i>
+                                Docto 1</button>
+                        </div>
+                        <div class="col-sm-1">
+                            <button type="button" class="btn btn-link">
+                                <i class="fa fa-file" aria-hidden="true"></i>
+                                Docto 2</button>
+                        </div>
+                        <div class="col-sm-5"></div>
+
+
+                    </div>
+                </div>
+                <div class="modal-footer" style="margin-top: 0%; margin-right:1%;">
+                    <!--<button class="btn btn-primary" ng-click="guardarDetalle()">
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                    Aprobar Todo
+                </button>-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--================================ Modal para Agregar descuento ================================-->
+<div class="modal fade" id="modalDescuento" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+aria-hidden="true">
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header label-mint headerModal">
+            <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                <i class="pci-cross pci-circle text-white"></i>
+            </button>
+            <h4 class="modal-title text-white" style="color: white;">Devolver efectivo</h4>
+        </div>
+        <div class="modal-body">
+                <div class="row">
+                <div class="form-group col-md-12">
+                 
+                        <label class="col-md-3">Tipo de descuento</label>
+                        <div class="col-md-3">
+                            <select  class="form-control" ng-model="descuentoSelected"
+                            ng-options="tipo.id as tipo.text for tipo in tipoDescuento">
+                            <option value="">Seleccione</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">  </div>
+                        <div class="col-md-2"> 
+                            <button class="btn btnNuevosChico" ng-click="enviarDescuentoGral()">
+                                Aceptar 
+                            </button>  
+                        </div>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"> 
+                        <div class="row" style="margin-top: 2%;  border-top: 0.5px solid #A0C9F7">             
+                                <div class="col-md-12" style="margin-top:8px; text-align: center;">
+                                    <button class="btn btnNuevosChico" ng-click="regresarComprobacion()">
+                                        Salir
+                                    </button>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+
+    <!--================================ Modal para seleccionar CC ================================-->
+    <div class="modal fade" id="modalCC" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Cuenta Contable</h4>
+            </div>
+            <div class="modal-body">
+                    <div class="row">
+                    <div class="form-group col-md-12">
+                     
+                            <label class="col-md-3">Cuenta Contable</label>
+                            <div class="col-md-3">
+                                <select  class="form-control" ng-model="cuentaContableSelected"
+                                ng-options="cuenta as cuenta.cuentaContable for cuenta in cuentasContablesSuc">
+                                <option value="">Seleccione</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1">  </div>
+                            <div class="col-md-2"> 
+                                <button class="btn btnNuevosChico" ng-click="enviarcuentaContable()">
+                                    Aceptar 
+                                </button>  
+                            </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+
+<!--Inicia modal conceptos de gasto Registro-->
+<!--===================================================-->
+<div class="modal fade" id="modalConceptoGastos" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                <h4 class="modal-title text-white">Concepto de Gasto</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="margin-top: 1%; margin-left:0%;">
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <span
+                            ng-class="{adjuntado: selCNC_CONCEPTO1 != '', noadjuntado: selCNC_CONCEPTO1 == ''}">*</span>&nbsp;
+                        <label class="labelIdCliente">Área:</label>
+                    </div>
+                    <div class="col-sm-4 form-inline">
+                        <select style="width: 95% !important;" class="form-control" ng-model="selCNC_CONCEPTO1" disabled="true"
+                            ng-options="areaAfectacion.PAR_IDENPARA as areaAfectacion.descripcion for areaAfectacion in areaAfectacionList"
+                            ng-change="asignarAreaAfectacion(selCNC_CONCEPTO1)" required>
+                            <option value="">Seleccione un area</option>
+                        </select>
+                    </div>
+                    
+                </div>
+                <div class="row" style="margin-top: 1%; margin-left:0%;">
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <span
+                            ng-class="{adjuntado: idConceptoSeleccion != '', noadjuntado: idConceptoSeleccion == ''}">*</span>&nbsp;
+                        <label class="labelIdCliente">Concepto:</label>
+                    </div>
+                    <div class="col-sm-8 form-inline">
+                        <select style="width: 95% !important;" class="form-control" ng-model="idConceptoSeleccion" 	ng-disabled="disabledConcepto"
+                            ng-options="conceptoItem.id as conceptoItem.concepto for conceptoItem in conceptoGastoList"
+                            ng-change="asignarConcepto(idConceptoSeleccion)">
+                            <option value="">Seleccione Concepto</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 1%; margin-left:0%;" ng-show="mostrarDistancia">
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <span>*</span>&nbsp;
+                        <label class="labelIdCliente">Distancia(KM):</label>
+                    </div>
+                    <div class="col-sm-4 form-inline" style="text-align: left;">
+                        <input 
+                        type="number"
+                        min="50"
+                        class="form-control"
+                        required
+                        style="width: 100% !important;"
+                        placeholder=""
+                        ng-model="distancia"
+                        minlength="2"
+                        maxlength="10"
+                        ng-change="obtieneMaximoGasolina()">
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 1%; margin-left:0%;">
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <span
+                            ng-class="{adjuntado: idConceptoSeleccion != '', noadjuntado: idConceptoSeleccion == ''}">*</span>&nbsp;
+                        <label class="labelIdCliente">Nacional:</label>
+                    </div>
+                    <div class="col-sm-4 form-inline" >
+                        <select style="width: 95% !important;" class="form-control" ng-model="idtipoViaje"
+                        ng-change="TipoViaje()" required ng-disabled="disabledTipoViaje">
+                        <option value="-1" selected>Seleccione un tipo</option>
+                        <option value="1" >Nacional</option>
+                        <option value="0">Extranjero</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <label class="labelIdCliente">Cuenta:</label>
+                    </div>
+                    <div class="col-sm-4 form-inline">
+                        <label class="labelIdDataCliente">{{concepto.numeroCuenta}}</label>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 1%; margin-left:0%;">
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <span
+                            ng-class="{adjuntado: idConceptoSeleccion != '', noadjuntado: idConceptoSeleccion == ''}">*</span>&nbsp;
+                        <label class="labelIdCliente">Importe:</label>
+                    </div>
+                    <div class="col-sm-4 form-inline">
+                        <input type="number" id="montos" class="form-control" required style="width: 95% !important;" placeholder=""
+                        min="1" ng-model="concepto.importeSolicitado" ng-change="validaMontoMaximo()" ng-disabled="disabledMonto">
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 1%; margin-left:0%;">
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <label class="labelIdCliente">Comentario:</label>
+                    </div>
+                    <div class="col-sm-6 form-inline">
+                        <input type="text" class="form-control" required style="width: 99% !important;"
+                            placeholder="Agregar comentario" ng-model="concepto.comentario" minlength="3"
+                            maxlength="150">
+                    </div>
+                    <div class="col-sm-4 form-inline" style="text-align: right;">
+                        <button class="btn btnNuevos" ng-click="guardarConceptoPorSolicitud(concepto)">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+      
+                    <div ng-show="tipoRetencion" class="row" style="margin-top: 1%; margin-left:0%;">
+                        <br>
+                        <label class="col-md-1">IVA</label>
+                        <div class="col-md-2">
+                            <input disabled currency-mask class="form-control" type="text"  ng-model="ivaVale">
+                        </div>
+                        <label class="col-md-1">-IVA Retención</label>
+                        <div class="col-md-2">
+                            <input disabled currency-mask class="form-control" type="text"  ng-model="retencion">
+                        </div>
+                        <label class="col-md-1">-ISR Retención</label>
+                        <div class="col-md-2">
+                            <input disabled currency-mask class="form-control" type="text"  ng-model="ISRretencion">
+                        </div>
+                        <label class="col-md-1">SubTotal</label>
+                        <div class="col-md-2">
+                            <input disabled currency-mask class="form-control" type="text"  ng-model="subtotalVale">
+                        </div>           
+                    </div>
+                <span class="noadjuntado">*</span> Información Obligatoria
+            </div>
+            <div class="modal-footer" style="margin-top: 0%; margin-right:1%;">
+                <div class="col-sm-12 form-inline">
+                    <label class="" style="text-align: justify; ">{{concepto.politicaGasto}}</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--===================================================-->
+<div class="modal fade" id="modalDeMas" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                         
+                <h4 class="modal-title text-white">Comprobación de gastos de más</h4>
+            </div>
+            <div class="modal-body">
+                <p>Se ha detectado que el monto que se proporciona en la comprobación supera al monto autorizado para este rubro.</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th align="right">Monto de la comprobación</th>
+                            <th align="right">Monto NO aprobado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td align="right">{{ archivoTemporal.total | currency }}</td>
+                            <td align="right">{{ archivoTemporal.ExcedeMonto | currency }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer" style="margin-right:1%;">
+                <button class="btn btnNuevos pull-left" ng-click="modalDeMasHide()">
+                    Cerrar
+                </button>
+
+                <button class="btn btnNuevos" ng-if="archivoTemporal.estatusNotificacionDeMas == 0" ng-click="enviarConprobacionExcedente(archivoTemporal)">
+                    <i class="fa fa-paper-plane"></i> Enviar a su aprobación
+                </button>
+
+                <!-- <button class="btn btnNuevos" ng-disabled="true" ng-if="archivoTemporal.estatusNotificacionDeMas == 2" ng-click="enviarConprobacionExcedente(archivoTemporal)">
+                    <i class="fa fa-paper-plane"></i> Notificación enviada
+                </button> -->
+
+                <span class="estatus" ng-if="archivoTemporal.estatusNotificacionDeMas == 2">Gastos de más pendiente de Autorización</span>
+                <span class="estatus" ng-if="archivoTemporal.estatusNotificacionDeMas == 3" style="color: green;">Gastos de más Aprobados</span>
+                <span class="estatus" ng-if="archivoTemporal.estatusNotificacionDeMas == 4" style="color: red;">Gastos de más Rechazados</span>
+
+            </div>
+        </div>
+    </div>
+</div>
+</div>

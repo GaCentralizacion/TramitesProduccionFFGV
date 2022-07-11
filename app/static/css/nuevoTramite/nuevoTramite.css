@@ -1,0 +1,497 @@
+.imgSubHeader{
+  width: 10%;
+  margin: 0 10px 0 35px;
+}
+
+.labelDocs{
+  font-size: 20px; 
+  margin-top: 29px;
+  color: #013064;
+}
+
+.form-inline .form-control {
+  display: inline-block;
+  width: auto;
+  vertical-align: middle;
+  border-radius: 1px !important;
+}
+
+.btn-circleBack {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    line-height: 1.428571429;
+    border-radius: 15px;
+    color: white !important;
+}
+
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    line-height: 1.428571429;
+    border-radius: 15px;
+    background-color: transparent !important;
+    color: black !important;
+}
+
+.btn-circleNUEVO {
+    width: 55px;
+    height: 55px;
+    padding: 10px 16px;
+    font-size: 24px;
+    line-height: 1.33;
+    border-radius: 35px;
+}
+
+.btn-circle:hover{
+    background-color: #5AB7CD !important;
+    color: white !important;
+}
+
+.saldo{
+    border: outset; 
+    border-color: #E8E8E8; 
+    margin-left: 5px; 
+    width: 50px !important;
+}
+
+.headerLabel{
+    font-size: 20px;
+    color: #292929;
+    margin-bottom: 5%;
+}
+
+.subHeaderLabel{
+    font-size: 18px;
+    color: #523535;
+}
+
+.documentosLabel{
+    font-size: 15px;
+    color: #013064 !important;
+}
+
+.divDocumentos{
+    border-bottom: 0.5px solid #62A3EB;
+}
+
+.picture-container {
+    position: relative !important;
+    cursor: pointer !important;
+    text-align: center !important;
+    display: inline-flex;
+}
+
+.picture {
+    width: 25px !important;
+    height: 25px !important;
+    /* background-color: #999999 !important;
+    border: 1px solid #CCCCCC !important; */
+    color: #FFFFFF !important;
+    border-radius: 50% !important;
+    margin: 5px auto !important;
+    overflow: hidden !important;
+    transition: all 0.2s !important;
+    -webkit-transition: all 0.2s !important;
+    
+}
+
+.picture input[type="file"] {
+    cursor: pointer !important;
+    display: block !important;
+    height: 100% !important;
+    left: 0 !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    top: 0 !important;
+    width: 100% !important;
+ }
+
+.picture-src {
+    width: 79% !important;
+ }
+
+ .nueva:hover{
+     cursor: pointer !important;
+ }
+
+ .divObservaciones{
+     margin-top: 1%;
+     border-bottom: 0.5px solid #62A3EB; 
+     padding-bottom: 3px;
+ }
+
+ .color_span_estatusSuc{
+    color: white !important;
+    width: auto;
+    height: auto;
+    background-color: #0E6F0D;
+    margin-top: 18px;
+    border-radius: 5px;
+}
+
+.color_span_estatusErr{
+    color: white !important;
+    width: auto;
+    height: auto;
+    background-color: #AE2A1A;
+    margin-top: 18px;
+    border-radius: 5px;
+}
+
+.color_span_estatusWar{
+    width: auto;
+    height: auto;
+    background-color: #DBDE24;
+    margin-top: 18px;
+    border-radius: 5px;
+}
+.color_span_estatusCanWar{
+  width: auto;
+  height: auto;
+  background-color: #E96012;
+  margin-top: 18px;
+  border-radius: 5px;
+  color: white;
+}
+
+.color_span_estatusEspeWar{
+    width: auto;
+    height: auto;
+    background-color: #DBDE24;
+    margin-top: 18px;
+    border-radius: 5px;
+}
+
+.color_span_estatusBor{
+    width: auto;
+    height: auto;
+    background-color: rgb(182, 134, 2);
+    margin-top: 18px;
+    color:white;
+    border-radius: 5px;
+}
+
+.imgDocumento {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    width: 100%;
+  }
+
+.color_texto_aprobar{
+    color: green !important;
+}
+
+.color_texto_rechazar{
+    color: red !important;
+}
+
+.divComentariosError{
+    background-color: red;
+    width: auto;
+    text-align: center !important;
+    font-size: 20px;
+    color: white;
+    font-weight: bold;
+    height: auto;
+}
+
+.picture-src:hover{
+    cursor: pointer;
+}
+
+.labelIdCliente{
+    padding-left: 5px;
+    font-size: 20px;
+    color: #666363;
+    font-weight: bold;
+}
+
+.labelIdClienteText{
+  color: #013064;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.labelDataCliente{
+    font-size: 13px;
+    color: #013064;
+}
+
+.labelIdDataCliente{
+    font-size: 15px;
+    color: #013064;
+    font-weight: bold;
+}
+
+.labelSaldoCliente{
+  /* padding-left: 20px; */
+  font-size: 18px;
+  color: #013064;
+  font-weight: bold;
+}
+
+.labelDevolucion{
+  padding-left: 5px;
+  font-size: 15px;
+  color: #666363;
+  font-weight: bold;
+}
+
+/* ====================== Estilos para el checkbox ===================== */
+.container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Hide the browser's default checkbox */
+  .container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  
+  /* Create a custom checkbox */
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #C2CBD6;
+  }
+  
+  /* On mouse-over, add a grey background color */
+  .container:hover input ~ .checkmark {
+    background-color: #ccc;
+  }
+  
+  /* When the checkbox is checked, add a blue background */
+  .container input:checked ~ .checkmark {
+    background-color: #2196F3;
+  }
+  
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  /* Show the checkmark when checked */
+  .container input:checked ~ .checkmark:after {
+    display: block;
+  }
+  
+  /* Style the checkmark/indicator */
+  .container .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+
+  /* ====================== Fin estilos para el checkbox ===================== */
+
+  /* Estilos de tabla */
+  .form-inline .form-control{
+    border-radius: 20px !important;
+  }
+  /* Fin de estilos de tabla */
+
+.divTotalDevolucion{
+  margin-top: 40px;
+  background-color: #F8F8F8;
+  border-width:5px;  
+  border-bottom: 0.5px solid #62A3EB;
+}
+
+  .form-inline .form-group{
+      margin-bottom: 10px !important;
+  }
+
+  .rigthCell{
+    width: 10%;
+    text-align: right !important;
+  }
+
+.saldoNeutro{
+    padding-left: 5px;
+    font-size: 15px;
+    color: #666363;
+    font-weight: bold;
+}
+
+.saldoTrue{
+    padding-left: 5px;
+    font-size: 15px;
+    color: green;
+    font-weight: bold;
+}
+
+
+.containerAll {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 1px;
+    cursor: pointer;
+    font-size: 18px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    margin: 0 0 0 10px;
+  }
+  
+  /* Hide the browser's default checkbox */
+  .containerAll input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  
+  /* Create a custom checkbox */
+  .checkmarkAll {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 15px;
+    width: 15px;
+    background-color: #C2CBD6;
+  }
+  
+  /* On mouse-over, add a grey background color */
+  .containerAll:hover input ~ .checkmarkAll {
+    background-color: #ccc;
+  }
+  
+  /* When the checkbox is checked, add a blue background */
+  .containerAll input:checked ~ .checkmarkAll {
+    background-color: rgb(49, 218, 47);
+  }
+  
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .checkmarkAll:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+  
+  /* Show the checkmark when checked */
+  .containerAll input:checked ~ .checkmarkAll:after {
+    display: block;
+  }
+  
+  /* Style the checkmark/indicator */
+  .containerAll .checkmarkAll:after {
+    left: 5px;
+    top: 1px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+
+  #tableDocumentos input {
+    border-radius: 20px;
+    width: 210px;
+ }
+
+.btn-search{
+  background-color: #62A3EB;
+  border-radius: 20px;
+  color: white;
+}
+
+ .divWizard {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px; 
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px; 
+  text-align: center; 
+  font-size: 10px;
+  border: solid 1px;
+  height: 70px;
+  width: 70px;
+  margin-left: 2.5%
+}
+
+.wizardActive{
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px; 
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px; 
+  text-align: center; 
+  font-size: 10px;
+  border: solid 1px;
+  height: 70px;
+  width: 70px;
+  margin-left: 2.5%;
+  background-color: #006AAF;
+  color: white
+}
+
+.colorsAmountSuccess{
+  background-color: #0E6F0D;
+  color: white;
+}
+
+.colorsAmountGo{
+  background-color: #005A9A;
+  color: white;
+}
+
+.colorsAmountError{
+  background-color: #EB2A26;
+  color: white;
+}
+
+.colorsAmountNormal{
+  background-color: #EBEBE4;
+}
+.adjuntado{color: green}
+.noadjuntado{color: red}
+
+.divUser{
+  border: 0.5px solid #A0C9F7; 
+  margin-bottom: 3%; 
+  padding: 20px;
+  height: 160px;
+  overflow: auto;
+}
+
+.divBancos{
+  -webkit-box-shadow: 6px 7px 5px 0px rgba(125,121,125,1);
+  -moz-box-shadow: 6px 7px 5px 0px rgba(125,121,125,1);
+  box-shadow: 6px 7px 5px 0px rgba(125,121,125,1);
+  margin-right: 45px;
+  border: solid #A29FA2 0.5px;
+  padding: 10px;
+}

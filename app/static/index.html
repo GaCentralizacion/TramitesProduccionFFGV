@@ -1,0 +1,406 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Portal de Trámites</title>
+    <meta name="description" content="description project">
+    <meta name="author" content="name" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Expires" content="Sat, 01 Dec 2001 00:00:00 GMT">
+    <!--Librerias necesarias para la función leer archivos xlsx-->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.1/xlsx.full.min.js"></script>
+    <script src="http://oss.sheetjs.com/js-xlsx/jszip.js"></script> -->
+    <!--Hojas de estilos-->
+    <link href="css/bootstrap.css" rel="stylesheet" />
+    <link href="css/toastr.css" rel="stylesheet" />
+    <link href="css/spinner/spinner.css" rel="stylesheet">
+    <link href="js/libs/sweetalert/dist/sweetalert.css" rel="stylesheet" type="text/css">
+    <link href="js/bootstrap-filestyle.min.js">
+    <link href="css/datepicker3.css" rel="stylesheet">
+    <link href="css/nifty.min.css" rel="stylesheet">
+    <link href="css/tab.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
+    <link href="css/demo/nifty-demo-icons.min.css" rel="stylesheet">
+    <link href="css/demo/nifty-demo.min.css" rel="stylesheet">
+    <link href="plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="css/themify-icons/themify-icons.min.css">
+    <link href="plugins/datatables/media/css/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="plugins/datatables/extensions/Responsive/css/dataTables.responsive.css" rel="stylesheet">
+    <link href="css/colorpicker.css" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn3.devexpress.com/jslib/21.2.7/css/dx.common.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn3.devexpress.com/jslib/21.2.7/css/dx.material.blue.light.compact.css" />
+    
+<!-- RXJS -->
+<script data-require="angular.js@1.4.x" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js" data-semver="1.4.5"></script>
+<script data-require="rxjs@*" data-semver="2.5.3" src="//cdnjs.cloudflare.com/ajax/libs/rxjs/2.5.3/rx.all.js"></script>
+<script data-require="rx.angular.js@*" data-semver="0.0.14" src="https://cdn.rawgit.com/Reactive-Extensions/rx.angular.js/v0.0.14/dist/rx.angular.js"></script>
+
+
+</head>
+
+<body ng-app="registrationModule" ng-controller="mainController" ng-init="init()">
+    <div id="container" class="effect aside-float aside-bright mainnav-sm">
+        <header id="navbar" class="hidePrint">
+            <div id="navbar-container" style="background-color: #F8F8F8; height: 48px;" class="boxed" ng-show="ver">
+                <div class="clearfix">
+                    <ul class="nav navbar-top-links pull-left">
+                        <img src="./img/header/logoCompleto.png" style="width: 10%; margin: 7px 0 0 10px;">
+                    </ul>
+                    <ul class="nav navbar-top-links pull-right">
+                        <li id="dropdown-user" class="dropdown">
+                            <a href="#" data-toggle="dropdown" class="dropdown-toggle text-right">
+                                <div>
+                                    <span>
+                                        <div class="one" style="margin-top: 5px; display: inline-block;  width: 30px; height: 30px; border-radius: 50%; background-repeat: no-repeat; background-position: center center;
+                                        background-size: cover;">
+                                        </div>
+                                    </span>
+                                    <div class="username hidden-xs"> {{user.nombre}}</div>
+                                </div>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-md dropdown-menu-right panel-default">
+                                <div class="pad-all text-right">
+                                    <h5 class="pull-left" style="padding-top: 1px;"> Hasta pronto... </h5>
+                                    <a class="btn btn-primary" ng-click="salir()">
+                                        <i class="demo-pli-unlock"></i> Salir
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+        <div class="boxed">
+            <!--CONTENT CONTAINER-->
+            <!--===================================================-->
+            <div id="content-container">
+                <div ng-view></div>
+            </div>
+            <!--===================================================-->
+            <!--MAIN NAVIGATION-->
+            <!--===================================================-->
+            <nav id="mainnav-container" ng-show="ver">
+                <div id="mainnav" class="hidePrint" style="background-color: #0A3C71;">
+                    <!--Menu-->
+                    <!--================================-->
+                    <div id="mainnav-menu-wrap">
+                        <div class="nano">
+                            <div class="nano-content">
+                                <div id="mainnav-menu" class="list-group" style="margin-top: 10px;">
+                                    <span class="tgl-menu-btn">
+                                        <a class="mainnav-toggle" href="#">
+                                            <i class="demo-pli-view-list"> &nbsp;&nbsp; Menú</i>
+                                        </a>
+                                    </span>
+                                </div>
+
+                                <ul id="mainnav-menu" class="list-group">
+                                    <!--Category name-->
+                                    <li class="list-header">Navegación</li>
+                                    <!--Menu list item-->
+                                    <li ng-repeat ="men in menu">
+                                        <a href="{{men.path}}">
+                                            <i class="{{men.class}}" aria-hidden="true"></i>
+                                            <span class="menu-title">
+                                                <strong>{{men.nombre}}</strong>
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <!-- <li>
+                                        <a href="/home">
+                                            <i class="fa fa-globe" aria-hidden="true"></i>
+                                            <span class="menu-title">
+                                                <strong>Dashboard</strong>
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/documentos">
+                                            <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                                            <span class="menu-title">
+                                                <strong>Documentos</strong>
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/tramites">
+                                            <i class="fa fa-book" aria-hidden="true"></i>
+                                            <span class="menu-title">
+                                                <strong>Trámites</strong>
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/misTramites">
+                                            <i class="fa fa-calendar-o" aria-hidden="true"></i>
+                                            <span class="menu-title">
+                                                <strong> Mis Trámites</strong>
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                            <a href="/misVales">
+                                                <i class="fa fa-archive" aria-hidden="true"></i>
+                                                <span class="menu-title">
+                                                    <strong> Mis Vales</strong>
+                                                </span>
+                                            </a>
+                                        </li>
+                                    <li>
+                                        <a href="/reportesContraloria">
+                                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                                            <span class="menu-title">
+                                                <strong> Reportes Contraloria</strong>
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li ng-show="user.idRol == 13 || user.idRol == 1">
+                                        <a href="/reportesComprobacionGV">
+                                            <i class="fa fa-credit-card" aria-hidden="true"></i>
+                                            <span class="menu-title">
+                                                <strong> Reportes Comprobacion GV</strong>
+                                            </span>
+                                        </a>
+                                    </li>
+
+                                    </li> -->
+                                    <!--<li>
+                                        <a href="/subalternos">
+                                            <i class="fa fa-sitemap" aria-hidden="true"></i>
+                                            <span class="menu-title">
+                                                <strong>Captura Subalternos</strong>
+                                            </span>
+                                        </a>
+                                    </li>-->
+                                        <!-- <li ng-show="user.idRol == 3">
+                                                <a href="/aprobarVale">
+                                                    <i class="fa fa-folder-o" aria-hidden="true"></i>
+                                                    <span class="menu-title">
+                                                        <strong>Aprobar Vale</strong>
+                                                    </span>
+                                                </a>
+                                            </li> -->
+                                </ul>
+                                <div class="main">
+                                    <div></div>
+                                    <input type="hidden" id="lgnUser" value="[[ user.idUsuario ]]">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--================================-->
+                    <!--End menu-->
+                </div>
+            </nav>
+            <!--===================================================-->
+            <!--END MAIN NAVIGATION-->
+        </div>
+        <!-- SCROLL PAGE BUTTON -->
+        <!--===================================================-->
+        <button class="scroll-top btn hidePrint">
+            <i class="pci-chevron chevron-up"></i>
+        </button>
+        <!--===================================================-->
+    </div>
+    <div class="cargando">
+        <div class="contenedor">
+            <img src="/images/logoa.png" width="200">
+            <br>
+            <img src="/images/loading.gif">
+        </div>
+    </div>
+  <div id="loadModalCXC" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<div class="sk-cube-grid">
+                <div class="sk-cube sk-cube1"></div>
+                <div class="sk-cube sk-cube2"></div>
+                <div class="sk-cube sk-cube3"></div>
+                <div class="sk-cube sk-cube4"></div>
+                <div class="sk-cube sk-cube5"></div>
+                <div class="sk-cube sk-cube6"></div>
+                <div class="sk-cube sk-cube7"></div>
+                <div class="sk-cube sk-cube8"></div>
+                <div class="sk-cube sk-cube9"></div>
+              </div>
+		</div>
+	</div>
+
+    <style type="text/css">
+        .no-success,
+        .cargando {
+            /*display: none;*/
+            width: 100%;
+            height: 100%;
+            background-color: #ecf0f5;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1024;
+        }
+
+        .one {
+            background-image: url('../img/iconos/user_male2-512.png');
+        }
+
+        .cargando .contenedor,
+        .no-success .contenedor {
+            width: 400px;
+            height: 200px;
+            margin: 15% auto;
+            text-align: center;
+        }
+
+        .no-success {
+            display: none;
+        }
+    </style>
+    <!--Interface de usuario-->
+    <!-- Librerias Angular-->
+    <script src="js/tab.js"></script>
+    <script src="js/jquery-2.2.4.min.js"></script>
+    <script src="js/libs/angular/angular.min.js"></script>
+    <script src="js/libs/angular/angular-route.min.js"></script>
+    <script src="js/libs/angular/angular-local-storage.min.js"></script>
+    <script src="js/angular-filter.js"></script>
+    <!--BootstrapJS [ RECOMMENDED ]-->
+    <script src="js/bootstrap.js"></script>
+    <script src="js/bootstrap-datepicker.js"></script>
+    <script src="js/libs/toastr/toastr.min.js"></script>
+    <script src="js/demo/ui-panels.js"></script>
+    <script src="js/datatables.min.js"></script>
+    <script src="js/ui-bootstrap.js"></script>
+    <script src="js/ui-bootstrap-tpls.js"></script>
+    <!--NiftyJS [ RECOMMENDED ]-->
+    <script src="js/nifty.min.js"></script>
+    <link href="plugins/pace/pace.min.css" rel="stylesheet">
+    <script src="plugins/pace/pace.min.js"></script>
+    <script src="js/demo/nifty-demo.min.js"></script>
+    <script src="js/vfs_fonts.js"></script>
+    <script src="js/ui-grid.js"></script>
+    <link rel="stylesheet" href="css/ui-grid.css" type="text/css">
+    <!--Responsive table-->
+    <script src="plugins/datatables/media/js/jquery.dataTables.js"></script>
+    <script src="plugins/datatables/media/js/dataTables.bootstrap.js"></script>
+    <script src="plugins/datatables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+    <script src="js/demo/tables-datatables.js"></script>
+    <script src="js/libs/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="js/bootstrap-colorpicker-module.js"></script>
+    <script src="/js/angular-drag-and-drop-lists.js"></script>
+    <!--Funciones Comunes-->
+    <script src="confront.js"></script>
+    <script src="helpers.js"></script>
+    <!--Librerias de aplicación angular-->
+    <script src="AngularJS/registrationModule.js"></script>
+    <script src="AngularJS/globalFactory.js"></script>
+    <!-- Directiva para imagenes -->
+    <script src="AngularJS/directiveFile/directiveFile.js"></script>
+    <!-- Fin directiva para imagenes -->
+    <!-- Directiva para input currency -->
+    <script src="AngularJS/directiveFile/directiveCurrency.js"></script>
+    <!-- directiva para input currency -->
+    <!--Controllers y Repositorys-->
+    <script src="AngularJS/Main/mainController.js"></script>
+    <script src="AngularJS/login/loginController.js"></script>
+    <script src="AngularJS/login/loginRepository.js"></script>
+    <script src="AngularJS/home/homeController.js"></script>
+    <script src="AngularJS/home/homeRepository.js"></script>
+    <script src="AngularJS/registro/registroController.js"></script>
+    <script src="AngularJS/documentos/documentosController.js"></script>
+    <script src="AngularJS/documentos/documentosRepository.js"></script>
+    <script src="AngularJS/tramites/tramitesController.js"></script>
+    <script src="AngularJS/tramites/tramitesRepository.js"></script>
+    <script src="AngularJS/aprobar/aprobarController.js"></script>
+    <script src="AngularJS/aprobar/aprobarRepository.js"></script>
+    <script src="AngularJS/proveedores/proveedoresRepository.js"></script>
+    <script src="AngularJS/misTramites/misTramitesController.js"></script>
+    <script src="AngularJS/misTramites/misTramitesRepository.js"></script>
+    <script src="AngularJS/clientes/clientesRepository.js"></script>
+    <!-- Nuevo tramite se incluyen todos los controladores y repository de las directivas -->
+    <script src="AngularJS/nuevoTramite/nuevoTramiteController.js"></script>
+    <script src="AngularJS/nuevoTramite/nuevoTramiteRepository.js"></script>
+    <script src="AngularJS/nuevoTramite/nuevoTramiteDirective.js"></script>
+    <script src="AngularJS/nuevoTramite/sinTramite/sinTramiteController.js"></script>
+    <script src="AngularJS/nuevoTramite/devoluciones/devolucionesController.js"></script>
+    <script src="AngularJS/nuevoTramite/devoluciones/devolucionesRepository.js"></script>
+    <script src="AngularJS/nuevoTramite/anticipoGasto/anticipoGastoController.js"></script>
+    <script src="AngularJS/nuevoTramite/anticipoGasto/AnticipoGastoDirective.js"></script>
+    <script src="AngularJS/nuevoTramite/anticipoGasto/comprobacion/comprobacionGastoController.js"></script>
+    <script src="AngularJS/nuevoTramite/anticipoGasto/anticipoGastoRepository.js"></script>
+    <script src="AngularJS/nuevoTramite/anticipoGasto/solicitud/solicitudGastoController.js"></script>
+    <script src="AngularJS/aprobarAnticipoGasto/aprobarAnticipoGastoController.js"></script>
+    <script src="AngularJS/aprobarFacturaGV/aprobarFacturaGVController.js"></script>
+
+    <!-- Fin nuevo tramite se incluyen todos los controladores y repository de las directivas -->
+    <script src="AngularJS/aprobarDevolucion/aprobarDevController.js"></script>
+    <script src="AngularJS/aprobarDevolucion/aprobarDevRepository.js"></script>
+    <script src="AngularJS/tesoreria/tesoreriaController.js"></script>
+    <script src="AngularJS/tesoreria/tesoreriaRespository.js"></script>
+    <script src="AngularJS/ordenDePago/ordenDePagoController.js"></script>
+    <script src="AngularJS/ordenDePago/ordenDePagoRepository.js"></script>
+    <script src="AngularJS/ordenDePagoFFAG/ordenDePagoFFAGController.js"></script>
+    <script src="AngularJS/ordenDePagoFFAG/ordenDePagoFFAGRepository.js"></script>
+
+    <!-- TRAMITE TRANSFERENCIAS -->
+    <script src="AngularJS/transferencias/transferenciaController.js"></script>
+    <script src="AngularJS/transferencias/transferenciaRepository.js"></script>
+    
+    <!-- FONDO FIJO -->
+    <script src="AngularJS/aprobarFondoFijo/aprobarFondoController.js"></script>
+    <script src="AngularJS/aprobarFondoFijo/aprobarFondoRepository.js"></script>
+    <script src="AngularJS/misTramitesVales/misTramitesValesController.js"></script>
+    <script src="AngularJS/misTramitesVales/misTramitesValesRepository.js"></script>
+    <script src="AngularJS/aprobarVale/aprobarValeController.js"></script>
+    <script src="AngularJS/aprobarVale/aprobarValeRepository.js"></script>
+	<script src="AngularJS/nuevoTramite/fondoFijo/FondoFijoController.js"></script>
+    <script src="AngularJS/nuevoTramite/fondoFijo/fondoFijoRepository.js"></script>
+    
+    <!-- Reportes Contraloria -->
+    <script src="AngularJS/reportesContraloria/reportesContraloriaController.js"></script>
+    <script src="AngularJS/reportesContraloria/reportesContraloriaRepository.js"></script>
+
+    <!-- TRASPASOS FONDO FIJO -->
+    <script src="AngularJS/traspasosFondoFijo/traspasosFondoFijoController.js"></script>
+    <script src="AngularJS/traspasosFondoFijo/traspasosFondoFijoRepository.js"></script>
+
+    <!-- SUBALTERNOS -->
+    <script src="AngularJS/subalternos/subalternosController.js"></script>
+    <script src="AngularJS/subalternos/subalternosRepository.js"></script>
+
+    <!-- Reportes Comprobacion GV -->
+    <script src="AngularJS/reportesComprobacionGV/reportesComprobacionGVController.js"></script>
+    <script src="AngularJS/reportesComprobacionGV/reportesComprobacionGVRepository.js"></script>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.4/jspdf.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/df-number-format/2.1.6/jquery.number.min.js"></script>
+
+    <!-- Validacion de cuenta -->
+    <script src="AngularJS/validacionCuenta/ValidacionCuentaController.js"></script>
+    <script src="AngularJS/validacionCuenta/ValidacionCuentaRepository.js"></script>
+
+    <!-- Orden de compra -->
+    <script src="AngularJS/ordenCompra/OcController.js"></script>
+
+    <!-- Aprobacion de gastos de mas -->
+    <script src="AngularJS/aprobarDeMas/aprobarDeMasController.js"></script>
+
+    <!-- Entrega de efectivo de gastos de mas -->
+    <script src="AngularJS/gastosdemas/gastosDeMasController.js"></script>
+
+       <!-- Reembolso Fondo Fijo -->
+       <script src="AngularJS/reembolsoFondoFijo/reembolsoFondoFijoController.js"></script>
+
+    <script src="AngularJS/shared/apiBproRepository.js" ></script>
+
+       <!-- <script src="js/devexpress/dx.all.js"></script> -->
+      
+       <!-- <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script> -->
+
+
+</html>

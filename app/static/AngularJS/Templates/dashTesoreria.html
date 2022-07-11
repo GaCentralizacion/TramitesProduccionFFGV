@@ -1,0 +1,333 @@
+<link rel="stylesheet" href="css/home/home.css">
+<link rel="stylesheet" href="css/generic.css">
+<div ng-init="init()">
+    <div class="col-md-12" style="height: 100px; background-color: white;">
+        <div class="col-md-6 pull-left">
+            <label class="labelDocs">
+                <span>
+                    <img class="imgSubHeader" src="../../img/iconos/resumen@2x.png">
+                </span>
+                Resumen de trámites
+            </label>
+        </div>
+    </div>
+</div>
+<div class="col-md-12">
+    <div class="divPrincipal col-md-10">
+        <div class="middle-box">
+            <div class="row nav nav-pills nav-stacked" style="margin-bottom: 18px;">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-2" style="text-align: center; border-top-left-radius: 100px; border-bottom-left-radius: 100px;" ng-click="setTab(1)" ng-class="{ active: isSet(1), noActive: isSet(2), noActiveFin: isSet(3) }">
+                    <a ng-class="{ textoActivo: isSet(1), textoNoActivo: isSet(2), textoNoActivoFin: isSet(3) }">En proceso</a>
+                </div>
+                <div class="col-sm-2" style="text-align: center;" ng-click="setTab(2)" ng-class="{ active: isSet(2), noActive: isSet(1), noActiveFin: isSet(3) }">
+                    <a ng-class="{ textoActivo: isSet(2), textoNoActivo: isSet(1),textoNoActivoFin:isSet(3) }">Atendidos</a>
+                </div>
+                <div class="col-sm-2" style="text-align: center; border-top-right-radius: 100px; border-bottom-right-radius: 100px;" ng-click="setTab(3)" ng-class="{ active: isSet(3), noActive: isSet(1), noActiveFin: isSet(2)  }">
+                    <a ng-class="{ textoActivo: isSet(3), textoNoActivo: isSet(1), textoNoActivoFin: isSet(2) }">Finalizados</a>
+                </div>
+                <!-- <div class="col-sm-4">
+                    <button 
+                        style="
+                            background-color: #C8C6C6;
+                            border-radius: 50px !important;
+                            width:200px;
+                            border:none;
+                            float: right;
+                            color: black;
+                            font-size: 17px;
+                            "
+                        ng-click="openModalCuentas()">Buscar cuentas</button>
+                    
+                </div> -->
+            </div>
+           
+                <div class="resumenTramites">
+                    <div class="row" style="text-align: center;">
+                        <div class="col-sm-4 form-inline">
+                            <label class="labelIdCliente">Empresa:</label>
+                            <select class="form-control selectSM" ng-model="selEmpresa" ng-options="empresa.idEmpresa as empresa.nombreEmpresa for empresa in empresas" ng-change="seleccionarEmpresa()">
+                                <option value="">Seleccione Empresa</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4 form-inline">
+                            <label class="labelIdCliente">Sucursal:</label>
+                            <select class="form-control selectSM" ng-model="selSucursal" ng-options="sucursal.idSucursal as sucursal.nombreSucursal for sucursal in sucursales">
+                                <option value="">Seleccione Sucursal</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-4 form-inline">
+                            <label class="labelIdCliente">Trámite:</label>
+                            <select class="form-control selectSM" ng-model="selTramite" ng-options="tipo.idTramite as tipo.nombreTramite for tipo in tipoTramite">
+                                <option value="">Seleccione tipo trámite</option>
+                            </select>
+                        </div>
+                      
+                    </div>
+                    <div class="row" style="text-align: center;">
+                        <div class="col-sm-4 form-inline">
+                            <div class="form-group formCalendar">
+                              <label class="labelIdCliente">Fecha Inicio:</label>
+                              <input type="date" class="form-control inputCalendar" id="fInicio" ng-model="fechaIni">
+                            </div>
+                        </div>
+                        <div class="col-sm-4 form-inline">
+                            <div class="form-group formCalendar">
+                              <label class="labelIdCliente">Fecha Fin:</label>
+                              <input type="date" class="form-control inputCalendar" id="fFin" ng-model="fechaFin">
+                            </div>
+                        </div>
+                        <!-- <div class="col-sm-5 form-inline">
+                            <label class="labelIdCliente">Fecha Inicio:</label><br>
+                            <input type="date" class="form-control " id="fInicio" ng-model="fechaIni">
+                    
+                        </div>
+                        <div class="col-sm-5 form-inline">
+                            <label class="labelIdCliente">Fecha Fin:</label><br>
+                            <input type="date" class="form-control " id="fFin" ng-model="fechaFin">
+                        </div>-->
+                        <div class="col-sm-4 form-inline">
+                            <button class="btn btn-circle botonCalendar pull-right" ng-click="buscar()" title="Buscar"><span class="fa fa-search"></span></button>
+                        </div> 
+                    </div>
+                    <div class="row marginT">
+                        <div class="col-md-12">
+                            <div class="col-md-1">
+                            </div>
+                            <div class="col-md-5">
+                                <div class="divsTVP">
+                                    <img class="imgTVP" src="../../img/iconos/vencidos@2x.png">
+                                    <label class="pull-right labelNumsTVP">{{vencidos}}</label><label class="pull-right labelTVP">Trámites procesados:</label>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="divsTVP">
+                                    <img class="imgTVP" src="../../img/iconos/proximo@2x.png">
+                                    <label class="pull-right labelNumsTVP">{{proxVencidos}}</label> <label class="pull-right labelTVP">Información pendiente:</label>
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                            </div>
+                            <!-- <div class="col-md-4">
+                            <div class="divsTVP">
+                                <img class=" imgTVP" src="../../img/iconos/tiempo@2x.png">
+                                <label class="pull-right labelNumsTVP"> {{tiempo}} </label> <label
+                                    class="pull-right labelTVP">En tiempo </label>
+                            </div>
+                        </div> -->
+                        </div>
+                    </div>
+                </div>
+                <div ng-show="isSet(1)">
+                <div class="row" style="margin-top: 15px;">
+                    <div class="col-sm-12">
+                        <table id="tableTramite" class="table table-striped table-bordered tblFont" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+                                    <th width="10px" class="tblAlign">Semaforo</th>
+                                    <th width="10px" class="tblAlign">Número de solicitud<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Solicitante<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Fecha y Hora de Solicitud<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Trámite<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Persona<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Documentación<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Atender</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="tramite in tramites">
+                                    <td width="10px">
+                                        <div style="width: 100%; text-align: center;">
+                                            <span ng-class="{enTiempo: (tramite.id_estatus == 1 || tramite.id_estatus == 0 ) && tramite.dias < dayMin, 
+                                                    proximoVencer: (tramite.id_estatus == 1 || tramite.id_estatus == 0 ) && tramite.dias >= dayMin && tramite.dias < dayMax, 
+                                                    vencidos: (tramite.id_estatus == 1 || tramite.id_estatus == 0 ) && tramite.dias >= dayMax}">
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td width="10px" class="tblAlign">{{tramite.id_perTra}}</td>
+                                    <td width="20%" class="tblAlign">{{tramite.nombre}}</td>
+                                    <td width="10px" class="tblAlign">{{tramite.petr_fechaTramite}}</td>
+                                    <td width="10px" class="tblAlign">{{tramite.tra_nomTramite}} {{ (tramite.consecutivo >= 2) ? ' - ' + tramite.consecutivo:'' }}</td>
+                                    <td width="20%" class="tblAlign">{{tramite.PER_PERSONA}}</td>
+                                    <td width="10px">
+                                        <label ng-if="tramite.noti == 1 && tramite.id_estatus != 3"> Documentación rechazada </label>
+                                        <label ng-if="tramite.notiRevisar === 1 && tramite.noti == 0 && tramite.id_estatus != 3"> Documentación actualizada </label>
+                                        <label ng-if="tramite.notiRevisar === 0 && tramite.noti == 0 && tramite.notiDocsAprobar == 1 && tramite.id_estatus != 3"> Documentación aprobada </label>
+                                    </td>
+                                    <td width="10px">
+                                        <div style="width: 100%; text-align: center;">
+                                            <div ng-if="tramite.noti == 1 && tramite.id_estatus != 3" title="Documentación rechazada" class="btn-circleNoti">
+                                                <i class="fa fa-exclamation" aria-hidden="true"></i>
+                                            </div>
+                                            <div ng-if="tramite.notiRevisar === 1 && tramite.noti == 0 && tramite.id_estatus != 3" title="Documentación actualizada" class="btn-circleNotiRevisar">
+                                                <i class="fa fa-undo" aria-hidden="true"></i>
+                                            </div>
+                                            <div ng-if="tramite.notiRevisar === 0 && tramite.noti == 0 && tramite.notiDocsAprobar == 1 && tramite.id_estatus != 3" title="Documentación actualizada" class="btn-circleNotiDocsCompletos">
+                                                <i class="fa fa-check" aria-hidden="true"></i>
+                                            </div>
+                                            <button class="btn btn-circle" ng-click="goAprobar(tramite)">
+                                                <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="isSet(2)">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table id="tableTramiteAtendidos" class="table table-striped table-bordered tblFont" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+                                    <th width="10px" class="tblAlign">Número de solicitud<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Solicitante<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Fecha y Hora de Solicitud<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Trámite<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Persona<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Atender</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="tramite in tramites">
+                                    <td width="10px" class="tblAlign">{{tramite.id_perTra}}</td>
+                                    <td width="20%" class="tblAlign">{{tramite.nombre}}</td>
+                                    <td width="10px" class="tblAlign">{{tramite.petr_fechaTramite}}</td>
+                                    <td width="10px" class="tblAlign">{{tramite.tra_nomTramite}}</td>
+                                    <td width="20%" class="tblAlign">{{tramite.PER_PERSONA}}</td>
+                                    <td width="10px" class="tblAlign">
+                                        <div style="width: 100%; text-align: center;">
+                                            <button class="btn btn-circle" ng-click="goAprobar(tramite)">
+                                                <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="isSet(3)">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table id="tableTramiteFin" class="table table-striped table-bordered tblFont" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+                                    <th width="10px" class="tblAlign">Número de solicitud<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Solicitante<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Fecha y Hora de Solicitud<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Trámite<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Persona<br><input type="text" class="filtro-tabla inputTableFilter" /></th>
+                                    <th width="10px" class="tblAlign">Atender</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="tramite in tramites">
+                                    <td width="10px">{{tramite.id_perTra}}</td>
+                                    <td width="10px">{{tramite.nombre}}</td>
+                                    <td width="10px">{{tramite.petr_fechaTramite}}</td>
+                                    <td width="10px">{{tramite.tra_nomTramite}}</td>
+                                    <td width="10px">{{tramite.PER_PERSONA}}</td>
+                                    <td width="10px">
+                                        <div style="width: 100%; text-align: center;">
+                                            <button class="btn btn-circle" ng-click="goAprobar(tramite)">
+                                                <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--===================================================-->
+<div class="modal fade" id="modalCuentas" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                <h4 class="modal-title text-white">Búsqueda de cuentas</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-11">
+                        <input type="text" ng-model="busquedaparam" ng-keypress="getkeys($event)" class="form-control" required style="width: 100% !important;" placeholder="CLABE, No Cuenta, Id Persona">
+                    </div>
+                    <div class="col-sm-1">
+                        <button type="button" ng-click="buscarCuentas()" data-toggle="tooltip" title="Buscar Persona" class="btn btn-info btn-icon"><i class="fa fa-search"></i></button>
+                    </div>
+                    <!-- <div class="col-sm-12">
+                        <p>Panel para búsqueda de cuentas bancarias mediante los siguientes parametros: cuenta CLABE, número de cuenta y/o Id del Solicitante.</p>
+                        <p>En esta sección se podra deshabilitar las cuentas bancarias que por alguna razon deban cancelarse y no sigan el proceso de tranferencias mediante estas cuentas.</p>
+                    </div> -->
+                </div>
+                <hr>
+                <div class="row" ng-show="flagRespuesta == 0 && flagBusqueda">
+                    <div class="col-sm-12">
+                        <center><img src="images/loading.gif"></center>
+                    </div>
+                </div>
+                <table ng-show="flagRespuesta == 1 && DataCuentas.length != 0">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>CLABE</th>
+                            <th>No. Cuenta</th>
+                            <th>Banco</th>
+                            <th>Fecha Registro</th>
+                            <th>-</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="(key, item) in DataCuentas">
+                            <td>{{item.nombre}}</td>
+                            <td>{{item.CLABE}}</td>
+                            <td>{{item.cuenta}}</td>
+                            <td>{{item.banco}}</td>
+                            <td>{{item.fecha}}</td>
+                            <td>
+                                <button class="btn btn-default" ng-click="openModalEliminar( item )"> Rechazar</button>
+                                <!-- <button class="btn btn-default">Eliminar</button> -->
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div ng-if="DataCuentas.length == 0 && !flagBusqueda">
+                    <center>
+                        <h4>Introduzca criterios de búsqueda.</h4>
+                    </center>
+                </div>
+                <div ng-if="DataCuentas.length == 0 && flagBusqueda && flagRespuesta == 1">
+                    <center>
+                        <h2><i class="fa fa-inbox" aria-hidden="true"></i></h2>
+                        <h4>No se han encontrado resultados.</h4>
+                    </center>
+                </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 0%; margin-right:1%;">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <label style="color: black; font-size: 16px;">Motivo del rechazo</label><br>
+                <textarea style="width: 100%; padding: 10px;" rows="6" ng-model="comentariorechazo" class="ng-pristine ng-valid ng-touched"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 150px;">Cerrar</button>
+                <button type="button" class="btn btn-primary" ng-click="rechazar()" style="width: 150px;">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>

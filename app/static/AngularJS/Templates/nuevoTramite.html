@@ -1,0 +1,57 @@
+<link rel="stylesheet" href="css/generic.css">
+<link rel="stylesheet" href="css/nuevoTramite/nuevoTramite.css">
+<div ng-init="init()">
+    <div class="col-md-12 subheader">
+        <div class="col-md-6 pull-left">
+            <label class="labelDocs">
+                <span>
+                    <img class="imgSubHeader" src="../../img/iconos/tramite@2x.png">
+                </span>
+                Sistema de Gestion de Servicios Compartidos
+            </label>
+        </div>
+        <div class="col-md-6 pull-right">
+            <div class="divBtns">
+                <button class="btn btnNuevos pull-right" ng-click="goNuevoTramite()">
+                    Nuevo Trámite
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="divPrincipal col-md-11">
+                <div class="middle-box">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-sm-4 form-inline" style="margin-bottom: 5px;">
+                                <label class="labelIdCliente">Trámites:</label>
+                                <select class="form-control" ng-model="selTramite" ng-change="selectTramite()"
+                                    ng-options="tramite.id_tramite as tramite.tra_nomTramite for tramite in allTramites">
+                                    <option value="">Seleccione un trámite</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <newtramite-Sin-Tramite ng-if="selTramite == 0"></newtramite-Sin-Tramite>
+                    <newtramite-devoluciones ng-if="selTramite == 4"></newtramite-devoluciones>
+                    <newtramite-Fondo-Fijo ng-if="selTramite == 10"></newtramite-Fondo-Fijo>
+                    <newanticipo-Gasto ng-if="selTramite == 9"></newanticipo-Gasto>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Inicia modal spinner -->
+<!--===================================================-->
+<div id="loading" class="modal fade" tabindex="-1" data-focus-on="input:first">
+    <div class="modal-dialog modal-lg">
+        <div class="spinner">
+            <div class="cube1"></div>
+            <div class="cube2"></div>
+        </div>
+    </div>
+</div>
+<!--Termina modal spinner -->

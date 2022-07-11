@@ -1,0 +1,77 @@
+<style type="text/css">
+    .link-oc{
+        color: blue;
+        cursor: pointer;
+    }
+
+    .link-oc:hover{
+        text-decoration: underline;
+    }
+</style>
+<link rel="stylesheet" href="css/home/home.css">
+<link rel="stylesheet" href="css/generic.css">
+<div ng-init="init()">
+    <div class="col-md-12" style="height: 100px; background-color: white;">
+        <label class="labelDocs"> 
+            Ordenes de Compra con Anticipos para Gastos de Viaje
+        </label>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <div class="divPrincipal col-md-12">
+        <div class="">
+            <br><br>
+            <div>
+                <div class="row" style="margin-top: 15px;">
+                    <div class="">
+                        <table id="tableTramite" class="table table-striped " cellspacing="0"
+                            width="100%">
+                            <thead>
+                                <tr>
+                                    <th width="180px">Empresa</th>
+                                    <th width="180px">Orden de Compra</th>
+                                    <th width="80px">Cantidad</th>
+                                    <th width="80px">% de Anticipo</th>
+                                    <th width="80px">Área de Afectación</th>
+                                    <th width="300px">Descripción</th>
+                                    <th width="">Fecha de Orden</th>
+                                    <th width="">Fecha de Proceso</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="oc in ordenescompra">
+                                    <td>{{oc.odm_empresa}}</td>
+                                    <td>
+                                        <div ng-click="abrirCarrucel(oc);" class="link-oc">
+                                            <b>{{oc.odm_ordencompra}}</b>
+                                        </div>
+                                    </td>
+                                    <td>{{oc.odm_cantidadanticipo | currency}}</td>
+                                    <td>{{oc.odm_porcentajeanticipo}}</td>
+                                    <td>{{oc.odm_areaafectacion}}</td>
+                                    <td>{{oc.odm_observaciones}}</td>
+                                    <td>{{oc.odm_fechaorden.split('T')[0]}}</td>
+                                    <td>{{oc.odm_fechaproceso}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<!--Inicia modal spinner -->
+<!--===================================================-->
+<div id="loading" class="modal fade" tabindex="-1" data-focus-on="input:first">
+    <div class="modal-dialog modal-lg">
+        <div class="spinner">
+            <div class="cube1"></div>
+            <div class="cube2"></div>
+        </div>
+    </div>
+</div>
+<!--Termina modal spinner -->

@@ -1,0 +1,256 @@
+<link rel="stylesheet" href="css/misTramites/misTramites.css">
+<link rel="stylesheet" href="css/generic.css">
+<link rel="stylesheet" href="css/home/home.css">
+<link rel="stylesheet" href="css/reportesCss/style.css">
+
+<div ng-init="init()">
+
+    <div class="col-md-12 subheader">
+        <div class="col-md-6 pull-left">
+            <label class="labelDocs">
+                <span>
+                    <img class="imgSubHeader" src="../../img/iconos/tramite@2x.png">
+                </span>
+                Reportes Comprobaciones GV
+            </label>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="divPrincipal col-md-10">
+            <div class="middle-box">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table id="tableMisTramite" class="table table-striped table-bordered" cellspacing="0"
+                            width="100%">
+                            <thead>
+                                <tr>
+                                    <th width="10px">Id</th>
+                                    <th width="10px">Empresa</th>
+                                    <th width="10px">Sucursal</th>
+                                    <th width="10px">Departamento</th>
+                                    <th width="10px">Solicitante</th>
+                                    <th width="10px">Viaje A</th>
+                                    <th width="10px">Motivo</th>
+                                    <th width="10px">Cliente</th>
+                                    <th width="10px">Fecha Inicio</th>
+                                    <th width="10px">Fecha Fin</th>
+                                    <th width="10px">Monto</th>
+                                    <th width="5px"></th>
+                                    <th width="5px"></th>
+                                    <!-- <th width="5px"></th>
+                                    <th width="5px"></th> -->
+
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="gv in listaGV">
+                                    <td width="10px">{{gv.id}}</td>
+                                    <td width="10px">{{gv.empresa}}</td>
+                                    <td width="10px">{{gv.sucursal}}</td>
+                                    <td width="10px">{{gv.departamento}}</td>
+                                    <td width="10px">{{gv.solicitante}}</td>
+                                    <td width="10px">{{gv.viajeA}}</td>
+                                    <td width="10px">{{gv.motivo}}</td>
+                                    <td width="10px">{{gv.nombreCliente}}</td>
+                                    <td width="10px">{{gv.fechaInicio}}</td>
+                                    <td width="10px">{{gv.fechaFin}}</td>
+                                    <td width="10px">{{gv.importe | currency}}</td>
+                                    <td width="5px">
+                                        <div style="width: 100%;">
+                                            <center>
+                                                <button class="btn btn-circle" ng-click="goReporte(gv.id, gv.idCompania, gv.empresa ,gv.idSucursal, gv.sucursal, gv.idDepartamento, gv.departamento, gv.solicitante ,gv.viajeA ,gv.motivo ,gv.nombreCliente ,gv.fechaInicio ,gv.fechaFin, gv.idSolicitante, gv.autorizador, gv.idAutorizador, gv.fechaRegistroDevolucion, gv.idDevolucion, gv.idpersona )" title="Visualiza reporte">
+                                                    <i class="fa fa-file-pdf-o fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </center>
+                                        </div>
+                                    </td>
+                                    <td width="5px">
+                                        <div style="width: 100%;">
+                                            <center>
+                                                <button class="btn btn-circle" ng-click="loadEvidenciaPresupuestos(gv.id)" title="Presupuestos Autorizados">
+                                                    <i class="fa fa-files-o fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </center>
+                                        </div>
+                                    </td>
+                                    <!-- <td width="5px">
+                                        <div style="width: 100%;">
+                                            <center>
+                                                <button class="btn btn-circle" ng-click="subirEvidencia(gv.id, gv.idCompania, gv.idSucursal, gv.idDepartamento)" title="Carga evidencia">
+                                                    <i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </center>
+                                        </div>
+                                    </td>
+                                    <td width="5px">
+                                        <div style="width: 100%;">
+                                            <center>
+                                                <button class="btn btn-circle" ng-click="loadEvidenciaReporte(gv.id, gv.idCompania, gv.idSucursal, gv.idDepartamento)" title="Ver reporte firmado">
+                                                    <i class="fa fa-book fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </center>
+                                        </div>
+                                    </td> -->
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<!--Inicia modal spinner -->
+<!--===================================================-->
+<div id="loading" class="modal fade" tabindex="-1" data-focus-on="input:first">
+    <div class="modal-dialog modal-lg">
+        <div class="spinner">
+            <div class="cube1"></div>
+            <div class="cube2"></div>
+        </div>
+    </div>
+</div>
+<!--Termina modal spinner -->
+
+<!--================================ Modal para colocar PDF ================================-->
+<div class="modal fade" id="mostrarPdf" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width: 90%; height: 700px;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">{{modalTitle}}</h4>
+            </div>
+            <div class="modal-body" id="pdfReferenceContent" style="height: 750px;"></div>
+
+        </div>
+    </div>
+</div>
+<!--================================ End Modal para para colocar PDF ================================-->
+
+<!-- Carga reporte firmado -->
+<div class="modal fade" id="viewCargaReporte" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width: 50%; height: 700px;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">{{modalTitle}}</h4>
+            </div>
+            <div class="modal-body" id="pdfReference" style="max-height: 350px;">
+                <div class="row">
+                    <div class="col-sm-12 form-inline">
+                        <label class="labelIdCliente">Reporte de comprobación de gastos de viaje:</label>
+                        <br>
+                        <div>
+                            <div class="col-md-2">
+                                <button class="btn btn-circle btn-cir-view" ng-click="verPdf(documento)" ng-disabled = "documento.archivo === '' " title="Ver reporte firmado">
+                                    <i style="color: #62A3EB;" class="fa fa-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <div class="col-md-7">
+                                <center>
+                                    <span ng-class="{adjuntado: documento.archivo == '', noadjuntado: documento.archivo != ''}">*</span>&nbsp;
+                                    <label class="documentosLabel" style="margin: 0; padding-top: 5px;">Subir comprobación de gastos de viaje firmado</label>    
+                                </center>
+                                
+                            </div>
+                            <div class="col-md-2 picture-container">
+                                <div class="picture ">
+
+                                    <img style="width: 100%" src="../images/autorizacion@2x.png" title="Documento Adjuntado"
+                                        ng-show="documento.archivo !== '' " />
+                                    <img style="width: 100%" src="../images/subir@2x.png" class="picture-src"
+                                        ng-show="documento.archivo === '' " title="Subir Archivo" />
+                                    <input type="file" ng-model="documento.archivo" id="wizard-picture"
+                                        ng-file-select="onFileSelect($files)" class="picture"
+                                        accept="{{documento.ext_nombre == 'pdf' ? 'application/pdf': 'image/'+ documento.ext_nombre  }}">
+                                </div>                   
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <center>
+                            <button class="btn btnNuevos" style="width: 18%" ng-disabled ="documento.archivo === ''"
+                            ng-click="guardarEvidencia()">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Guardar
+                        </button>
+                        </center>
+                    </div>
+                </div>
+                
+            </div>
+            <!-- <div class="row" ng-if="urlEvidencia !== ''">
+                <div class="col-11" style="padding: 15px;">
+                    <button class="btn " ng-click="cerrarEvidenciaCompro()"><i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>Cerrar</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-11" id="viewEvidenciaCompro" style="height: 50px;">
+                </div>
+            </div> -->
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="viewhistoricoCargado" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog  modal-lg" >
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Presupuestos Autorizados</h4>
+            </div>
+            <div class="modal-body" id="body" style="max-height: auto;">
+                <div class="row">
+                    <div class="col-11">
+                        <table id="historicoEvidencias" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                   
+                                    <th> <center>Fecha de carga</center></th>
+                                    <th> <center>archivo</center> </th>
+                                    <th> <center>Consultar</center></th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr ng-repeat="his in historico">
+                                    
+                                    <td> <center>{{his.fecha}}</center> </td>
+                                    <td> <center>{{his.nombreArchivo}}</center> </td>
+                                    <td> 
+                                        <center>
+                                            <div style="width: 100%; text-align: center;">
+                                                <button class="btn btn-circle" ng-click="verEvidenciaHistorico(his.ruta, his.nombreArchivo)">
+                                                    <i class="fa fa-file-excel-o fa-lg" aria-hidden="true"></i>
+                                                </button>
+                                            </div>     
+                                        </center>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
