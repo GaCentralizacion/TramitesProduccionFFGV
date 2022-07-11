@@ -2070,4 +2070,27 @@ anticipoGasto.prototype.post_AuthBpro = function(req, res, next) {
     });
 };
 
+anticipoGasto.prototype.get_ActualizaTramitePoliza = function(req, res, next) {
+    var self = this;
+    var id_perTra = req.query.id_perTra;
+    var poliza = req.query.poliza;
+    var documentoConcepto = req.query.documentoConcepto;
+    var incremental = req.query.incremental;
+
+    var params = [
+        { name: 'id_perTra', value: id_perTra, type: self.model.types.INT },
+        { name: 'poliza', value: poliza, type: self.model.types.STRING },
+        { name: 'documentoConcepto', value: documentoConcepto, type: self.model.types.STRING },
+        { name: 'incremental', value: incremental, type: self.model.types.INT }
+    ];
+    
+    this.model.query('UPD_TRAMITE_GASTO_VIAJE', params, function(error, result) {
+        
+        self.view.expositor(res, {
+            error: error,
+            result: result
+        });
+    });
+};
+
 module.exports = anticipoGasto;
