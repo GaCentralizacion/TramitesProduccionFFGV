@@ -1,0 +1,857 @@
+<link rel="stylesheet" href="css/generic.css">
+<link rel="stylesheet" href="css/aprobarDev/aprobarDev.css">
+<link rel="stylesheet" href="css/nuevoTramite/nuevoTramite.css">
+<link rel="stylesheet" href="css/notaColapse.css">
+<style>
+.form-control {
+        border-radius: 20px;
+    }
+</style>
+<div ng-init="init()">
+    <div class="col-md-12" style="height: 100px; background-color: white;">
+        <label class="labelDocs">
+            <span>
+                <img class="imgSubHeader" src="../../img/iconos/devolucion@2x.png">
+            </span> Aprobar Fondo Fijo
+        </label>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="divPrincipal col-md-11">
+                <div class="middle-box">
+                    <div class="row">
+                    <div class="col-sm-12 form-inline" > 
+                        <div class="col-md-3" style="border-bottom: 1px solid #A0C9F7;">
+                            <div class="col-sm-11 form-inline" style="margin-bottom: 5px;">
+                                <label class="labelIdCliente">{{titleAprobar}}</label>
+                            </div>
+                        </div>
+                        <div class="col-md-9" >
+                                <div class="pull-right">
+                                        <h4>Proceso:</h4>
+                                        <div ng-repeat="estatus in allEstatusFondoFijo"
+                                            ng-class="{arrowRightActive: estatusFondoFijo >= estatus.idEstatus, arrowRight: estatusFondoFijo < estatus.idEstatus}">
+                                            <div class="row">
+                                                <div class="col-md-5">
+                                                    <img style="width: 90%; margin-top: 10px; margin-left:15px;" ng-src="{{estatus.icono}}">
+                                                </div>
+                                                <div class="col-md-7">
+                                                    <div class="divPadreCenter">
+                                                        <div class="divHijoCenter">
+                                                            <label style="font-size:10px; text-align: left;">{{estatus.descripcion}}</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+    
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"> 
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <div class="form-group col-sm-12">
+                                    <br>
+                                    <label class="col-md-4" for="divEmpresa">Empresa</label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="empresa"
+                                            ng-options="empresa.emp_idempresa as empresa.emp_nombre for empresa in empresas"
+                                            disabled>                           
+                                            </select>
+                                        </div>
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4">Agencia/Sucursal a la que se le asigna el Fondo Fijo</label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="sucursal"
+                                              ng-options="sucursal.idSucursal as sucursal.nombre for sucursal in sucursales"
+                                              disabled>  
+                                            </select>
+                                        </div>
+                                </div>     
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4">Nombre del departamento</label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="departamento"
+                                            ng-options="departamento.idDepartamento as departamento.nombre for departamento in departamentos"   
+                                            disabled>  
+                                            </select>
+                                        </div>
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4">ID Persona</label>
+                                        <div class="col-md-8">
+                                            <input disabled  class="form-control" type="text" ng-model="idPersona" id="idPersona">
+                                        </div>
+                                </div>
+                                <!-- <div class="form-group col-sm-12">
+                                    <label class="col-md-4">Responsable que autoriza el fondo fijo</label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="autorizador"
+                                            ng-options="autorizador.idUsuario as autorizador.nombre + ' ' + autorizador. apellidoPaterno + ' ' + autorizador. apellidoMaterno for autorizador in autorizadores" 
+                                            disabled>  
+                                            </select>
+                                        </div>
+                                </div> -->
+                                <div class="form-group col-sm-12">
+                                    <label class="col-sm-4">Monto del fondo fijo</label>
+                                        <div class="col-md-8">
+                                            <input disabled  currency-mask class="form-control" type="text" ng-model="monto" id="montoFondoFijo">
+                                        </div>
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-sm-4">Descripción</label>
+                                        <div class="col-md-8">
+                                            <textarea  disabled ng-model="descripcion"   class="form-control"></textarea> 
+                                        </div>
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4"><span ng-show="nuevo" class="noadjuntado">*</span>&nbsp;Fondo Fijo</label>
+                                    <div class="col-md-8">
+                                    <select disabled class="form-control" ng-model="cuentaContableFF"
+                                    ng-options="cuenta.cuenta as cuenta.descripcion for cuenta in cuentasContables"  ng-change="selectedCuenta()">
+                                    <option value="">Seleccione</option>
+                                    </select>
+                                     </div>
+                                    </div>
+                                <br>
+                           <!--  <table ng-show="verPoliza" class="table table-bordered" cellspacing="0"
+                            width="100%">
+                              <thead>
+                                <tr>
+                                  <th>Id Vale</th>
+                                  <th>Id Comprobación</th>
+                                  <th>Importe</th>
+                                  <th> </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat="item in vales">
+            
+                                    <td>{{item.nombreVale}}</td>
+                                    <td>{{item.idComprobacionVale}}</td>
+                                    <td>{{item.monto}}</td>
+                                    <td>
+                                    <button class="btn btn-circle btn-cir-view" ng-click="aprobacionSalidaEfectivo(item)" title="Salida de Efectivo">
+                                    <i class="fa fa-money" aria-hidden="true"></i>
+                                    </button>
+                                </td>
+                                </tr>      
+                              </tbody>
+                            </table> -->
+                        </div>
+                        <!-- Aca termina las columnas de 6 -->
+
+                        <div ng-show="idRol != 10 && !verReembolsoFinanzas" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <div class="col-md-12" style="margin-left: 50px;">
+                                        <div class="col-md-10" style="margin-left: 50px;">
+                                        <br>
+                                        <h4 class="ng-binding">Documentación</h4>
+                                            <div class="row divDocumentos" ng-repeat="documento in documentos">
+                                                <div>
+                                                    <div class="col-md-1">
+                                                        <button class="btn btn-circle btn-cir-view" ng-click="verPdf(documento)"
+                                                            ng-if="documento.idExtension == 2 && documento.existe > 0">
+                                                            <i style="color: #62A3EB;" class="fa fa-eye" aria-hidden="true"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <label
+                                                            ng-class="{color_texto_aprobar: documento.estatusDocumento == 2, color_texto_rechazar: documento.estatusDocumento == 3}"
+                                                            class="documentosLabel">
+                                                            {{documento.doc_nomDocumento}}
+                                                        </label>
+                                                    </div>
+                                                    <div class="col-md-1" ng-if="documento.existe > 0">
+                                                        <button ng-disabled="documento.estatusDocumento != 1 || traEstatus == 3" class="btn btn-circle btn-cir-success" ng-click="aprobarDocumento(documento)" title="Aprobar Documento">
+                                                                <i class="fa fa-check" aria-hidden="true"></i>
+                                                            </button>
+                                                        </div>
+                                                    <div class="col-md-1" ng-if="documento.existe > 0">
+                                                        <button ng-disabled="documento.estatusDocumento != 1 || traEstatus == 3" class="btn btn-circle" ng-click="modalComentarios(documento)" title="Rechazar Documento">
+                                                        <i class="fa fa-times" aria-hidden="true"></i></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+           
+                                        </div>
+                                </div>
+                                <div class="form-group col-sm-12" ng-show="estatusFondoFijo == 4">
+                                    <div class="form-group col-sm-12">
+                                    <label class="col-sm-5">{{aumentodisminucion}} fondo fijo</label>
+                                        <div class="col-md-3">
+                                                <input disabled  currency-mask class="form-control" type="text" ng-model="montoAD" id="montoFondoFijo">
+                                        </div>
+                                    <label class="col-sm-3"> Evidencia</label>
+                                    <div class="col-md-1">   
+                                        <button class="btn btn-circle" ng-click="verComprobanteAD(1, idAumentoDecremento)">
+                                            <i class="fa fa-picture-o" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-sm-5">{{aumentodisminucion}} Carta Compromiso</label>
+                                    <div class="col-md-1">   
+                                        <button class="btn btn-circle" ng-click="verComprobanteAD(2, idAumentoDecremento)">
+                                            <i class="fa fa-picture-o" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                    <label class="col-sm-5">{{aumentodisminucion}} Pagare</label>
+                                    <div class="col-md-1">   
+                                        <button class="btn btn-circle" ng-click="verComprobanteAD(3, idAumentoDecremento)">
+                                            <i class="fa fa-picture-o" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                    </div>
+                                </div>
+                        </div>
+                        <div ng-show="idRol == 10 && estatusFondoFijo == 2" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <div class="row divDocumentos" ng-repeat="documento in documentos">
+                             <div>
+                                 <div class="col-md-1">
+                                     <button class="btn btn-circle btn-cir-view" ng-click="verPdf(documento)"
+                                         ng-if="documento.idExtension == 2 && documento.existe > 0">
+                                         <i style="color: #62A3EB;" class="fa fa-eye" aria-hidden="true"></i>
+                                     </button>
+                                 </div>
+                                 <div class="col-md-9">
+                                     <label
+                                         ng-class="{color_texto_aprobar: documento.estatusDocumento == 2, color_texto_rechazar: documento.estatusDocumento == 3}"
+                                         class="documentosLabel">
+                                         {{documento.doc_nomDocumento}}
+                                     </label>
+                                 </div>
+                                 <!-- <div class="col-md-1" ng-if="documento.existe > 0">
+                                     <button ng-disabled="documento.estatusDocumento != 1 || traEstatus == 3" class="btn btn-circle btn-cir-success" ng-click="aprobarDocumento(documento)" title="Aprobar Documento">
+                                             <i class="fa fa-check" aria-hidden="true"></i>
+                                         </button>
+                                 </div> -->
+                                 <div class="col-md-1" ng-if="documento.existe > 0">
+                                     <button ng-disabled="estatusFondoFijo!=0" class="btn btn-circle" ng-click="modalComentariosdocumentos(documento)" title="Rechazar Documento">
+                                     <i class="fa fa-times" aria-hidden="true"></i></button>
+                                 </div>
+                             </div>
+                         </div>
+
+                         <label class="col-md-2">Tipo de Salida Fondo Fijo</label>
+                         <div class="col-md-3">
+                         <select class="form-control" ng-model="salidaSelected"
+                         ng-options="tipo.id as tipo.text for tipo in tipoSalida"
+                         ng-change="SeleccionaTipo(salidaSelected)">
+                         <option value="">Seleccione</option>
+                         </select>
+                         </div>
+                         <div  ng-show="verBotonSalida"  class="col-md-2"> 
+                                 <button class="btn btnNuevosChico" 
+                                 ng-click="guardarSalidaFF(salidaSelected,BancoSalidaFFS,BancoEntradaFFS)">
+                                     Guardar 
+                                 </button>  
+                         </div>
+                         <div ng-show="verOrdenPago" class="form-group col-sm-12">
+                            <br>
+                            <label class="col-md-2">Banco Salida</label>
+                            <div class="col-md-4"> 
+                                    <select class="form-control" ng-model="BancoSalidaFFS"
+                                    ng-options="banco as banco.Nombre for banco in bancos">
+                                    <option value="">Seleccione</option>
+                                    </select>
+                            </div>
+                        </div>
+                        <div ng-show="verCaja" class="form-group col-md-12">
+                                        <br>
+                                      
+                                        <label class="col-md-2">Banco Salida</label>
+                                        <div class="col-md-4"> 
+                                                <select class="form-control" ng-model="BancoSalidaFFS"
+                                                ng-options="banco as banco.Nombre for banco in bancos">
+                                                <option value="">Seleccione</option>
+                                                </select>
+                                        </div>
+                                        <label class="col-md-2">Banco Entrada</label>
+                                        <div class="col-md-4"> 
+                                                <select class="form-control" ng-model="BancoEntradaFFS"
+                                                ng-options="banco as banco.Nombre for banco in bancos">
+                                                <option value="">Seleccione</option>
+                                                </select>
+                                        </div>
+                        </div>
+                        </div>
+                        <div ng-show="(estatusFondoFijoCierre == 5 || estatusFondoFijoCierre == 6)" class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <div class="col-md-2">    </div>
+                    <label class="col-md-3">Monto Cierre</label>
+                        <div class="col-md-3"> 
+                            <input disabled  class="form-control" type="text" ng-model="montoDisponible">
+                    </div>
+                    <div class="col-md-4"> 
+                        <button ng-disabled="estatusFondoFijo == 7" class="btn btnNuevosChico" ng-click="enviarCierreFF()">
+                            Aprobar 
+                        </button>  
+                    </div>
+                    <div class="col-md-2">    </div>
+                    <label class="col-md-2">Comprobante</label>
+                    <div class="col-md-1">   
+                    <button class="btn btn-circle" ng-click="verComprobante(comprobanteCierre)">
+                        <i class="fa fa-picture-o" aria-hidden="true"></i>
+                    </button>
+                    </div>
+                    <label class="col-md-2">Arqueo</label>
+                    <div class="col-md-1">   
+                    <button class="btn btn-circle" ng-click="verComprobante(arqueoCierre)">
+                        <i class="fa fa-picture-o" aria-hidden="true"></i>
+                    </button>
+                    </div>
+                   <!-- <div class="col-md-2"> 
+                    <button ng-disabled="estatusFondoFijo == 7" class="btn btnNuevosChico" ng-click="enviarCierreFF()">
+                        Aprobar 
+                    </button>  
+                    </div>
+                         <div class="col-md-2"> 
+                            <button ng-disabled="estatusFondoFijoCierre == 6" class="btn btnNuevosChico" ng-click="guardarCierreFF()">
+                                Aprobar 
+                            </button>  
+                    </div> -->
+                        </div>
+                        <div ng-show="((idRol == 10 && estatusFondoFijo == 5) && !tieneRemboolso) || verReembolsoFinanzas" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <br>
+                    <div   class="form-group col-md-12" >
+                        <div class="form-group col-sm-12" ng-show="verHistorico">
+                            <div ng-click="active = !active" ng-class="{'expandcollapse-heading-collapsed': active, 'expandcollapse-heading-expanded': !active}">
+                                <p>Reembolso Historico</p>
+                            </div>
+                            <div class="slideDown" ng-hide="!active" style="height:200px; overflow:auto;">
+                            <label>Reembolsos</label>
+                            <table class="table table-bordered" cellspacing="0"
+                            width="100%">
+                              <thead>
+                                <tr>
+                                  <th>Cajero</th>
+                                  <th>Documento</th>
+                                  <th>Importe Reembolso</th>
+                                  <th>Fecha</th>
+                                  <th> </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat="item in evidenciasReembolsos">
+
+                                    <td>{{item.cajero}}</td>
+                                    <td>{{item.documento}}</td>
+                                    <td>{{item.importeReembolsado | currency}}</td>
+                                    <td>{{item.fecha}}</td>
+                                    <td>
+                                    <button class="btn btn-circle btn-cir-view" ng-click="verImagenModalVale(item)">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                    </button>
+                                </td>
+                                </tr>      
+                              </tbody>
+                            </table>
+                            <br>
+                            <label>Evidencias Reembolsos Historicos</label>
+                            <table class="table table-bordered" cellspacing="0"
+                            width="100%">
+                              <thead>
+                                <tr>
+                                  <!-- <th>Id Fondo Fijo</th> -->
+                                  <!-- <th>Id Vale Historico</th>
+                                  <th>Id Comprobación Historico</th> -->
+                                  <th>Importe</th>
+                                  <th>IVA</th>
+                                   <th>Total</th>
+                             <!--    <th>Imp. Poliza</th> -->
+                                <th>Motivo</th>
+                                  <!-- <th>Fecha</th> -->
+                                  <!-- <th>¿Es Factura?</th> -->
+                                  <th> </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr ng-repeat="item in evidenciasReembolsoHistorico">
+                                    <!-- <td>{{item.idFondoFijo}}</td> -->
+                                   <!--  <td>{{item.idVale}}</td>
+                                    <td>{{item.idComprobacionVale}}</td> -->
+                                    <td>{{item.importe | currency}}</td>
+                                    <td>{{item.IVA | currency}}</td>
+                                    <td>{{item.monto | currency}}</td>
+                                    <td>{{item.motivo}}</td>
+                                    <!-- <td>{{item.fechaCreacion}}</td> -->
+                                    <!-- <td>{{item.esFactura}}</td> -->
+                                    <td>
+                                    <button class="btn btn-circle btn-cir-view" ng-click="verImagenModalVale(item)">
+                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                    </button>
+                                </td>
+                                </tr>      
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div ng-show="tipoUsuario == 5 && estatusReembolsoFinanzas == 0" class="form-group col-sm-12" style="height:400px; overflow:auto;">
+                        <br>
+                        <table id="tableEvidencias" class="table table-bordered" cellspacing="0"
+                        width="100%">
+                          <thead>
+                            <tr>
+                                <th>Importe</th>
+                                <th>IVA</th>
+                                <th>Total</th>
+                                <th>Motivo</th>
+                                <th> </th>
+                                <th> </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat="item in evidenciasReembolso">
+                                <td>{{item.importe | currency}}</td>
+                                <td>{{item.IVA | currency}}</td>
+                                <td>{{item.monto | currency}}</td>
+                                <td>{{item.motivo}}</td>
+                                <td>
+                                <button class="btn btn-circle btn-cir-view" ng-click="verImagenModalVale(item)">
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                </button>
+                               </td>
+                               <td>
+                                <button ng-hide="item.estatusReembolso > 0" class="btn btn-circle btn-cir-success" ng-click="modalComentariosEvidencia(item)" title="Rechazar Evidencia">
+                                <i class="fa fa-times" aria-hidden="true"></i></button>
+                              </td>                
+                            </tr>      
+                          </tbody>
+                        </table>
+                        <label class="col-md-3">Monto Reembolso</label>
+                        <div  class="col-md-3"> 
+                            <input disabled  class="form-control" type="text" ng-model="montoReembolso">
+                        </div>
+                    </div>
+                    <div ng-show="tipoUsuario == 6 && estatusReembolsoFinanzas == 1" class="form-group col-sm-12" style="height:400px; overflow:auto;">
+                        <br>
+                        <table id="tableEvidencias" class="table table-bordered" cellspacing="0"
+                        width="100%">
+                          <thead>
+                            <tr>
+                                <th>Importe</th>
+                                <th>IVA</th>
+                                <th>Total</th>
+                                <th>Motivo</th>
+                                <th> </th>
+                                <th> </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat="item in evidenciasReembolso">
+                                <td>{{item.importe | currency}}</td>
+                                <td>{{item.IVA | currency}}</td>
+                                <td>{{item.monto | currency}}</td>
+                                <td>{{item.motivo}}</td>
+                                <td>
+                                <button class="btn btn-circle btn-cir-view" ng-click="verImagenModalVale(item)">
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                </button>
+                               </td>
+                               <td>
+                                <button ng-hide="item.estatusReembolso > 0" class="btn btn-circle btn-cir-success" ng-click="modalComentariosEvidencia(item)" title="Rechazar Evidencia">
+                                <i class="fa fa-times" aria-hidden="true"></i></button>
+                              </td>                
+                            </tr>      
+                          </tbody>
+                        </table>
+                        <label class="col-md-3">Monto Reembolso</label>
+                        <div  class="col-md-3"> 
+                            <input disabled  class="form-control" type="text" ng-model="montoReembolso">
+                        </div>
+                    </div>
+                    <div ng-show="tipoUsuario == 7 && estatusReembolsoFinanzas == 2" class="form-group col-sm-12" style="height:400px; overflow:auto;">
+                        <br>
+                        <table id="tableEvidencias" class="table table-bordered" cellspacing="0"
+                        width="100%">
+                          <thead>
+                            <tr>
+                                <th>Importe</th>
+                                <th>IVA</th>
+                                <th>Total</th>
+                                <th>Motivo</th>
+                                <th> </th>
+                                <th> </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat="item in evidenciasReembolso">
+                                <td>{{item.importe | currency}}</td>
+                                <td>{{item.IVA | currency}}</td>
+                                <td>{{item.monto | currency}}</td>
+                                <td>{{item.motivo}}</td>
+                                <td>
+                                <button class="btn btn-circle btn-cir-view" ng-click="verImagenModalVale(item)">
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                </button>
+                               </td>
+                               <td>
+                                <button ng-hide="item.estatusReembolso > 0" class="btn btn-circle btn-cir-success" ng-click="modalComentariosEvidencia(item)" title="Rechazar Evidencia">
+                                <i class="fa fa-times" aria-hidden="true"></i></button>
+                              </td>                
+                            </tr>      
+                          </tbody>
+                        </table>
+                        <label class="col-md-3">Monto Reembolso</label>
+                        <div  class="col-md-3"> 
+                            <input disabled  class="form-control" type="text" ng-model="montoReembolso">
+                        </div>
+                    </div>
+
+                    </div>
+                    <div  ng-show = "verBotonReembolso && tipoUsuario == 5 && estatusReembolsoFinanzas == 0" class="form-group col-md-12" >
+                        <label class="col-md-2">Reembolso Fondo Fijo</label>
+                        <div class="col-md-3">
+                        <select ng-disabled="estatusFondoFijo ==3 || estatusFondoFijo ==4"  class="form-control" ng-model="salidaSelectedR"
+                        ng-options="tipo.id as tipo.text for tipo in tipoSalidaReebolso"
+                        ng-change="SeleccionaTipoR(salidaSelectedR)">
+                        <option value="">Seleccione</option>
+                        </select>
+                        </div>
+                        <div  ng-show="verBotonReembolso"  class="col-md-2"> 
+                                <button ng-disabled="estatusFondoFijo ==3 || estatusFondoFijo ==4" class="btn btnNuevosChico" ng-click="guardarReembolso(salidaSelectedR,BancoSalidaFFR,BancoEntradaFFR,3)">
+                                    Guardar 
+                                </button>  
+                        </div>
+                        <div class="col-md-5" >
+                            </div>
+                        <div ng-show="verOrdenPagoR" class="form-group col-sm-12">
+                            <br>
+                            <label class="col-md-2">Banco Salida</label>
+                            <div class="col-md-4"> 
+                                    <select ng-disabled="estatusFondoFijo ==3 || estatusFondoFijo ==4" class="form-control" ng-model="BancoSalidaFFR"
+                                    ng-options="banco as banco.Nombre for banco in bancos">
+                                    <option value="">Seleccione</option>
+                                    </select>
+                            </div>
+                        </div>
+                        <div ng-show="verCajaR" class="form-group col-md-12">
+                                        <br>
+                                        <label class="col-md-2">Banco Salida</label>
+                                        <div class="col-md-4"> 
+                                                <select ng-disabled="estatusFondoFijo ==3 || estatusFondoFijo ==4" class="form-control" ng-model="BancoSalidaFFR"
+                                                ng-options="banco as banco.Nombre for banco in bancos">
+                                                <option value="">Seleccione</option>
+                                                </select>
+                                        </div>
+                                        <label class="col-md-2">Banco Entrada</label>
+                                        <div class="col-md-4"> 
+                                                <select ng-disabled="estatusFondoFijo ==3 || estatusFondoFijo ==4" class="form-control" ng-model="BancoEntradaFFR"
+                                                ng-options="banco as banco.Nombre for banco in bancos">
+                                                <option value="">Seleccione</option>
+                                                </select>
+                                        </div>
+                        </div>
+                    </div>
+                    <div ng-show = "tipoUsuario == 6">
+                        <label ng-show="estatusReembolsoFinanzas == 1"  class="col-md-2">Avanzar Reembolso</label>
+                        <div  class="col-md-2"> 
+                                <button ng-show="estatusReembolsoFinanzas == 1" class="btn btnNuevosChico" ng-click="guardarReembolso2()">
+                                    Aceptar 
+                                </button>  
+                        </div>
+                    </div>
+                    <div ng-show = "tipoUsuario == 7">
+                        <label ng-show="estatusReembolsoFinanzas == 2" class="col-md-2">Envio Tesoreria</label>
+                        <div  class="col-md-2"> 
+                                <button ng-show="estatusReembolsoFinanzas == 2"  class="btn btnNuevosChico" ng-click="guardarReembolso3()">
+                                    Aceptar 
+                                </button>  
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"> 
+                <div class="row" style="margin-top: 2%;  border-top: 0.5px solid #A0C9F7">             
+                        <div class="col-md-12" style="margin-top:8px; text-align: center;">
+                            <button class="btn btnNuevos" ng-click="backDashboard()">
+                                Salir
+                            </button>
+                            <button  ng-if="estatusFondoFijo != 4  && idRol != 10" ng-disabled= "traEstatus != 1 || Autorizado == 1" class="btn btnNuevos" 
+                                ng-click="aprobarRechazarTramite(3)">
+                                Rechazar
+                            </button>
+                            <button ng-if="estatusFondoFijo != 4 && idRol != 10" class="btn btnNuevos"
+                            ng-click="aprobarRechazarTramite(2)" ng-disabled="activarAprobar || traEstatus != 1 || Autorizado == 1">
+                            Aprobar
+                            </button>
+                            <button ng-if="estatusFondoFijo == 4  && idRol != 10" class="btn btnNuevos" 
+                            ng-click="aprobarRechazarTramiteAD(3)" ng-disabled="Autorizado == 1">
+                            Rechazar
+                            </button>
+                            <button ng-if="estatusFondoFijo == 4  && idRol != 10" class="btn btnNuevos"
+                            ng-click="aprobarRechazarTramiteAD(2)" ng-disabled="Autorizado == 1">
+                            Aprobar
+                            </button>
+                            <!-- <button class="btn btnNuevos" 
+                                ng-click="aprobarGerente()">
+                                Enviar trámite
+                            </button> -->
+                        </div>
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<!--Inicia modal spinner -->
+<!--===================================================-->
+<div id="loading" class="modal fade" tabindex="-1" data-focus-on="input:first">
+    <div class="modal-dialog modal-lg">
+        <div class="spinner">
+            <div class="cube1"></div>
+            <div class="cube2"></div>
+        </div>
+    </div>
+</div>
+<!--Termina modal spinner -->
+
+
+<!--================================ Modal para colocar los comentario ================================-->
+<div class="modal fade" id="rechazarDoc" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Rechazar {{ modalTitle }}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <h4>¿Por que rechaza el documento?</h4>
+                </div>
+                <div class="row">
+                    <textarea ng-model="razonesRechazo" formControlName="texto2" style="resize: none" cols="120"
+                        rows="3"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2"></div>
+                    <div class="col-md-3">
+                        <button class="btn btnNuevos" ng-click="cancelRechazo()">
+                            Cancelar
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btnNuevos" ng-click="sendRechazo()">
+                            Rechazar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--================================ End Modal para los comentario ================================-->
+
+<!--================================ Modal para colocar los comentario ================================-->
+<div class="modal fade" id="rechazarDocEvidencia" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Rechazar Evidencia Vale</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <h4>¿Por que rechaza el documento?</h4>
+                </div>
+                <div class="row">
+                    <textarea ng-model="razonesRechazoEvi" formControlName="texto2" style="resize: none" cols="120"
+                        rows="3"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2"></div>
+                    <div class="col-md-3">
+                        <button class="btn btnNuevos" ng-click="cancelRechazoEvidencia()">
+                            Cancelar
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btnNuevos" ng-click="sendRechazoEvidencia()">
+                            Rechazar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--================================ End Modal para los comentario ================================-->
+
+<!--================================ Modal para colocar imagen ================================-->
+<div class="modal fade" id="mostrarImagen" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">{{modalTitle}}</h4>
+            </div>
+            <div class="divComentariosError" ng-if="verComentarios">
+                    <label> Motivo de el Rechazo: "{{comentario}}"</label>
+            </div>
+            <div class="modal-body">
+                <img class="imgDocumento" ng-src="{{verImagen}}" />
+            </div>
+        </div>
+    </div>
+</div>
+<!--================================ Modal para colocar imagen ================================-->
+
+<!--================================ Modal para colocar PDF ================================-->
+<div class="modal fade" id="mostrarPdf" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">{{modalTitle}}</h4>
+            </div>
+            <div class="divComentariosError" ng-if="verComentarios">
+                    <label> Motivo de el Rechazo: "{{comentario}}"</label>
+            </div>
+            <div class="modal-body" id="pdfReferenceContent"></div>
+        </div>
+    </div>
+</div>
+<!--================================ End Modal para para colocar PDF ================================-->
+
+<!--================================ Modal nuevo documento ================================-->
+<div class="modal fade" id="nuevoDocumento" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Agregar Nuevo Documento</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label class="labelDocumentos">Nombre del documento</label>
+                            <input type="text" class="form-control" placeholder="Nombre" ng-model="nuevoDoc.nombre">
+                        </div>
+                        <div class="form-group">
+                            <label class="labelDocumentos">Extensión</label>
+                            <select class="form-control" ng-model="nuevoDoc.extension"
+                                ng-options="extension.id_extension as extension.ext_nombre for extension in extensiones">
+                                <option value="">Seleccione extensión</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="labelDocumentos">¿Por que solicita?</label>
+                            <textarea ng-model="nuevoDoc.porSolicita" formControlName="texto2" style="resize: none; width: 100%;"
+                                rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-2"></div>
+                </div>
+                <div class="row" style="margin-top: 10px;">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-8" style="text-align: center;">
+                        <button class="btn btnNuevos" ng-click="cancelNuevoDoc()">
+                            Cancel
+                        </button>
+
+                        <button class="btn btnNuevos" ng-click="guardarNuevoDoc()">
+                            Guardar
+                        </button>
+                    </div>
+                    <div class="col-md-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--================================ Fin modal nuevo documento ================================-->
+
+<div class="modal fade" id="modalSalidaEfectivo" role="dialog" tabindex="-1"
+aria-labelledby="demo-default-modal" aria-hidden="true">
+<div class="modal-dialog modal-md">
+    <div class="modal-content">
+        <div class="modal-header headerModal">
+            <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+            <h4 class="modal-title text-white">Salida Efectivo</h4>
+        </div>
+        <div class="modal-body">
+            <div class="row" style="margin-top: 1%; margin-left: 2%;">
+
+                <div class="row" style="margin-top: 1%; margin-left:0%;">
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <label>Tipo de Salida:</label>
+                    </div>
+                    <div class="col-sm-9 form-inline">
+                        <div class="col-sm-9 form-inline">
+                                <select  class="form-control" ng-model="salidaSelectedV"
+                                ng-options="tipo.id as tipo.text for tipo in tipoSalida"
+                                ng-change="SeleccionaTipoV(salidaSelectedV)">
+                                <option value="">Seleccione</option>
+                                </select>
+                        </div>
+                    </div>
+                </div>
+                <div ng-show="verOrdenPagoV" class="form-group col-sm-12">
+                    <br>
+                    <label class="col-md-2">Banco Salida</label>
+                    <div class="col-md-4">
+                            <select class="form-control" ng-model="BancoSalidaFFV"
+                            ng-options="banco as banco.Nombre for banco in bancos">
+                            <option value="">Seleccione</option>
+                            </select>
+                    </div>  
+                    </div>
+                    <div ng-show="verCajaV" class="form-group col-md-12">
+                                    <br>
+                                    <label class="col-md-2">Banco Salida</label>
+                                    <div class="col-md-4">
+                                            <select class="form-control" ng-model="BancoSalidaFFV"
+                                            ng-options="banco as banco.Nombre for banco in bancos">
+                                            <option value="">Seleccione</option>
+                                            </select>
+                                    </div>
+                                    <label class="col-md-2">Banco Entrada</label>
+                                    <div class="col-md-4">
+                                            <select  class="form-control" ng-model="BancoEntradaFFV"
+                                            ng-options="banco as banco.Nombre for banco in bancos">
+                                            <option value="">Seleccione</option>
+                                            </select>
+                                    </div>
+                    </div>
+            </div>
+        </div>
+        <div ng-show="verBotonVale" class="modal-footer" style="margin-top: 0%; margin-right:1%;">
+            <button class="btn btnNuevos" ng-click="confirmarSalidaVale()">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                Guardar
+            </button>
+        </div>
+    </div>
+</div>
+</div>

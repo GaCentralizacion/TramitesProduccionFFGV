@@ -1,0 +1,159 @@
+<link rel="stylesheet" href="css/generic.css" class="ng-scope">
+<link rel="stylesheet" href="css/aprobarDev/aprobarDev.css" class="ng-scope">
+
+<div ng-init="init()" class="ng-scope">
+    <div class="col-md-12" style="height: 100px; background-color: white;">
+        <label class="labelDocs">
+            <span>
+                <img class="imgSubHeader" src="../../img/iconos/devolucion@2x.png">
+            </span> Validación de Cuenta Bancaria
+        </label>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="divPrincipal col-md-11">
+                <div class="middle-box" ng-init="estadocuenta = 0">
+                    <div class="row" style="border-bottom: 1px solid #A0C9F7;">
+                    	<div class="col-sm-12">
+                    		
+                    	</div>
+                    </div>
+
+                    <div class="row">
+                    	<div class="col-sm-12">
+                    		<h3>Datos de la cuenta</h3>
+                    	</div>
+
+                    	<div class="col-sm-12"  style="margin-bottom: 50px;">
+                    		<label><b>Solcitante</b></label>
+                    		<h4 style="margin-top: 0px">{{ vc_cuenta.nombre }}</h4>
+                    	</div>
+
+                    	<div class="col-sm-3" ng-show="estadocuenta == 0">
+                    		<label><b>CLABE</b></label>
+                    		<h4 style="margin-top: 0px">{{cuenta.ca_clabe}}</h4>
+                    	</div>
+
+                    	<div class="col-sm-2" ng-show="estadocuenta == 0">
+                    		<label><b>No. Cuenta</b></label>
+                    		<h4 style="margin-top: 0px">{{cuenta.ca_cuenta}}</h4>
+                    	</div>
+
+                    	<div class="col-sm-3" ng-show="estadocuenta == 0">
+                    		<label><b>Banco</b></label>
+                    		<h4 style="margin-top: 0px">{{cuenta.ca_banconombre}}</h4>
+                    	</div>
+
+                    	<div class="col-sm-2" ng-show="estadocuenta == 0">
+                    		<label><b>Plaza</b></label>
+                    		<h4 style="margin-top: 0px">{{cuenta.ca_plaza}}</h4>
+                    	</div>
+
+                    	<div class="col-sm-2" ng-show="estadocuenta == 0">
+                    		<label><b>Sucursal</b></label>
+                    		<h4 style="margin-top: 0px">{{cuenta.ca_sucursal}}</h4>
+                    	</div>
+
+                    	<div class="col-sm-12">
+                    		<center>
+                    			<a href="" ng-click="estadocuenta = 1" ng-show="estadocuenta == 0">
+                    				<br><br>
+                    				<i class="fa fa-angle-double-left" aria-hidden="true"></i> Ver Estado de Cuenta <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                    				<br>
+
+                    				<i class="fa fa-angle-down" aria-hidden="true" style="font-size: 36px"></i>
+                    			</a>
+                    		</center>
+                    	</div>
+                    </div>
+
+                    <div class="row" ng-show="estadocuenta == 1">
+                    <!-- <div class="row"> -->
+                    	<div class="col-sm-2">
+                    		<div class="row">
+                    			<div class="col-sm-12" ng-show="estadocuenta == 1">
+		                    		<label><b>CLABE</b></label>
+		                    		<h4 style="margin-top: 0px">{{ cuenta.ca_clabe }}</h4>
+		                    	</div>
+
+		                    	<div class="col-sm-12" ng-show="estadocuenta == 1" style="margin-top: 40px;">
+		                    		<label><b>No. Cuenta</b></label>
+		                    		<h4 style="margin-top: 0px">{{ cuenta.ca_cuenta }}</h4>
+		                    	</div>
+
+		                    	<div class="col-sm-12" ng-show="estadocuenta == 1" style="margin-top: 40px;">
+		                    		<label><b>Banco</b></label>
+		                    		<h4 style="margin-top: 0px">{{ cuenta.ca_banconombre }}</h4>
+		                    	</div>
+
+		                    	<div class="col-sm-12" ng-show="estadocuenta == 1" style="margin-top: 40px;">
+		                    		<label><b>Plaza</b></label>
+		                    		<h4 style="margin-top: 0px">{{ cuenta.ca_plaza }}</h4>
+		                    	</div>
+
+		                    	<div class="col-sm-12" ng-show="estadocuenta == 1" style="margin-top: 40px;">
+		                    		<label><b>Sucursal</b></label>
+		                    		<h4 style="margin-top: 0px">{{ cuenta.ca_sucursal }}</h4>
+		                    	</div>
+                    		</div>
+                    	</div>
+                    	<div class="col-sm-5" id="estadoCuenta">
+                    		<!-- <iframe width="100%" height="500px" src="http://localhost:1200/documentos/Comprobacion/Comprobacion_1439/13_comprobacion_1.pdf"></iframe> -->
+                            <!-- <iframe width="100%" height="500px" src="{{ cuenta.EstadoCuenta }}"></iframe> -->
+                            
+						</div>
+						<div class="col-sm-5" id="INE">
+                    		<!-- <iframe width="100%" height="500px" src="http://localhost:1200/documentos/Comprobacion/Comprobacion_1439/13_comprobacion_1.pdf"></iframe> -->
+                            <!-- <iframe width="100%" height="500px" src="{{ cuenta.EstadoCuenta }}"></iframe> -->
+                            
+                    	</div>
+
+                    	<div class="col-sm-12">
+                    		<center>
+                    			<a href="" ng-click="estadocuenta = 0" ng-show="estadocuenta == 1">
+                    				<br><br>
+                    				<i class="fa fa-angle-up" aria-hidden="true" style="font-size: 36px"></i>
+                    				<br>
+                    				<i class="fa fa-angle-double-left" aria-hidden="true"></i> Mostrar menos <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                    				<br><br>
+                    			</a>
+                    		</center>
+                    	</div>
+                    </div>
+
+                    <div class="row" style="border-top: 1px solid #A0C9F7;">
+                    	<div class="col-sm-12" style="padding: 20px 0;">
+                    		<button 
+                    			class="btn btn-default pull-left" 
+                    			ng-click="regresar()"
+                    			style="width: 150px;"> Salir</button>
+
+                    		<!-- <button class="btn btn-danger pull-right" style="width: 150px;" ng-click="rechazar()"> Rechazar</button> -->
+                            
+                            <button class="btn btn-danger pull-right" style="width: 150px;" data-toggle="modal" data-target="#exampleModal"> Rechazar</button>
+                    		<button class="btn btn-primary pull-right" style="width: 150px; margin-right: 10px;" ng-click="aprobar()"> Aceptar</button>
+                    	</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <label style="color: black; font-size: 16px;">Motivo del rechazo</label><br>
+            <textarea style="width: 100%; padding: 10px;" rows="6" ng-model="comentariorechazo"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" style="width: 150px;">Cerrar</button>
+            <button type="button" class="btn btn-primary" ng-click="rechazar()" style="width: 150px;">Aceptar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>

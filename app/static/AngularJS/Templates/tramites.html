@@ -1,0 +1,130 @@
+<link rel="stylesheet" href="css/tramites/tramite.css">
+<div ng-init="init()" class="col-md-12" style="height: 100px; background-color: white;">
+    <label class="labelDocs">
+        <span>
+            <img class="imgSubHeader" src="../../img/iconos/tramite@2x.png">
+        </span> {{titulo}} de Trámite
+    </label>
+</div>
+<div class="col-md-12">
+    <div class="divPrincipal col-md-10">
+        <div class="middle-box">
+            <div class="row nav nav-pills nav-stacked" style="margin-bottom: 18px;">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-2" style="text-align: center; border-top-left-radius: 100px; border-bottom-left-radius: 100px;" ng-click="setTab(1)" ng-class="{ active: isSet(1), noActive: isSet(2)}">
+                    <a ng-class="{ textoActivo: isSet(1), textoNoActivo: isSet(2)}">Alta</a>
+                </div>
+                <div class="col-sm-2" style="text-align: center; border-top-right-radius: 100px; border-bottom-right-radius: 100px;" ng-click="setTab(2)" ng-class="{ active: isSet(2), noActive: isSet(1) }">
+                    <a ng-class="{ textoActivo: isSet(2), textoNoActivo: isSet(1)}">Consulta</a>
+                </div>
+            </div>
+            <div class="row" ng-show="isSet(1)">
+                <div class="col-md-12">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="labelDocs">Nombre del trámite</label>
+                            <input type="text" class="form-control" placeholder="Nombre" ng-model="tram.nombre">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="labelDocs">Areas</label>
+                            <select class="form-control" ng-model="tram.area" ng-options="area.id_area as area.are_nombreArea for area in areas">
+                                <option value="">Seleccione area</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="col-md-6">
+                        <div class="col-md-12">
+                            <div class="panel-heading">
+                                <h5 class="panel-title">Documentos Seleccionados</h5>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <ul dnd-list="models.lists.A" class="pull-right principalUL">
+                                <label class="placeholderUL" ng-if="models.lists.A.length == 0">
+                                    Arrastre sus documentos aquí</label>
+                                <li class="principalLi" ng-repeat="item in models.lists.A | filter:keySearch" dnd-draggable="item" dnd-moved="models.lists.A.splice($index, 1)" dnd-effect-allowed="move" dnd-selected="models.selected = item" ng-class="{'selected': models.selected === item}">
+                                    {{item.doc_nomDocumento}}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="col-md-12">
+                            <div class="panel-heading">
+                                <h5 class="panel-title">Catálogo de documentos</h5>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <ul dnd-list="models.lists.B" class="pull-right principalUL">
+                                <li class="principalLi" ng-repeat="item in models.lists.B | filter:keySearch" dnd-draggable="item" dnd-moved="models.lists.B.splice($index, 1)" dnd-effect-allowed="move" dnd-selected="models.selected = item" ng-class="{'selected': models.selected === item}">
+                                    {{item.doc_nomDocumento}}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <button type="submit" class="btn save-button" ng-click="saveTramite()" ng-disabled="tram.nombre == ''">
+                        Guardar Trámite
+                    </button>
+                </div>
+            </div>
+            <div class="row" ng-show="isSet(2)">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="labelDocs">Tramites</label>
+                        <select class="form-control" ng-model="tramite" ng-options="tramite.id_tramite as tramite.tra_nomTramite for tramite in tramites" ng-change="obtieneDocumentos(tramite)">
+                            <option value="">Seleccione tramite</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <button class="btn btn-primary guardaDocumento" ng-click="cambiadocumento()">Guardar</button>
+                </div>
+                <div class="col-md-12">
+                    <table id="tableTramiteDocumentos" class="table table-bordered tblFont" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Documento</th>
+                                <th ng-show="modificarDocumentos">Mandatorio bancario</th>
+                                <th ng-show="modificarDocumentos">Transferencia bancaria</th>
+                                <th ng-show="modificarDocumentos">Mandatorio efectivo</th>
+                                <th ng-show="modificarDocumentos">Deposito en efectivo</th>
+                                <th ng-show="modificarDocumentos">Mostrar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="tramiteDocumento in tramiteDocumentos">
+                                <td ng-show="modificarDocumentos" style="width: 700px;"><input type="text" ng-model="tramiteDocumento.doc_nomDocumento"></td>
+                                <td ng-show="!modificarDocumentos">{{tramiteDocumento.doc_nomDocumento}}</td>
+                                <td ng-show="modificarDocumentos"><input type="checkbox" name="mandatorioBancario" id="mandatorioBancario-{{tramiteDocumento.id_documento}}" ng-model="tramiteDocumento.mandatorioBancario" ng-value="tramiteDocumento.mandatorioBancario"></td>
+                                <!-- <td ng-show="modificarDocumentos">{{tramiteDocumento.bancario}}</td> -->
+                                <td ng-show="modificarDocumentos"><input type="checkbox" name="bancario" id="bancario-{{tramiteDocumento.id_documento}}" ng-model="tramiteDocumento.bancario" ng-value="tramiteDocumento.bancario"></td>
+                                <td ng-show="modificarDocumentos"><input type="checkbox" name="mandatorioEfectivo" id="mandatorioEfectivo-{{tramiteDocumento.id_documento}}" ng-model="tramiteDocumento.mandatorioEfectivo" ng-value="tramiteDocumento.mandatorioEfectivo"></td>
+                                <!-- <td ng-show="modificarDocumentos">{{tramiteDocumento.efectivo}}</td> -->
+                                <td ng-show="modificarDocumentos"><input type="checkbox" name="efectivo" id="efectivo-{{tramiteDocumento.id_documento}}" ng-model="tramiteDocumento.efectivo" ng-value="tramiteDocumento.efectivo"></td>
+                                <!-- <td ng-show="modificarDocumentos">{{tramiteDocumento.activo}}</td> -->
+                                <td ng-show="modificarDocumentos"><input type="checkbox" name="activo" id="activo-{{tramiteDocumento.id_documento}}" ng-model="tramiteDocumento.activo" ng-value="tramiteDocumento.activo"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Inicia modal spinner -->
+<!--===================================================-->
+<div id="loading" class="modal fade" tabindex="-1" data-focus-on="input:first">
+    <div class="modal-dialog modal-lg">
+        <div class="spinner">
+            <div class="cube1"></div>
+            <div class="cube2"></div>
+        </div>
+    </div>
+</div>
+<!--Termina modal spinner -->

@@ -1,0 +1,718 @@
+<link rel="stylesheet" href="css/generic.css">
+<link rel="stylesheet" href="css/nuevoTramite/nuevoTramite.css">
+<div ng-init="init()">
+    <div class="row" ng-if="nuevo_Actualiza">
+        <div class="col-sm-12" style="text-align: center">
+            <h2>Devoluciones</h2>
+            <h4>{{numeroSolicitud}}</h4>
+        </div>
+    </div>
+    <div class="row" ng-if="!nuevo_Actualiza">
+        <div class="col-md-3" style="border-bottom: 1px solid #A0C9F7; margin-top: 15px;">
+            <div class="col-sm-11 form-inline" style="margin-bottom: 5px;">
+                <label class="labelIdClienteText">{{numeroSolicitud}}</label>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div style="width: 70%; float: right;font-size: 20px;font-weight: bold"
+                ng-if="!nuevo_Actualiza && (traEstatus == 5 || traEstatus == 3 || traEstatus == 2 || traEstatus == 14)">
+                <span class="pull-right"
+                    ng-class="{color_span_estatusWar: traEstatus == 1, color_span_estatusEspeWar: traEstatus == 0, color_span_estatusSuc: traEstatus == 2, color_span_estatusErr: traEstatus == 3, color_span_estatusBor: traEstatus == 5, color_span_estatusCanWar: traEstatus == 14}">
+                    {{nombreEstatus}}
+                </span>
+            </div>
+            <div class="pull-right"
+                ng-if="!nuevo_Actualiza && (traEstatus == 0 || traEstatus == 1 || traEstatus == 6 )">
+                <div class="row">
+                    <div class="col-sm-6"><h4>Proceso:</h4> </div>
+                    <div class="col-sm-6 tiempoTotal"><strong>Tiempo Total: </strong><span>{{tiempoTotal}}</span></div>
+                </div>
+                
+                
+                <div ng-repeat="estatus in allEstatusDevolucion"
+                ng-class="{arrowRightActive: estatusDevolucion >= estatus.idEstatus && estatusDevolucion != estatus.idEstatus && showDocumenosRechazados, 
+                    arrowRight: estatusDevolucion < estatus.idEstatus,
+                    arrowRightActiveActual: estatusDevolucion === estatus.idEstatus && showDocumenosRechazados,
+                    arrowRightActiveError: estatusDevolucion == estatus.idEstatus && !showDocumenosRechazados,
+                    arrowRightActive2: estatus.idEstatus < estatusDevolucion && !showDocumenosRechazados }" style="height: 75px;">
+                    <div class="row"> 
+                        <div class="col-md-5">
+                            <img style="width: 90%; margin-top: 10px; margin-left:15px;" ng-src="{{estatus.icono}}">
+                        </div>
+                        <div class="col-md-7">
+                            <div class="divPadreCenter">
+                                <div class="divHijoCenter">
+                                    <label style="font-size:10px; text-align: left;">{{estatus.descripcion}}</label>
+                                </div>
+                                
+                            </div>
+                           
+                        </div>
+                        
+                    </div>
+                    <div ng-if="estatus.tiempo">
+                        <label   class="labelProceso">{{estatus.tiempo}}</label>
+                                            
+                    </div>
+                   
+                </div>
+                <div style="width: 100%;" ng-hide="showDocumenosRechazados">
+                    <label  class="pull-right" style="font-size: 15px; color: red;">* Documentos Rechazados</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 2%;">
+        <div class="col-sm-4 form-inline">
+            <label class="labelIdCliente">Empresa:</label>
+            <select style="width: 82% !important;" class="form-control" ng-model="selEmpresa"
+                ng-options="empresa.emp_idempresa as empresa.emp_nombre for empresa in empresas"
+                ng-change="getSucuesales(selEmpresa)" ng-disabled="bloquearCampos">
+                <option value="">Seleccione Empresa</option>
+            </select>
+        </div>
+        <div class="col-sm-4 form-inline">
+            <label class="labelIdCliente">Sucursal:</label>
+            <select style="width: 82% !important;" class="form-control" ng-model="selSucursal"
+                ng-options="sucursal.idSucursal as sucursal.nombre for sucursal in sucursales"
+                ng-change="habilitarSearch()" ng-disabled="disabledSuc || bloquearCampos">
+                <option value="">Seleccione Sucursal</option>
+            </select>
+        </div>
+        <div class="col-sm-4 form-inline">
+            <label class="labelIdCliente" style="width: 70%">Id cliente:</label>
+            <div class="form-group">
+                <input type="number" class="form-control" placeholder="idCliente" ng-model="idCliente"
+                ng-disabled="disabledSearch || bloquearCampos">
+                <button class="btn btn-search" ng-disabled="disabledSearch || bloquearCampos" ng-click="getDataCliente(0)">
+                    Buscar cliente
+                    <i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+
+    <div class="row" style="margin-top: 1%;" ng-show="verDocumentacion">
+        <div class="row" >
+            <div class="col-md-8 col-md-offset-2" style="display: inline-flex;">
+                    <div class="col-md-4">
+                        <label class="labelIdCliente">Motivo devolución:</label>
+                    </div>
+                    <div class="col-md-8">
+                        <select style="width: 82% !important;border-radius: 20px !important;"  class="form-control" ng-model="motivoDev"
+                        ng-options="motivo.idMotivo as motivo.motivoDevolucion for motivo in motivoDevolucionLst"
+                        ng-disabled="bloquearCampos">
+                        <option value="">Seleccione motivo</option>
+                    </select>
+                    </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <label class="labelIdDataCliente">Datos del Cliente</label>
+            </div>
+            <div class="col-sm-6">
+                <div class="col-sm-10" style="margin-left: 50px; border-bottom: 0.5px solid #62A3EB">
+                    <label class="labelIdDataCliente">Documentos</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 form-inline" style="border: 0.5px solid #62A3EB; padding: 15px;">
+            <div>
+                <div class="col-md-8">
+                    <div class="col-md-4">
+                        <div class="user one">
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="labelIdDataCliente">Cliente:</label>
+                        <label class="labelDataCliente"> {{dataCliente.paterno}} {{dataCliente.materno}}
+                            {{dataCliente.nombre}}</label> <br>
+                        <label class="labelIdDataCliente">Id Cliente:</label>
+                        <label class="labelDataCliente"> {{dataCliente.idPersona}}</label> <br>
+                        <label class="labelIdDataCliente">RFC cliente:</label>
+                        <label class="labelDataCliente">{{dataCliente.rfc}}</label> <br>
+                    </div>
+                </div>
+                <div class="col-md-4" style="border-left: 0.5px solid #62A3EB; height: 95px; margin-top: 10px;">
+                    <div style="width: 100%; text-align: center">
+                        <label class="labelSaldoCliente" style="margin-top: 20px;">Saldo:</label><br>
+                        <label class="labelSaldoCliente">{{ dataCliente.saldo | currency }}</label><br>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6" ng-show="nuevo_Actualiza">
+            <div class="col-md-10 divUser scrollDovertido" style="margin-left: 50px;">
+                <div class="row divDocumentos" ng-repeat="documento in documentos">
+                    <div>
+                        <div class="col-md-10">
+                            <span ng-if="documento.opcional == false"
+                                ng-class="{adjuntado: documento.archivo == '', noadjuntado: documento.archivo != ''}">*</span>&nbsp;
+                            <label class="documentosLabel">{{documento.doc_nomDocumento}}</label>
+                        </div>
+                        <div class="col-md-2 picture-container">
+                            <div class="picture">
+                                <img style="width: 100%" src="../images/autorizacion@2x.png" title="Documento Adjuntado"
+                                    ng-hide="documento.archivo != '' " />
+                                <img style="width: 100%" src="../images/subir@2x.png" class="picture-src"
+                                    title="Subir Archivo {{documento.ext_nombre}}" ng-hide="documento.archivo == ''" />
+                                <input type="file" ng-model="documento.archivo" id="wizard-picture"
+                                    ng-file-select="onFileSelect($files)" class="picture"
+                                    accept="{{documento.ext_nombre == 'pdf' ? 'application/pdf': 'image/'+ documento.ext_nombre  }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <span class="noadjuntado">*</span> Documentación Obligatoria
+            </div>
+        </div>
+        <div class="row" ng-show="datosBancos && nuevo_Actualiza">
+            <div class="col-md-12">
+                <div class="divBancos">
+                    <div class="row">
+                        <div class="col-sm-6 form-inline">
+                            <label class="labelIdCliente">Cuenta:</label>
+                            <input type="text" class="form-control" placeholder="Cuenta Bancaria" style="width: 70%;"
+                                ng-model="cuentaBancaria" ng-blur="validaCuenta()" ng-disabled="estatusDevolucion > 0 " onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;"  pattern="^[0-9]\d*$">
+                        </div>
+                        <div class="col-sm-6 form-inline">
+                            <label class="labelIdCliente">Banco:</label>
+                            <select style="width: 71% !important;" class="form-control" ng-model="cveBanxico"
+                                ng-options="banxico.cveBanxico as banxico.nombreBanco for banxico in bancoCveBanxico"
+                                ng-change="getSucuesales(selEmpresa)">
+                                <option value="">Seleccione Banco</option>
+                            </select>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-6 form-inline">
+                            <label class="labelIdCliente">CLABE:</label>
+                            <input type="text" class="form-control" placeholder="CLABE" style="width: 72%;"
+                                ng-model="numeroCLABE" ng-disabled="estatusDevolucion > 0" pattern="^[0-9]\d*$" minlength="18" maxlength="18" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">
+                        </div>
+                        <div class="col-sm-6 form-inline">
+                            <label class="labelIdCliente">Tipo Cuenta:</label>
+                            <select style="width: 60% !important;" class="form-control" ng-model="tipoCuenta"
+                                ng-options="tc.cveTipoCuenta as tc.tipoCuenta for tc in bancoTipoCuenta">
+                                <option value="">Seleccione Tipo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ================================================================= -->
+        <div class="col-sm-6" ng-show="!nuevo_Actualiza">
+            <!-- <label class="headerLabel">Documentos Seleccionados</label> -->
+            <div class="col-md-10 divUser scrollDovertido" style="margin-left: 50px;">
+                <div class="row divDocumentos" ng-repeat="documento in documentos">
+                    <div>
+                        <div class="col-md-1">
+                            <button class="btn btn-circle btn-cir-view" ng-click="verPdf(documento)"
+                                ng-if="documento.idExtension == 2 && documento.existe > 0">
+                                <i style="color: #62A3EB;" class="fa fa-eye" aria-hidden="true"></i>
+                            </button>
+                            <button class="btn btn-circle btn-cir-view" ng-click="verImagenModal(documento)"
+                                ng-if="documento.idExtension != 2 && documento.existe > 0">
+                                <i style="color: #62A3EB;" class="fa fa-eye" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="col-md-8">
+                            <span ng-if="documento.opcional == false"
+                                ng-class="{adjuntado: documento.archivo == '', noadjuntado: documento.archivo != ''}">*</span>&nbsp;
+                            <label
+                                ng-class="{color_texto_aprobar: documento.estatusDocumento == 2, color_texto_rechazar: documento.estatusDocumento == 3}"
+                                class="documentosLabel">
+                                {{documento.doc_nomDocumento}}
+                            </label>
+                        </div>
+                        <div class="col-md-2 picture-container" ng-if="documento.existe > 0">
+                            <div class="picture">
+                                <img style="width: 100%" src="../images/autorizacion@2x.png" title="Documento aprobado"
+                                    ng-if="documento.existe > 0 && documento.estatusDocumento != 3 || documento.archivo == ''" />
+                                <img style="width: 100%" src="../images/subir@2x.png" class="picture-src"
+                                    title="Subir archivo"
+                                    ng-if="documento.existe > 0 && documento.estatusDocumento == 3 && documento.archivo != ''" />
+                                <input ng-if="documento.existe > 0 && documento.estatusDocumento == 3" type="file"
+                                    ng-model="documento.archivo" id="wizard-picture"
+                                    ng-file-select="onFileSelect($files)" class="picture"
+                                    accept="{{documento.ext_nombre == 'pdf' ? 'application/pdf': 'image/'+ documento.ext_nombre  }}">
+                            </div>
+                        </div>
+                        <div class="col-md-2 picture-container" ng-if="documento.existe == 0">
+                            <div class="picture">
+                                <img style="width: 100%" src="../images/autorizacion@2x.png" title="Documento Adjuntado"
+                                    ng-show="documento.archivo == ''" />
+                                <img style="width: 100%" src="../images/subir@2x.png" class="picture-src"
+                                    ng-show="documento.archivo != ''" title="Subir Archivo documento.ext_nombre}}" />
+                                <input type="file" ng-model="documento.archivo" id="wizard-picture"
+                                    ng-file-select="onFileSelect($files)" class="picture"
+                                    accept="{{documento.ext_nombre == 'pdf' ? 'application/pdf': 'image/'+ documento.ext_nombre  }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <span class="noadjuntado">*</span> Documentación Obligatoria
+            </div>
+        </div>
+        <div class="row" ng-show="datosBancos && !nuevo_Actualiza ">
+            <div class="col-md-12">
+                <div class="divBancos">
+                    <div class="row">
+                        <div class="col-sm-6 form-inline">
+                            <label class="labelIdCliente">Cuenta:</label> 
+                            <input type="text" class="form-control" placeholder="Cuenta Bancaria" style="width: 70%;"
+                                ng-model="cuentaBancaria" ng-blur="validaCuenta()" ng-disabled="estatusDevolucion > 0 && habilitaEditarCuenta  " onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;" pattern="^[0-9]\d*$">
+                        </div>
+
+                        <div class="col-sm-6 form-inline">
+                            <label class="labelIdCliente">Banco:</label>
+                            <select style="width: 71% !important;" class="form-control" ng-model="cveBanxico"
+                                ng-options="banxico.cveBanxico as banxico.nombreBanco for banxico in bancoCveBanxico"
+                                ng-change="getSucuesales(selEmpresa)" ng-disabled="estatusDevolucion > 0 && habilitaEditarCuenta ">
+                                <option value="">Seleccione Banco</option>
+                            </select>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-6 form-inline">
+                            <label class="labelIdCliente">CLABE:</label>
+                            <input type="text" class="form-control" placeholder="CLABE" style="width: 72%;"
+                                ng-model="numeroCLABE" ng-disabled="estatusDevolucion > 0 && habilitaEditarCuenta" minlength="18" maxlength="18" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;" pattern="^[0-9]\d*$">
+                        </div>
+                        <div class="col-sm-6 form-inline">
+                            <label class="labelIdCliente">Tipo Cuenta:</label>
+                            <select style="width: 60% !important;" class="form-control" ng-model="tipoCuenta"
+                                ng-options="tc.cveTipoCuenta as tc.tipoCuenta for tc in bancoTipoCuenta"
+                                ng-disabled="estatusDevolucion > 0 && habilitaEditarCuenta">
+                                <option value="">Seleccione Tipo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ================================================================= -->
+    <div class="row divObservaciones" ng-show="verDocumentacion">
+        <div class="col-sm-9">
+            <table id="tableDocumentos" class="table table-striped table-bordered" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Seleccion
+                            <div ng-if="traEstatus != 3 && estatusDevolucion == 0" class="form-group"
+                                style="text-align: right">
+                                <label class="containerAll">
+                                    <input type="checkbox" ng-model="checkAll" ng-change="selAll(checkAll)">
+                                    <span class="checkmarkAll"></span>
+                                </label>
+                            </div>
+                        </th>
+                        <th>Documento</th>
+                        <th>Doc. cancelación</th>
+                        <th>Departamento</th>
+                        <th>Tipo Pago</th>
+                        <th>Saldo</th>
+                        <th>Total a Devolver</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="documento in documentosCliente"> 
+                        <td style="width: 5%;">
+                            <div style="width: 100%; text-align: center !important;">
+                                <div class="form-group"
+                                    ng-if="(documento.saldofinal > 0 && traEstatus != 3 && estatusDevolucion == 0) && (documento.disponible == 1 && idPertraDisponible == 0)">
+                                    <label class="container">
+                                        <input type="checkbox" ng-model="documento.checado"
+                                            ng-change="checkDocumento(documento)">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                                <div class="form-group"
+                                    ng-if="(estatusDevolucion != 0 && documento.saldofinal > 0 && traEstatus != 3)  && (documento.disponible == 0  && idPertraDisponible > 0)">
+                                    <label class="container">
+                                        <input type="checkbox" ng-model="documento.checado"
+                                            ng-change="checkDocumento(documento)" disabled>
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                                <div class="form-group"
+                                ng-if="(traEstatus == 5 && documento.saldofinal > 0 && traEstatus != 3)  && (documento.disponible == 1  && idPertraDisponible > 0)">
+                                <label class="container">
+                                    <input type="checkbox" ng-model="documento.checado"
+                                        ng-change="checkDocumento(documento)" >
+                                    <span class="checkmark"></span>
+                                </label>
+                                 </div>
+                                <div style="background-color: red; border-radius: 5px; color: white; width: 80%; text-align: center;"
+                                    ng-if="(documento.saldofinal == 0 || traEstatus == 3) || (documento.disponible == 0 && idPertraDisponible == 0)">
+                                    <label>No disponible</label>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="rigthCell">{{documento.documento}}</td>
+                        <td class="rigthCell">{{documento.docCancelacion}}</td>
+                        <td style="width: 30%;">{{documento.departamento}}</td>
+                        <td>{{documento.tipoPago}}</td>
+                        <td class="rigthCell">{{documento.saldofinal | currency}}</td>
+                        <td>
+                            <label><i class="fa fa-money" aria-hidden="true"></i></label>&nbsp;
+                            <input ng-if="documento.saldofinal > 0 && traEstatus != 3 && estatusDevolucion == 0"
+                                type="text" currency-mask
+                                ng-class="{colorsAmountSuccess: documento.devFinal == documento.saldofinal, colorsAmountGo: documento.devFinal < documento.saldofinal, colorsAmountError: documento.devFinal > documento.saldofinal, colorsAmountNormal: documento.devFinal == 0, colorsAmountNormal: documento.devFinal == NULL}"
+                                ng-model="documento.devFinal" ng-disabled="!documento.checado"
+                                ng-blur="sumarValores()" />
+                            <input
+                                ng-class="{colorsAmountSuccess: documento.devFinal == documento.saldofinal, colorsAmountGo: documento.devFinal < documento.saldofinal, colorsAmountError: documento.devFinal > documento.saldofinal, colorsAmountNormal: documento.devFinal == 0, colorsAmountNormal: documento.devFinal == NULL}"
+                                currency-mask
+                                ng-if="documento.saldofinal == 0 || traEstatus == 3 || estatusDevolucion != 0"
+                                ng-model="documento.devFinal" disabled />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-3">
+            <div class="row">
+                <div class="divTotalDevolucion col-md-12">
+                    <label class="labelDevolucion">Total de la devolucion:</label>
+                    <label
+                        ng-class="{saldoNeutro: amount == 0, saldoTrue: amount > 0, }">{{ amount | currency }}</label><br>
+                </div>
+            </div>
+            <div class="row" ng-show="verDocumentacion">
+                <div class="col-sm-12" style="margin-top: 3px;">
+                    <textarea ng-model="observaciones" placeholder="Observaciones"
+                        style="resize: none; width: 100%; border: 0.5px solid #62A3EB" rows="7"
+                        maxlength="8000"></textarea>
+                </div>
+            </div>
+            <br>
+            <div class="row" ng-show="selFormaPago != 2">
+                <div class="col-sm-12" ng-if="documentoComprobante[0].det_idPerTra != null">
+                    <label class="headerLabel">Comprobante {{documentoComprobante.det_idPerTra.length}}</label>
+                    <!-- <div class="col-md-10"> -->
+                        <div class="row divDocumentos" ng-repeat="documento in documentoComprobante">
+                            <div>
+                                <div class="col-md-1">
+                                    <button class="btn btn-circle btn-cir-view" ng-click="verPdf(documento)"
+                                        ng-if="documento.idExtension == 2 && documento.existe > 0">
+                                        <i style="color: #62A3EB;" class="fa fa-eye" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="btn btn-circle btn-cir-view" ng-click="verImagenModal(documento)"
+                                        ng-if="documento.idExtension != 2 && documento.existe > 0">
+                                        <i style="color: #62A3EB;" class="fa fa-eye" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                                <div class="col-md-10">
+                                    <span ng-if="documento.opcional == false"
+                                        ng-class="{adjuntado: documento.archivo == '', noadjuntado: documento.archivo != ''}">*</span>&nbsp;
+                                    <label
+                                        ng-class="{color_texto_aprobar: documento.estatusDocumento == 2, color_texto_rechazar: documento.estatusDocumento == 3}"
+                                        class="documentosLabel" title="{{documento.doc_infoAdicional}}">
+                                        {{documento.nombreDoc}}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    <!-- </div> -->
+                </div>
+            </div>
+            <div class="row divDocumentos" ng-show="estatustramite == 6 && selFormaPago == 2">
+                <div>
+                    <div class="col-md-1">
+                        <button class="btn btn-circle btn-cir-view" ng-click="verComprobanteTransferencia()">
+                            <i style="color: #62A3EB;" class="fa fa-eye" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <div class="col-md-11">
+                        <label class="documentosLabel" title="{{documento.doc_infoAdicional}}">
+                            Comprobante Transferencia
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" ng-if="traEstatus == 5 || traEstatus == 0 || traEstatus == 1 || traEstatus == 6 || traEstatus == 14 ">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8" style="text-align: center; margin-top: 13px;" ng-if="verDocumentacion">
+        <button class="btn btnNuevos" ng-click="salirTramite()">
+            Salir
+        </button>
+        <button ng-show="((estatusProceso == 0 || estatusProceso == 1) && traEstatus != 14)  " class="btn btnNuevos" ng-click="cancelarTramite()">
+            Cancelar trámite
+        </button>
+      
+            <button ng-hide="traEstatus == 14" ng-if="nuevo_Actualiza" class="btn btnNuevos" ng-click="guardarTramite();">
+                Guardar
+            </button>
+            <button  ng-hide="traEstatus == 14" ng-if="!nuevo_Actualiza" class="btn btnNuevos" ng-click="actualizarTramite();">
+                Actualizar
+            </button>
+            <button  ng-hide="traEstatus == 14" ng-if="nuevo_Actualiza" class="btn btnNuevos" ng-click="solicitarTramite()">
+                Solicitar
+            </button>
+            <button  ng-hide="traEstatus == 14" ng-if="!nuevo_Actualiza && traEstatus == 5  " class="btn btnNuevos" ng-click="solicitarTramiteBorrador()">
+                Solicitar
+            </button>
+            <button   ng-show="estatusDevolucion == 6 && traEstatus != 2 && traEstatus != 3 && traEstatus != 14" class="btn btnNuevos"
+                ng-click="finalizarTramite()">
+                Finalizar trámite
+            </button>
+
+      
+       
+    </div>
+    <div class="col-sm-2"></div>
+</div>
+
+<!--===================================================-->
+<div id="loading" class="modal fade" tabindex="-1" data-focus-on="input:first">
+    <div class="modal-dialog modal-lg">
+        <div class="spinner">
+            <div class="cube1"></div>
+            <div class="cube2"></div>
+        </div>
+    </div>
+</div>
+<!--Termina modal spinner -->
+
+<!--================================ Modal para colocar los comentario ================================-->
+<div class="modal fade" id="finaizarTramite" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Rechazar {{ modalTitle }}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <h4>¿Desea enviar correo?</h4>
+                </div>
+                <form ng-submit="sendMain()">
+                    <div class="row">
+                        <input required ng-model="email" type="email" class="form-control"
+                            placeholder="Correo del cliente">
+                    </div>
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4">
+                        <input class="btn btnNuevos" type="submit" value="Enviar y finalizar">
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col-md-2">
+                        <button class="btn btnNuevos" style="width: 131px;" ng-click="cancelFinalizar()">
+                            Cancelar
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btnNuevos" style="width: 131px;"
+                            ng-click="sendFinalizarTramite('Se finalizo el trámite con éxito.')">
+                            Solo Finalizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--================================ End Modal para los comentario ================================-->
+
+<!--================================ Modal para colocar imagen ================================-->
+<div class="modal fade" id="mostrarImagen" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">{{modalTitle}}</h4>
+            </div>
+            <div class="modal-body">
+                <img class="imgDocumento" ng-src="{{verImagen}}" />
+                <div class="divComentariosError" ng-if="verComentarios">
+                    <label> Motivo de la devolucion: "{{obervacionesDoc}}"</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--================================ Modal para colocar imagen ================================-->
+
+<!--================================ Modal para colocar PDF ================================-->
+<div class="modal fade" id="mostrarPdf" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width: 80%;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 style="color: white;" class="modal-title text-white">{{modalTitle}}</h4>
+            </div>
+            <div class="divComentariosError" ng-if="verComentarios">
+                <label> Motivo de la devolucion: "{{obervacionesDoc}}"</label>
+            </div>
+            <div class="modal-body" id="pdfReferenceContent"></div>
+        </div>
+    </div>
+</div>
+<!--================================ End Modal para para colocar PDF ================================-->
+
+<!--================================ Modal para colocar imagen ================================-->
+<div class="modal fade" id="aplicarDev" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Ajustar Devolución</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table id="tableDocumentos" class="table table-striped table-bordered" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Documento</th>
+                                    <th>Importe</th>
+                                    <th>importe a aplicar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="(key, documentoDev) in dataDevDocumento">
+                                    <td class="rigthCell">{{key}} - {{documentoDev.documento}}</td>
+                                    <td class="rigthCell">{{documentoDev.saldo | currency}}</td>
+                                    <td class="rigthCell"> <input type="text" ng-model="documentoDev.devFinal" /> </td>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-success" ng-click="aplicarImporte();">
+                        Aplicar importe
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--================================ Modal para colocar imagen ================================-->
+<!--================================ Modal para colocar los comentario cancelacion================================-->
+<div class="modal fade" id="cancelTramite" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Cancelar devolución</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <h4>¿Por que desea cancelar el documento?</h4>
+                </div>
+                <div class="row">
+                    <textarea ng-model="razonesCancelacion" formControlName="texto2" style="resize: none" cols="120"
+                        rows="3" maxlength="500" placeholder="Máximo 500 caracteres"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2"></div>
+                    <div class="col-md-2"></div>
+                    <div class="col-md-3">
+                        <button class="btn btnNuevos" ng-click="cancelar()">
+                            Cancelar
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btnNuevos" ng-click="enviarCancelacion()">
+                            Enviar cancelación
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--================================ End Modal para los comentario ================================-->
+<!--================================ Modal Comprobante de Transferencia ================================-->
+<div class="modal fade" id="modalTransferencia" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Comprobante de pago transferencia </h4>
+            </div>
+            <div class="modal-body">
+                <div id="transferenciaBancaria">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--============================ Fin Modal Comprobante de Transferencia ================================-->
+
+<!--================================ Modal Trámites pendientes ================================-->
+<div class="modal fade" id="modalTramPendiente" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Trámites en tránsito</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="margin-left: 10px;">
+                    <h4>El Id de Cliente tiene los siguientes trámites en tránsito:</h4>
+                </div>
+            <div class="row">
+            
+                <div class="col-sm-12">
+                    <table id="tblPendiente" class="table table-striped table-bordered" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>No. Trámite</th>
+                                <th>Documento</th>
+                                <th>Id Usuario propietario</th>
+                                <th>Nombre</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="documento in arrayTramitePendiente">
+                                <td > {{documento.id_pertra}}</td>
+                                <td >{{documento.documento}}</td>
+                                <td >{{documento.usuario}} </td>
+                                <td >{{documento.usuarioNombre}} </td>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--============================ Fin Modal Comprobante de Transferencia ================================-->

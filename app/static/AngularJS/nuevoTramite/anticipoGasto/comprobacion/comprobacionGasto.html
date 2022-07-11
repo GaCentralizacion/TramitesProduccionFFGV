@@ -1,0 +1,1387 @@
+<link rel="stylesheet" href="css/aprobarAnticipoGasto/aprobarAnticipoGasto.css">
+<style type="text/css">
+    .labelIdCliente {
+        font-size: 13px;
+    }
+
+    .mygrid-wrapper-div {
+        overflow-y: scroll;
+        height: 70%;
+    }
+
+    .tableFixHead {
+        overflow-y: auto;
+        height: 250px;
+    }
+
+    .tableFixHead thead th {
+        position: sticky;
+        top: 0;
+    }
+
+    .estatus{
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    /* Just common table stuff. Really. */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th,
+    td {
+        padding: 8px 16px;
+    }
+
+    th {
+        background: #eee;
+    }
+
+    .notiRechazada{
+        background-color: #F8D7DA !important;
+        cursor: not-allowed;
+    }
+
+    .parpadea {
+  
+      animation-name: parpadeo;
+      animation-duration: 1s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+
+      -webkit-animation-name:parpadeo;
+      -webkit-animation-duration: 1s;
+      -webkit-animation-timing-function: linear;
+      -webkit-animation-iteration-count: infinite;
+    }
+
+    @-moz-keyframes parpadeo{  
+      0% { opacity: 1.0; }
+      50% { opacity: 0.0; }
+      100% { opacity: 1.0; }
+    }
+
+    @-webkit-keyframes parpadeo {  
+      0% { opacity: 1.0; }
+      50% { opacity: 0.0; }
+       100% { opacity: 1.0; }
+    }
+
+    @keyframes parpadeo {  
+      0% { opacity: 1.0; }
+       50% { opacity: 0.0; }
+      100% { opacity: 1.0; }
+    }
+</style>
+<!-- <div class="row">
+    <div class="col-sm-4">
+    </div>
+    <div class="col-sm-4" style="text-align: center">
+        <h2>{{titulo}}</h2>
+        <h4>{{subTitulo}}</h4>
+    </div>
+</div> -->
+<div class="row">
+    <div class="col-sm-12 form-inline" > 
+        <div class="col-md-3" style="border-bottom: 1px solid #A0C9F7;">
+            <div class="col-sm-11 form-inline" style="margin-bottom: 5px;">
+                <label class="labelIdCliente">{{titulo}}</label>
+            </div>
+        </div>
+        <div class="col-md-9" >
+            <div class="pull-right">
+                <h4>Proceso:</h4>
+                <div ng-repeat="estatus in allEstatusAnticipo"
+                    ng-class="{arrowRightActive: estatusAnticipo >= estatus.idEstatus, arrowRight: estatusAnticipo < estatus.idEstatus}">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <img style="width: 90%; margin-top: 10px; margin-left:15px;" ng-src="{{estatus.icono}}">
+                        </div>
+                        <div class="col-md-7">
+                            <div class="divPadreCenter">
+                                <div class="divHijoCenter">
+                                    <label style="font-size:10px; text-align: left;">{{estatus.descripcion}}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-init="init()">
+    <div class="middle-box">
+        <div class="row" style="margin-top: 1%;">
+            <div class="col-sm-4 form-inline">
+                <label class="labelIdCliente">Empresa:</label>
+                <label class="labelDataCliente">{{tramite.empresa}}</label>
+            </div>
+            <div class="col-sm-4 form-inline">
+                <label class="labelIdCliente">Sucursal:</label>
+                <label class="labelDataCliente">{{tramite.sucursal}}</label>
+            </div>
+            <div class="col-sm-4 form-inline">
+                <label class="labelIdCliente">Departamento:</label>
+                <label class="labelDataCliente">{{tramite.departamento}}</label>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 1%;">
+            <div class="col-sm-4 form-inline">
+                <label class="labelIdCliente">Viaje a:</label>
+                <label class="labelDataCliente">{{tramite.concepto}}</label>
+            </div>
+            <div class="col-sm-4 form-inline">
+                <label class="labelIdCliente">Inicio de viaje:</label>
+                <label class="labelDataCliente">{{tramite.fechaInicio}}</label>
+            </div>
+            <div class="col-sm-4 form-inline">
+                <label class="labelIdCliente">Fin de viaje:</label>
+                <label class="labelDataCliente">{{tramite.fechaFin}}</label>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 1%;">
+            <div class="col-sm-4 form-inline">
+                <label class="labelIdCliente">Motivo:</label>
+                <label class="labelDataCliente">{{tramite.motivo}}</label>
+            </div>
+            <div class="col-sm-4 form-inline">
+                <label class="labelIdCliente">Nombre cliente:</label>
+                <label class="labelDataCliente">{{tramite.nombreCliente}}</label>
+            </div>
+            <div class="col-sm-4 form-inline"  ng-hide = "hiddenOrdenCompra" >
+                <label class="labelIdCliente">Comprobante de pago:</label>
+                <br>
+                <div class="row">
+                    <div class="col-sm-11">
+                        <button class="btn btnNuevos" ng-click="verOPs()"
+                            style="width: auto;">
+                            <i class="fa fa-eye" aria-hidden="true"></i>
+                            Ver Orden Pago
+                        </button>
+                       
+                    </div>
+                    
+                    
+                </div>
+            </div>
+            <div class="col-sm-4 form-inline" style="text-align: right;">
+                <button class="btn btnNuevos" ng-click="frmModalEmpleado()" style="width: auto;" title="Ver Empleados">
+                    <i class="fa fa-users" aria-hidden="true"></i> Empleados
+                </button>
+            </div>
+            <!--<div class="col-sm-2 form-inline" style="text-align: left;">
+                <button class="btn btnNuevos" ng-click="frmModalDevolucionRecibo()" style="width: auto;"
+                    title="Devolver por cancelación">
+                    <i class="fa fa-times-circle" aria-hidden="true"></i> Devolver
+                </button>
+            </div>-->
+            <div class="col-sm-2 form-inline" style="text-align: left;">
+                <!--<button class="btn btnNuevos" ng-click="frmModalDevolucionRecibo()" style="width: auto;" title="Devolver por cancelación"
+                    ng-if="tramite.idEstatus === 7 || tramite.idEstatus === 8">
+                    <i class="fa fa-times-circle" aria-hidden="true"></i> Devolver
+                </button>-->
+            </div>
+        </div>
+        <div class="row" style="margin-top: 1%;">.
+            <div class="col-sm-2 form-inline">
+                <label class="labelIdCliente">Conceptos:</label>
+            </div>
+            <div class="col-sm-3 form-inline" style="text-align: right;">
+                <!-- <button class="btn btn-circle" ng-click="frmModalConceptoGasto(0)" title="Agregar Concepto">
+                    <i class="fa fa-plus" aria-hidden="true"
+                        ng-show="tramite.idEstatus === 7 || tramite.idEstatus === 8"></i></button> -->
+                        <button class="btn btn-plus" ng-click="frmModalConceptoGasto(0)" title="Agregar Concepto"										
+                        ng-if="(tramite.idEstatus === 7 || tramite.idEstatus === 8)">
+                         <!-- TODO: Verificar que para comprobar se necesita una salida de efectivo -->
+                         <i class="fa fa-plus" aria-hidden="true"></i>Agregar Concepto</button>
+            </div>
+            <div class="col-sm-5 form-inline">
+                <label class="labelIdCliente">Archivos de: {{conceptoSeleccionado}}</label>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <!-- TABLA DE CONCEPTOS  -->
+            <div class="col-sm-7 form-inline">
+                <table class="table table-striped table-bordered" cellspacing="0"
+                    style="width: 98% !important; font-size: 11px;">
+                    <thead>
+                        <tr>
+                            <th style="width: 18% !important;">Concepto</th>
+                            <th style="width: 10% !important;">Solicitado</th>
+                            <th style="width: 10% !important;">Comprobado</th>
+                            <th style="width: 10% !important;">Aprobado</th>
+                            <th style="width: 10% !important;">Por Comprobar o devolver</th>
+                            <th style="width: 10% !important;">Gasto de más</th>
+                            <th style="width: 10% !important;"></th>
+                            <th style="width: 7% !important;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="concepto in conceptosSolicitud">
+                            <td>{{concepto.concepto}}</td>
+                            <td>{{concepto.importeSolicitado | currency }}</td>
+                            <td>{{concepto.importeComprobado | currency }}</td>
+                            <td>{{concepto.importeAprobado | currency }}</td>
+                            <td>{{(concepto.importeSolicitado - concepto.importeComprobado) > 0 ?concepto.importeSolicitado - concepto.importeComprobado : 0 | currency }}</td>
+                            <td>{{(concepto.importeAprobado - concepto.importeComprobado) > 0 ? concepto.importeAprobado - concepto.importeComprobado: 0 | currency }}</td>
+                            <td>
+                                <!-- <div ng-show="tramite.idEstatus === 7 || tramite.idEstatus === 8" -->
+                                <div ng-show="concepto.importeSolicitado != concepto.importeAprobado" style="border: 1px solid #e3e3e3;">
+                                    <div class="picture-container" ng-hide="(concepto.idTipoSeleccionado == 1 && concepto.archivoXml != null && concepto.archivoPdf != null) || (concepto.idTipoSeleccionado == 2 && concepto.archivo != null)">
+                                        <div class="picture">
+                                            <img style="width: 100%" src="../../../../images/subir@2x.png" ng-click="subirArchivo(concepto)"
+                                                class="picture-src" title="Subir Archivo {{documento.ext_nombre}}" />
+                                            <!--input type="file" ng-model="concepto.archivo" id="wizard-picture"
+                                                ng-file-select="onFileSelect($files)" class="picture" title="Subir Archivo ¿?" accept=".xml,image/*,.pdf"!-->
+																	 
+																		   
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-circle" ng-click="guardaComprobante(concepto)" title="Guardar"
+                                        ng-show="(concepto.idTipoSeleccionado == 1 && concepto.archivoXml != null && concepto.archivoPdf != null) || (concepto.idTipoSeleccionado == 2 && concepto.archivo != null)">
+                                        <i class="fa fa-check" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="btn btn-circle" ng-click="cancelarArchivo(concepto)" title="Cancelar"
+                                        ng-show="(concepto.idTipoSeleccionado == 1 && concepto.archivoXml != null && concepto.archivoPdf != null) || (concepto.idTipoSeleccionado == 2 && concepto.archivo != null)">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <button  class="btn btn-circle" id="{{concepto.id}}"
+                                    ng-click="getArchivosPorConcepto(concepto)" title="Archivos">
+                                    <i class="fa fa-chevron-right" aria-hidden="true"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <footer ng-show = "conceptosSolicitud.length > 0">
+                        <td>TOTALES</td>
+                        <td>{{ conceptosSolicitud.length > 0 ? sumSolicitado() : 0 | currency  }}</td>
+                        <td>{{ conceptosSolicitud.length > 0 ? sumComprobado() : 0 | currency  }}</td>
+                        <td>{{ conceptosSolicitud.length > 0 ? sumAprobado() : 0 | currency  }}</td>
+                        <td> {{ conceptosSolicitud.length > 0 ? sumPorComprobar() : 0 | currency  }}</td>
+                        <td>{{ conceptosSolicitud.length > 0 ? sumGastoMas() : 0 | currency  }}</td>
+                        <td></td>
+                        <td></td>
+                    </footer>
+                </table>
+            </div>
+            
+            <!-- tabla de archivos cargados en el sistema -->
+            <div class="col-sm-5 form-inline">
+                <table id="tableArchivos" class="table table-striped table-bordered" cellspacing="0"
+                    style="width: 100% !important; font-size: 11px;">
+                    <thead>
+                        <tr>
+                            <th style="width: 10% !important;">Estatus</th>
+                            <th style="width: 10% !important;">Comprobante</th>
+                            <th style="width: 10% !important;">Total</th>
+                            <th style="width: 15% !important;">Comprobación</th>
+                            <th style="width: 15% !important;">Aprobación</th>
+                        <!--<th style="width: 10% !important;">Deptos</th>-->  
+                           <th style="width: 5% !important;"></th>
+                            <th style="width: 5% !important;"></th>
+                            <th style="width: 5% !important;"></th>
+                            <th style="width: 5% !important;"></th>
+                            <th style="width: 5% !important;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr 
+                            ng-repeat="archivo in archivos"
+                            title="{{ (archivo.estatusNotificacionDeMas == 4) ? 'Gasto de más rechazado': '' }}"
+                            >
+                            <td>
+                                <span class="{{ ( archivo.idEstatus== 10) ? 'text-danger': ( archivo.idEstatus== 9) ? 'text-success': '' }}">{{ archivo.estatus }}</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-circle" style="background-color: aquamarine"
+                                    title="{{archivo.nombre}}" ng-show="archivo.extension == 'xml'">
+                                    <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                                </button>
+                                <button class="btn btn-circle" title="{{archivo.nombre}}"
+                                    ng-show="archivo.extension == 'pdf'">
+                                    <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                </button>
+                                <button class="btn btn-circle" title="{{archivo.nombre}}"
+                                    ng-show="archivo.extension == 'jpg'">
+                                    <i class="fa fa-file-image-o" aria-hidden="true"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <label ng-show="!archivo.idConceptoArchivoPar">{{ archivo.total | currency }}</label>
+                                <label ng-show="archivo.idConceptoArchivoPar">(ver XML)</label>
+                            </td>
+                            <td>{{ archivo.comentarioComprobacion }}</td>
+                            <td>{{ archivo.comentarioAprobacion }}</td>
+                            <!-- <td style="text-align: center;">
+                                <button class="btn btn-circle" ng-click="modalDepartamentos(archivo)"
+                                    title="Ver Departamentos"
+                                 ng-show="!archivo.idConceptoArchivoPar && archivo.idEstatus == 7"> 
+                                    {{ archivo.porcentaje }}%
+                                </button>
+                            </td> -->
+                            <td>
+                                <button class="btn btn-circle" ng-click="modalConceptosXml(archivo)" title="Conceptos"
+                                   ng-show="archivo.esFactura == 1">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button 
+                                    ng-disabled="archivo.disabledOptions" 
+                                    class="btn btn-circle" 
+                                    ng-click="frmModalComentario(archivo)" 
+                                    title="{{(archivo.estatusNotificacionDeMas >= 2) ? 'Aprobación enviada' : 'Modificar'}}"
+                                    ng-show="!archivo.idConceptoArchivoPar && archivo.idEstatus == 7" >
+                                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button type="button" ng-show="archivo.estatusNotificacion == 1" ng-click="enviarFinanzas(archivo)" 
+                                data-toggle="tooltip" title="Enviar a Finanzas" class="btn btn-circle">
+                                    <i class="fa fa-paper-plane"></i>
+                                 </button>
+                            </td>
+                            <td>
+                                <!-- [{{ archivo.Excede }} - {{archivo.ExcedeMonto}}] -->
+                                <!-- [ {{ archivo.estatusNotificacionDeMas }} ] -->
+                                <button 
+                                    type="button" 
+                                    ng-show="archivo.Excede == 1 && archivo.ExcedeMonto != 0" 
+                                    ng-click="modalDeMas(archivo)" 
+                                    data-toggle="tooltip" 
+                                    title="Se excede monto comprobado" 
+                                    class="btn btn-circle {{ archivo.estatusNotificacionDeMas == 0 ? 'parpadea': '' }}">
+                                    
+                                    <i class="fa fa-exclamation-triangle" 
+                                        aria-hidden="true" 
+                                        style="color: {{ (archivo.estatusNotificacionDeMas == 4) ? '#FFC107': (archivo.estatusNotificacionDeMas == 3) ? '#28A745': '' }};"></i>
+                                 </button>
+                            </td>
+                            <td>
+                                <button 
+                                    ng-disabled="archivo.disabledOptions" 
+                                    class="btn btn-circle" 
+                                    ng-click="eliminarArchivo(archivo)"
+                                    ng-show="!archivo.idConceptoArchivoPar && archivo.idEstatus == 7 "
+                                    title="{{(archivo.estatusNotificacionDeMas >= 2) ? 'Aprobación enviada' : 'Eliminar Archivo'}}">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="alert alert-warning" role="alert" style="color: black;"><strong>Si hay dinero por devolver y gasto de más, se deben realizar ambos procesos. El sistema no hace neteo entre los dos.</strong></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-3 form-inline" hidden>
+                <label class="labelIdCliente">Monto Gastado: </label>
+                <label class="labelDataCliente">{{ montoGastado | currency }}</label>
+            </div>
+            <div class="col-sm-3 form-inline" hidden>
+                <label class="labelIdCliente">Dif. Cargo/Favor: </label>
+                <label class="labelDataCliente">{{ montoDiferencia | currency }}</label>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 1%;">
+            <div class="col-sm-3 form-inline">
+                <label class="labelIdCliente">Devolución con recibo de caja:</label><br>
+                <label class="labelDataCliente">{{ archivoDevolucion.nombreArchivo }}</label>
+                
+            </div>
+            <div class="col-sm-1 form-inline" style="text-align: right;">
+                <div ng-show="tramite.idEstatus === 7 || tramite.idEstatus === 8">
+                    <button ng-disabled="archivoDevolucion.nombreArchivo !== ''" class="btn btnNuevos" style="width: auto" ng-click="frmModalDevolucionRecibo()"
+                        title="Subir recibo">
+                        <i class="fa fa-file-image-o" aria-hidden="true"></i>
+                    </button>
+                    <!-- <div class="picture-container" ng-show="archivoRecibo.archivo == null">
+                        <div class="picture">
+                            <img style="width: 100%" src="../../../../images/subir@2x.png" class="picture-src"
+                                title="Subir Archivo {{documento.ext_nombre}}" />
+                            <input type="file" ng-model="archivoRecibo" id="wizard-picture"
+                                ng-file-select="onFileSelect($files)" class="picture" title="Subir Archivo">
+                        </div>
+                    </div> -->
+                    <button class="btn btn-circle" ng-click="guardarReciboCaja(archivoRecibo)" title="Guardar"
+                        ng-show="archivoRecibo.archivo != null">
+                        <i class="fa fa-check" aria-hidden="true"></i>
+                    </button>
+                    <button class="btn btn-circle" ng-click="cancelarArchivoRecibo(archivoRecibo)" title="Cancelar"
+                        ng-show="archivoRecibo.archivo != null">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-sm-2 form-inline" hidden>
+                <label class="labelIdCliente">Descargar Vale:</label> <br>
+                <label class="labelDataCliente">{{ archivoRecibo.nombreArchivo }}</label>
+            </div>
+            <div class="col-sm-1 form-inline" hidden>
+                <button class="btn btnNuevos" style="width: auto" ng-click="frmDescargaVale()" 
+                title="Descargar">
+                <i class="fa fa-file"></i>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 1%; margin-right:1%;">
+            <div class="col-sm-2 form-inline" style="text-align: left;">
+                <button class="btn btnNuevos" style="width: 80%" ng-click="salirTramite()">
+                    <i class="fa fa-reply" aria-hidden="true"></i>
+                    Cancelar
+                </button>
+            </div>
+            <div class="col-sm-10 form-inline" style="text-align: right;">
+                <button  ng-disabled= "tramite.idEstatus == 9" class="btn btnNuevos" style="width: 20%"
+                    ng-click="actualizaEstatusTramite()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Enviar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Inicia modal spinner -->
+<!--===================================================-->
+<div id="spinner-loading" class="modal fade" tabindex="-1" data-focus-on="input:first">
+    <div class="modal-dialog modal-lg">
+        <div class="spinner">
+            <div class="cube1"></div>
+            <div class="cube2"></div>
+        </div>
+    </div>
+</div>
+<!--Termina modal spinner -->
+
+<!--Inicia modal conceptos de gasto Registro-->
+<!--===================================================-->
+<!-- <div class="modal fade" id="modalConceptoGasto" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                <h4 class="modal-title text-white">Concepto de Gasto</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="margin-top: 1%; margin-left: 2%;">
+                    <div class="row" style="margin-top: 1%;">
+                        <div class="col-sm-2 form-inline" style="text-align: right;">
+                            <span
+                                ng-class="{adjuntado: selCNC_CONCEPTO1 != '', noadjuntado: selCNC_CONCEPTO1 == ''}">*</span>&nbsp;
+                            <label class="labelIdCliente">Area:</label>
+                        </div>
+                        <div class="col-sm-9 form-inline">
+                            <select style="width: 95% !important;" class="form-control" ng-model="selCNC_CONCEPTO1"
+                                ng-options="areaAfectacion.PAR_IDENPARA as areaAfectacion.PAR_DESCRIP1 for areaAfectacion in areaAfectacionList"
+                                ng-change="asignarAreaAfectacion(selCNC_CONCEPTO1)" required>
+                                <option value="">Seleccione un area</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 1%;">
+                        <div class="col-sm-2 form-inline" style="text-align: right;">
+                            <label class="labelIdCliente">Concepto:</label>
+                        </div>
+                        <div class="col-sm-9 form-inline">
+                            <select style="width: 95% !important;" class="form-control" ng-model="idConceptoSeleccion"
+                                ng-options="conceptoItem.id as conceptoItem.concepto for conceptoItem in conceptoGastoList"
+                                ng-change="asignarConcepto(idConceptoSeleccion)">
+                                <option value="">Seleccione Concepto</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 2%;">
+                        <div class="col-sm-2 form-inline" style="text-align: right;">
+                            <label class="labelIdCliente">Cuenta:</label>
+                        </div>
+                        <div class="col-sm-6 form-inline">
+                            <label class="labelIdDataCliente">{{concepto.numeroCuenta}}</label>
+                        </div>
+                        <div class="col-sm-4 form-inline" style="text-align: right;">
+                            <button class="btn btnNuevos" ng-click="guardarConceptoPorSolicitud()" style="width: auto;">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                                Guardar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="margin-right:1%;">
+                <div class="col-sm-12 form-inline">
+                    <label class="" style="text-align: justify; ">{{concepto.politicaGasto}}</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+<div class="modal fade" id="modalConceptoGasto" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                <h4 class="modal-title text-white">Concepto de Gasto</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="margin-top: 1%; margin-left:0%;">
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <span
+                            ng-class="{adjuntado: selCNC_CONCEPTO1 != '', noadjuntado: selCNC_CONCEPTO1 == ''}">*</span>&nbsp;
+                        <label class="labelIdCliente">Area:</label>
+                    </div>
+                    <div class="col-sm-4 form-inline">
+                        <select style="width: 95% !important;" class="form-control" ng-model="selCNC_CONCEPTO1"  disabled="true"
+                            ng-options="areaAfectacion.PAR_IDENPARA as areaAfectacion.descripcion for areaAfectacion in areaAfectacionList"
+                            ng-change="asignarAreaAfectacion(selCNC_CONCEPTO1)" required>
+                            <option value="">Seleccione un area</option>
+                        </select>
+                    </div>
+                    
+                </div>
+                <div class="row" style="margin-top: 1%; margin-left:0%;">
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <span
+                            ng-class="{adjuntado: idConceptoSeleccion != '', noadjuntado: idConceptoSeleccion == ''}">*</span>&nbsp;
+                        <label class="labelIdCliente">Concepto:</label>
+                    </div>
+                    <div class="col-sm-8 form-inline">
+                        <select style="width: 95% !important;" class="form-control" ng-model="idConceptoSeleccion"
+                            ng-options="conceptoItem.id as conceptoItem.concepto for conceptoItem in conceptoGastoList" ng-disabled="disabledConcepto"
+                            ng-change="asignarConcepto(idConceptoSeleccion)">
+                            <option value="">Seleccione Concepto</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 1%; margin-left:0%;" ng-show="mostrarDistancia">
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <span>*</span>&nbsp;
+                        <label class="labelIdCliente">Distancia(KM):</label>
+                    </div>
+                    <div class="col-sm-4 form-inline" style="text-align: left;">
+                        <input 
+                        type="number"
+                        min="50"
+                        class="form-control"
+                        required
+                        style="width: 100% !important;"
+                        placeholder=""
+                        ng-model="distancia"
+                        minlength="2"
+                        maxlength="10"
+                        ng-change="obtieneMaximoGasolina()">
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 1%; margin-left:0%;">
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <span
+                            ng-class="{adjuntado: idConceptoSeleccion != '', noadjuntado: idConceptoSeleccion == ''}">*</span>&nbsp;
+                        <label class="labelIdCliente">Nacional:</label>
+                    </div>
+                    <div class="col-sm-4 form-inline" >
+                        <select style="width: 95% !important;" class="form-control" ng-model="idtipoViaje"
+                        ng-change="TipoViaje()" required ng-disabled="disabledTipoViaje">
+                        <option value="-1" selected>Seleccione un tipo</option>
+                        <option value="1" >Nacional</option>
+                        <option value="0">Extranjero</option>
+                        </select>
+                    </div>
+                    <!-- <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <span
+                            ng-class="{adjuntado: idConceptoSeleccion != '', noadjuntado: idConceptoSeleccion == ''}">*</span>&nbsp;
+                        <label class="labelIdCliente">Comprobante:</label>
+                    </div> -->
+                    <!-- <div class="col-sm-4 form-inline">
+                        <select style="width: 95% !important;" class="form-control" ng-model="idtipoComprobante"
+                        ng-options="tipo as tipo.PAR_DESCRIP1 for tipo in tipoComprobanteList" ng-change="actualizarMontos()"
+                        required>
+                        <option value="">Seleccione un tipo</option>
+                        </select>
+                    </div> -->
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <label class="labelIdCliente">Cuenta:</label>
+                    </div>
+                    <div class="col-sm-4 form-inline">
+                        <label class="labelIdDataCliente">{{concepto.numeroCuenta}}</label>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 1%; margin-left:0%;">
+                    <!-- <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <span
+                            ng-class="{adjuntado: selCNC_CONCEPTO1 != '', noadjuntado: selCNC_CONCEPTO1 == ''}">*</span>&nbsp;
+                        <label class="labelIdCliente">IVA:</label>
+                    </div> -->
+                    <!-- <div class="col-sm-4 form-inline">
+                        <select style="width: 95% !important;" class="form-control"
+                        ng-model="idtipoIVA"
+                        ng-options="tipo as tipo.PAR_DESCRIP1 for tipo in IVAList"  ng-change="actualizarMontos()" 
+                        required>
+                        <option value="">Seleccione IVA</option>
+                        </select>
+                    </div> -->
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <span
+                            ng-class="{adjuntado: idConceptoSeleccion != '', noadjuntado: idConceptoSeleccion == ''}">*</span>&nbsp;
+                        <label class="labelIdCliente">Importe:</label>
+                    </div>
+                    <div class="col-sm-4 form-inline">
+                        <input type="number" id="montos" class="form-control" required style="width: 95% !important;" placeholder="" ng-disabled= "disabledMonto"
+                        min="1" ng-model="concepto.importeSolicitado" ng-change="validaMontoMaximo()">
+                    </div>
+                    <!-- <div class="col-sm-4 form-inline">
+                        <input type="number" class="form-control" required style="width: 95% !important;" placeholder=""
+                        min="1" ng-model="concepto.importeSolicitado" ng-change="actualizarMontos()">
+                    </div> -->
+                </div>
+                <div class="row" style="margin-top: 1%; margin-left:0%;">
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <label class="labelIdCliente">Comentario:</label>
+                    </div>
+                    <div class="col-sm-6 form-inline">
+                        <input type="text" class="form-control" required style="width: 99% !important;"
+                            placeholder="Agregar comentario" ng-model="concepto.comentario" minlength="3"
+                            maxlength="150">
+                    </div>
+                    <div class="col-sm-4 form-inline" style="text-align: right;">
+                        <button class="btn btnNuevos" ng-click="guardarConceptoPorSolicitud(concepto)">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+                <!-- <div class="row" style="margin-top: 1%; margin-left:0%;">
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <span
+                            ng-class="{adjuntado: concepto.importeSolicitado > 0, noadjuntado: concepto.importeSolicitado < 1 }">*</span>&nbsp;
+                        <label class="labelIdCliente">Importe:</label>
+                    </div>
+                    <div class="col-sm-4 form-inline">
+                        <input type="number" class="form-control" required style="width: 95% !important;" placeholder=""
+                            min="1" ng-model="concepto.importeSolicitado">
+                    </div>
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <label class="labelIdCliente">Cuenta:</label>
+                    </div>
+                    <div class="col-sm-4 form-inline">
+                        <label class="labelIdDataCliente">{{concepto.numeroCuenta}}</label>
+                    </div>
+                </div> 
+                <div class="row" style="margin-top: 1%; margin-left:0%;">
+                    <div class="col-sm-2 form-inline" style="text-align: right;">
+                        <label class="labelIdCliente">Comentario:</label>
+                    </div>
+                    <div class="col-sm-6 form-inline">
+                        <input type="text" class="form-control" required style="width: 99% !important;"
+                            placeholder="Agregar comentario" ng-model="concepto.comentario" minlength="3"
+                            maxlength="150">
+                    </div>
+                    <div class="col-sm-4 form-inline" style="text-align: right;">
+                        <button class="btn btnNuevos" ng-click="guardarConceptoPorSolicitud(concepto)">
+                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            Guardar
+                        </button>
+                    </div>
+                </div> -->
+                <div ng-show="tipoRetencion" class="row" style="margin-top: 1%; margin-left:0%;">
+                    <br>
+                    <label class="col-md-1">IVA</label>
+                    <div class="col-md-2">
+                        <input disabled currency-mask class="form-control" type="text"  ng-model="ivaVale">
+                    </div>
+                    <label class="col-md-1">-IVA Retención</label>
+                    <div class="col-md-2">
+                        <input disabled currency-mask class="form-control" type="text"  ng-model="retencion">
+                    </div>
+                    <label class="col-md-1">-ISR Retención</label>
+                    <div class="col-md-2">
+                        <input disabled currency-mask class="form-control" type="text"  ng-model="ISRretencion">
+                    </div>
+                    <label class="col-md-1">SubTotal</label>
+                    <div class="col-md-2">
+                        <input disabled currency-mask class="form-control" type="text"  ng-model="subtotalVale">
+                    </div>           
+                </div>
+                <span class="noadjuntado">*</span> Información Obligatoria
+            </div>
+            <div class="modal-footer" style="margin-top: 0%; margin-right:1%;">
+                <div class="col-sm-12 form-inline">
+                    <label class="" style="text-align: justify; ">{{concepto.politicaGasto}}</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Inicia modal conceptos de gasto Registro-->
+<!--===================================================-->
+<div class="modal fade" id="modalDevolucionRecibo" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                <h4 class="modal-title text-white">Comprobar con recibo de devolución</h4>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-8 form-inline">
+                            <label class="labelIdCliente">Devolución con</label>
+                            <select class="form-control ng-pristine ng-valid ng-touched" ng-model="tipo_devolucion" ng-change="cambioTipo()">
+                                <option value="1">recibo de caja</option>
+                                <option value="2">deposito/transferencia Bancaria</option>
+                            </select>
+                            <div ng-if="tipo_devolucion == 2">
+                                <div class="row" style="width: 500px;">
+                                    <div class="col-sm-6" style="margin-top: 1%; margin-left:0%;">
+                                        <div class="col-sm-5 form-inline" style="text-align: right;">
+                                            <label class="labelIdCliente">Banco:</label>
+                                        </div>
+                                        <div class="col-sm-7 form-inline">
+                                            {{ banco.Nombre }}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6" style="margin-top: 1%; margin-left:0%;">
+                                        <div class="col-sm-5 form-inline" style="text-align: right;">
+                                            <label class="labelIdCliente">No. Cuenta:</label>
+                                        </div>
+                                        <div class="col-sm-7 form-inline">
+                                            {{ banco.numeroCuenta }}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6" style="margin-top: 1%; margin-left:0%;">
+                                        <div class="col-sm-5 form-inline" style="text-align: right;">
+                                            <label class="labelIdCliente">Convenio:</label>
+                                        </div>
+                                        <div class="col-sm-7 form-inline">
+                                            {{ banco.convenio }}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6" style="margin-top: 1%; margin-left:0%;">
+                                        <div class="col-sm-5 form-inline" style="text-align: right;">
+                                            <label class="labelIdCliente">CLABE:</label>
+                                        </div>
+                                        <div class="col-sm-7 form-inline">
+                                            {{ banco.cuentaClabe }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 1%; margin-left: 2%;">
+                        <div class="row" style="margin-top: 1%;">
+                            <div class="col-sm-10 form-inline" style="text-align: left;">
+                                <label class="labelIdCliente">Recibo:</label>
+                                <label class="labelDataCliente">{{ archivoDevolucion.nombreArchivo }}</label>
+                            </div>
+                            <div class="col-sm-2 form-inline" style="text-align: left;">
+                                <div class="picture-container" ng-show="archivoDevolucion.archivo == null">
+                                    <div class="picture">
+                                        <img style="width: 100%" src="../../../../images/subir@2x.png" class="picture-src"
+                                            title="Subir Archivo {{documento.ext_nombre}}" />
+                                        <input type="file" ng-model="archivoDevolucion" id="wizard-picture"
+                                            ng-file-select="onFileSelect($files)" class="picture" title="Subir Archivo">
+                                    </div>
+                                </div>
+                                <button class="btn btn-circle" ng-click="guardarArchivoDevolucion(archivoDevolucion)"
+                                    title="Guardar" ng-show="archivoDevolucion.archivo != null">
+                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                </button>
+                                <button class="btn btn-circle" ng-click="cancelarArchivoDevolucion(archivoDevolucion)"
+                                    title="Cancelar" ng-show="archivoDevolucion.archivo != null">
+                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!--<div class="row" style="margin-top: 1%;"
+                        ng-show="tramite.idEstatus === 7 || tramite.idEstatus === 8">
+                        <div class="col-sm-10 form-inline" style="text-align: left;">
+                            <input id="devovolucionTotalChk" type="checkbox" ng-model="chkDevTotal" [name="chkDevTotal" ] ng-change="devolucionTotal()">
+                            <label for="devovolucionTotalChk" class="labelDataCliente">Devolver total de anticipo</label>
+                        </div>
+                    </div>-->
+                    </div>
+                </div>
+            <div class="modal-footer" style="margin-right:1%;">
+                <!-- <button class="btn btnNuevos" ng-click="guardarConceptoPorSolicitud()">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Guardar
+                </button> -->
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<!--Inicia modal Descarga de Vale-->
+<!--===================================================-->
+<div class="modal fade" id="modalVale" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                <h4 class="modal-title text-white">Vale Anticipo de Gastos</h4>
+            </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12 form-inline" > 
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6"> 
+                                <label class="col-md-8">Descargar Vale</label>
+                                <div class="col-md-4">
+                                    <button class="btn btnNuevos" style="width: auto; text-align: left;" ng-click="DescargaVale()" 
+                                    title="Descargar">
+                                    <i class="fa fa-download"></i>
+                                    </button>
+                                </div> 
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <label class="col-md-8">Subir Vale</label>
+                                <div class="col-md-4">
+                                    <div class="col-md-8 picture-container" ng-hide="EvidenciaVale == ''">
+                                        <div class="picture">
+                                            <img ng-hide="EvidenciaVale != ''" style="width: 100%" src="../images/autorizacion@2x.png" title="Documento Adjuntado"/> 
+                                            <img ng-hide="EvidenciaVale == ''" style="width: 100%" src="../images/subir@2x.png" class="picture-src"
+                                                title="Subir Archivo" />
+                                            <input type="file" ng-model="EvidenciaVale" id="wizard-picture2"
+                                                ng-file-select="onFileSelect($files)" class="picture"
+                                                accept="application/pdf">
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-circle" ng-click="guardarArchivoVale(EvidenciaVale)"
+                                        title="Guardar" ng-show="EvidenciaVale != null">
+                                        <i class="fa fa-check" aria-hidden="true"></i>
+                                    </button>
+                                    <button class="btn btn-circle" ng-click="cancelarArchivoVale(EvidenciaVale)"
+                                        title="Cancelar" ng-show="EvidenciaVale != null">
+                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                           
+                              
+      
+                        </div>
+                </div>
+        </div>
+    </div>
+</div>
+</div>
+<!--Inicia modal Deptos -->
+<!--===================================================-->
+<div class="modal fade" id="modalDepartamento" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                <h4 class="modal-title text-white">Departamentos</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="margin-top: 1%; margin-left: 1%;">
+                    <div class="row" style="margin-top: 1%;">
+                        <div class="col-sm-3 form-inline" style="text-align: right;">
+                            <label class="labelIdCliente">Departamento:</label>
+                        </div>
+                        <div class="col-sm-5 form-inline">
+                            <select style="width: 100% !important;" class="form-control" ng-model="selDepartamento"
+                                ng-options="departamento.idDepartamento as departamento.nombre for departamento in departamentos"
+                                ng-change="asignarDepartamento(selDepartamento)">
+                                <option value="">Seleccione Departamento</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 1%; margin-bottom:1%;">
+                        <div class="col-sm-3 form-inline" style="text-align: right;">
+                            <label class="labelIdCliente">Porcentaje:</label>
+                        </div>
+                        <div class="col-sm-4 form-inline">
+                            <input type="number" name="input" ng-model="porcentaje" min="1" max="100" required>
+                        </div>
+                        <div class="col-sm-4 form-inline" style="text-align: right;">
+                            <button class="btn btnNuevos" style="width: 60%"
+                                ng-disabled="(selDepartamento == 0 || porcentaje == 0)" ng-click="guardarDepartamento()"
+                                ng-hi>
+                                <i class="fa fa-plus" aria-hidden="true"></i>
+                                Guardar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 1%; margin-left: 2%; margin-right: 2%;">
+                    <table class="table table-striped table-bordered " cellspacing="0" style="width: 100% !important;">
+                        <thead>
+                            <tr>
+                                <th class="col-sm-2" style="width: 50% !important;">Departamento</th>
+                                <th class="col-sm-1" style="width: 25% !important;">Porcentaje</th>
+                                <th class="col-sm-1" style="width: 25% !important;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="departamentoItem in departamentosArchivo">
+                                <td>{{departamentoItem.departamento}}</td>
+                                <td>{{departamentoItem.porcentaje}}</td>
+                                <td>
+                                    <button class="btn btn-circle" data-toggle="tooltip" data-placement="top"
+                                        title="Eliminar" ng-click="eliminarDepartamentoArchivo(departamentoItem)">
+                                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer" style="margin-right:1%;">
+                <label class="labelIdCliente" style="color: red">{{errorMensaje}}</label>
+                <!--<button class="btn btnNuevos" ng-click="guardarDepartamento()">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                    Cerrar
+                </button>-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Inicia modal Deptos -->
+<!--===================================================-->
+<div class="modal fade" id="modalEmpleado" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                <h4 class="modal-title text-white">Empleados</h4>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped table-bordered" cellspacing="0" style="width: 100% !important;">
+                    <thead>
+                        <tr>
+                            <th class="col-sm-3" style="width: 100% !important;">Empleados</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="empleado in empleados">
+                            <td>{{empleado.nombreEmpleado}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer" style="margin-right:1%;">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Inicia modal Conceptos -->
+<!--===================================================-->
+<div class="modal fade" id="modalConceptosXml" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                <h4 class="modal-title text-white">Conceptos de Factura</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="margin-top: 1%; margin-left: 2%; margin-right: 2%;">
+                    <table class="table table-striped table-bordered " cellspacing="0" style="width: 100% !important;">
+                        <thead>
+                            <tr>
+                                <th class="col-sm-2" style="width: 10% !important;">Clave</th>
+                                <th class="col-sm-1" style="width: 10% !important;">Cantidad</th>
+                                <th class="col-sm-1" style="width: 40% !important;">Descripción</th>
+                                <th class="col-sm-1" style="width: 20% !important;">Precio Unitario</th>
+                                <th class="col-sm-1" style="width: 20% !important;">Importe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="concepto in conceptoXmlList">
+                                <td>{{concepto.numeroIdentificacion}}</td>
+                                <td>{{concepto.cantidad}}</td>
+                                <td style="text-align: justify;">{{concepto.descripcion}}</td>
+                                <td>{{concepto.valorUnitario | currency }}</td>
+                                <td>{{concepto.importe | currency }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer" style="margin-right:1%;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Inicia modal conceptos de gasto Registro-->
+<!--===================================================-->
+<div class="modal fade" id="modalComentario" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                <h4 class="modal-title text-white">Agregar comentario-Importe</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="margin-top: 1%; margin-left: 2%;">
+                    <div class="row" style="margin-top: 1%;">
+                        <div class="col-sm-3 form-inline" style="text-align: right;">
+                            <label class="labelIdCliente">Importe:</label>
+                        </div>
+                        <div class="col-sm-4 form-inline">
+                            <input type="number" class="form-control" style="width: 95% !important;" placeholder="0.00"
+                            ng-disabled = "archivoEdicion.esFactura == 1" ng-change="redondeaImporte()"   
+                            ng-model="archivoEdicion.total" min="1" minlength="1" maxlength="150">
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top: 1%;" ng-show="EsFacturaModal == 0">
+                        <div class="col-sm-3 form-inline" style="text-align: right;">
+                            <label class="labelIdCliente">Fecha:</label>
+                        </div>
+                        <div class="col-sm-4 form-inline">
+                            <input class="form-control"  type="date" id="fechaInicio" name="fechaInicio" 
+                            style="width: 100% !important; height: 34px;"
+                            ng-change="" placeholder="dd-MM-yyyy" max="{{maxFechaVale | date:'yyyy-MM-dd'}}"
+                            ng-model="archivoEdicion.fecha" />
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top: 1%;">
+                        <div class="col-sm-3 form-inline" style="text-align: right;">
+                            <label class="labelIdCliente">Comentario:</label>
+                        </div>
+                        <div class="col-sm-8 form-inline">
+                            <input type="text" class="form-control" required style="width: 99% !important;"
+                                placeholder="Agregar comentario" ng-model="archivoEdicion.comentario" minlength="5"
+                                maxlength="150">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="margin-right:1%;">
+                <button class="btn btnNuevos" id="guardarComprobacion" ng-click="guardarComentario(archivoEdicion)">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="agregaEvidencia" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">Agregar Evidencia</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        <div>
+                            <label class="col-md-3">Tipo de Evidencia</label>
+                            <div class="col-md-9">
+                                <select class="form-control"
+                                    ng-options="tipo.id as tipo.text for tipo in tipoEvidencias"
+                                    ng-model="conceptoActual.idTipoSeleccionado">
+                                    <option value="">Seleccione</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div ng-show="conceptoActual.idTipoSeleccionado == 1" class="form-group col-sm-12">
+                            <form id="frm_subir_factura" name="frm_subir_factura" method="post">
+                                <br>
+                                <div class="col-md-3"> </div>
+                                <label class="col-md-1">XML</label>
+                                <div class="col-md-1 picture-container">
+                                    <div class="picture">
+                                        <img ng-hide="conceptoActual.archivoXml != ''" style="width: 100%"
+                                            src="../images/autorizacion@2x.png" title="Documento Adjuntado" />
+                                        <img ng-hide="conceptoActual.archivoXml == ''" style="width: 100%"
+                                            src="../images/subir@2x.png" class="picture-src" title="Subir Archivo" />
+                                        <input type="file" ng-model="conceptoActual.archivoXml" id="wizard-pictureXML"
+                                        ng-file-xml="onFileXML($files)" class="picture"
+                                        accept="text/xml">
+                                    </div>
+                                </div>
+                                <label class="col-md-1">PDF</label>
+                                <div class="col-md-1 picture-container">
+                                    <div class="picture">
+                                        <img ng-hide="conceptoActual.archivoPdf != ''" style="width: 100%"
+                                            src="../images/autorizacion@2x.png" title="Documento Adjuntado" />
+                                        <img ng-hide="conceptoActual.archivoPdf == ''" style="width: 100%"
+                                            src="../images/subir@2x.png" class="picture-src" title="Subir Archivo" />
+                                        <input type="file" ng-model="conceptoActual.archivoPdf" id="wizard-picturePDF"
+                                            ng-file-select="onFileSelect($files)" class="picture"
+                                            accept="application/pdf">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div ng-show="conceptoActual.idTipoSeleccionado == 2" class="form-group col-md-12">
+                            <br>
+                            <div class="col-md-3"> </div>
+                            <label class="col-md-2">Evidencia</label>
+                            <div class="col-md-1 picture-container">
+                                <div class="picture">
+                                    <img ng-hide="conceptoActual.archivo != ''" style="width: 100%"
+                                        src="../images/autorizacion@2x.png" title="Documento Adjuntado" />
+                                    <img ng-hide="conceptoActual.archivo == ''" style="width: 100%"
+                                        src="../images/subir@2x.png" class="picture-src" title="Subir Archivo" />
+                                    <input type="file" ng-model="conceptoActual.archivo" id="wizard-pictureVale"
+                                        ng-file-select="onFileSelect($files)" class="picture"
+                                        accept="image/jpg, image/jpeg, application/pdf">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="row" style="margin-top: 2%;  border-top: 0.5px solid #A0C9F7">
+                            <div class="col-md-12" style="margin-top:8px; text-align: center;">
+                                <button class="btn btnNuevosChico" ng-click="cerrarSubirArchivo()">
+                                    Salir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Inicia modal Devolucion-->
+<!--===================================================-->
+<div class="modal fade" id="modalDevolucion" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+						 
+                <h4 class="modal-title text-white">Agregar Devolucion</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                <div class="col-sm-8 form-inline">
+                    <label class="labelIdCliente">Devolución con</label>
+                    <select class="form-control ng-pristine ng-valid ng-touched" ng-model="tipo_devolucion" ng-change="cambioTipo()">
+                        <option value="1">recibo de caja</option>
+                        <option value="2">deposito/transferencia Bancaria</option>
+                    </select>
+                    <div ng-if="tipo_devolucion == 2">
+                        <div class="row" style="width: 500px;">
+                            <div class="col-sm-6" style="margin-top: 1%; margin-left:0%;">
+                                <div class="col-sm-5 form-inline" style="text-align: right;">
+                                    <label class="labelIdCliente">Banco:</label>
+                                </div>
+                                <div class="col-sm-7 form-inline">
+                                    {{ banco.Nombre }}
+                                </div>
+                            </div>
+                            <div class="col-sm-6" style="margin-top: 1%; margin-left:0%;">
+                                <div class="col-sm-5 form-inline" style="text-align: right;">
+                                    <label class="labelIdCliente">No. Cuenta:</label>		  
+                                </div>							   
+                                <div class="col-sm-7 form-inline">
+                                    {{ banco.numeroCuenta }}  
+                                </div>
+								   
+                            </div>
+                            <div class="col-sm-6" style="margin-top: 1%; margin-left:0%;">
+                                <div class="col-sm-5 form-inline" style="text-align: right;">
+                                    <label class="labelIdCliente">Convenio:</label>
+                                </div>
+                                <div class="col-sm-7 form-inline">
+                                    {{ banco.convenio }}										
+                                </div>
+                            </div>
+                            <div class="col-sm-6" style="margin-top: 1%; margin-left:0%;">
+                                <div class="col-sm-5 form-inline" style="text-align: right;">
+                                    <label class="labelIdCliente">CLABE:</label>
+                                </div>
+                                <div class="col-sm-7 form-inline">
+                                    {{ banco.cuentaClabe }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-8 form-inline">
+                        <label class="labelDataCliente">{{ archivoRecibo.nombreArchivo }}</label>
+                    </div>
+                <div class="col-sm-4 form-inline" style="text-align: right;">
+                    <div class="picture-container" ng-show="archivoRecibo.archivo == null">
+                        <div class="picture">
+                            <img style="width: 100%" src="../../../../images/subir@2x.png" class="picture-src"
+                                title="Subir Archivo {{documento.ext_nombre}}" />
+                            <input type="file" ng-model="archivoRecibo" id="wizard-picture"
+                                ng-file-select="onFileSelect($files)" class="picture" title="Subir Archivo">
+                        </div>
+                    </div>
+                    <button class="btn btn-circle" ng-click="guardarArchivoRecibo(archivoRecibo)" title="Guardar"
+                        ng-show="archivoRecibo.archivo != null"><!-- Cambio de 'guardaReciboCaja' a 'guardaRecibo' -->
+                        <i class="fa fa-check" aria-hidden="true"></i>
+                    </button>
+                    <button class="btn btn-circle" ng-click="cancelarArchivoRecibo(archivoRecibo)" title="Cancelar"
+                        ng-show="archivoRecibo.archivo != null">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </button>
+                </div>
+                </div>
+            </div>
+            <!--<div class="modal-footer" style="margin-right:1%;">
+                <button class="btn btnNuevos" ng-click="guardarRecibo(archivoRecibo)">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    Guardar
+                </button>
+            </div>-->
+        </div>
+    </div>
+</div>
+
+<!--===================================================-->
+<div class="modal fade" id="modalDeMas" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                         
+                <h4 class="modal-title text-white">Comprobación de gastos de más</h4>
+            </div>
+            <div class="modal-body">
+                <p>Se ha detectado que el monto que se proporciona en la comprobación supera al monto autorizado para este rubro.</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th align="right">Monto de la comprobación</th>
+                            <th align="right">Monto NO aprobado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td align="right">{{ archivoTemporal.total | currency }}</td>
+                            <td align="right">{{ archivoTemporal.ExcedeMonto | currency }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer" style="margin-right:1%;">
+                <button class="btn btnNuevos pull-left" ng-click="modalDeMasHide()">
+                    Cerrar
+                </button>
+
+                <!-- <button class="btn btnNuevos" id="enviarConprobacionExcedente" ng-click="enviarConprobacionExcedente(archivoTemporal)">
+                    <i class="fa fa-paper-plane"></i> Enviar a su aprobación
+                </button> -->
+
+                <button class="btn btnNuevos" id="enviarConprobacionExcedente" ng-if="archivoTemporal.estatusNotificacionDeMas == 0" ng-click="enviarConprobacionExcedente(archivoTemporal)">
+                    <i class="fa fa-paper-plane"></i> Enviar a su aprobación
+                </button>
+
+                <button class="btn btnNuevos" ng-disabled="true" ng-if="archivoTemporal.estatusNotificacionDeMas == 2" ng-click="enviarConprobacionExcedente(archivoTemporal)">
+                    <i class="fa fa-paper-plane"></i> Notificación enviada
+                </button>
+
+                <span class="estatus" ng-if="archivoTemporal.estatusNotificacionDeMas == 3" style="color: green;">Gastos de más Aprobados</span>
+                <span class="estatus" ng-if="archivoTemporal.estatusNotificacionDeMas == 4" style="color: red;">Gastos de más Rechazados</span>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!--===================================================-->
+<div class="modal fade" id="modalordenesCompra" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white" style="margin-top: -40%;"></i></button>
+                <h4 class="modal-title text-white">Ordenes de pago</h4>
+            </div>
+            <div class="modal-body">
+                <div class="col-sm-12 form-inline">
+                    <table class="table table-striped table-bordered" cellspacing="0" id="tableOP"
+                        style="width: 100% !important; margin-top: 0%; margin-left: 0%;">
+                        <thead>
+                            <tr>
+                                <th class="col-sm-3" style="width: 15% !important;">Concepto</th>
+                                <th class="col-sm-3" style="width: 15% !important;">ver</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="docto in documentoComprobacion">
+                                <td><label class="documentosLabel" style="margin: 0; padding-top: 5px;">{{docto.nombreDoc}} {{docto.Observaciones}}</label> </td>
+                                <td style="text-align: center;">
+                                    <button class="btn btn-circle btn-cir-view" ng-click="verPdf(docto)">
+                                        <i style="color: #62A3EB;" class="fa fa-eye" aria-hidden="true"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>   
+            </div>
+            <div class="modal-footer" style="margin-top: 0%; margin-right:1%;">
+               
+                    <span ng-class="{adjuntado: docto.archivo == '', noadjuntado: docto.archivo != ''}"></span>&nbsp;
+                    
+            </div>
+        </div>
+    </div>
+</div>
+<!--================================ Modal para colocar PDF ================================-->
+<div class="modal fade" id="mostrarPdf" role="dialog" tabindex="-1" aria-labelledby="demo-default-modal"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width: 80%;">
+        <div class="modal-content">
+            <div class="modal-header label-mint headerModal">
+                <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                    <i class="pci-cross pci-circle text-white"></i>
+                </button>
+                <h4 class="modal-title text-white" style="color: white;">{{modalTitle}}</h4>
+            </div>
+            <div style="margin-top: 10px; text-align: center;" >
+                
+            </div>
+            <div class="modal-body" id="pdfReferenceContent" style="height: 600px;"></div>
+            <div style="margin-top: 10px; margin-bottom: 10px; text-align: center;">
+                
+            </div>
+        </div>
+    </div>
+</div>

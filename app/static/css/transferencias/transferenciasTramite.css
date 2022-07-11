@@ -1,0 +1,217 @@
+.vertical-center {
+    margin: 0;
+    /* position: absolute; */
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+  }
+
+  .divUser{
+    border: 0.5px solid #A0C9F7; 
+    margin-bottom: 3%; 
+    padding: 20px;
+    height: 160px;
+    overflow: auto;
+}
+
+.divSeguimiento{
+    border: 0.5px solid #A0C9F7; 
+    margin-bottom: 3%; 
+    height: 160px;
+    overflow: auto;
+}
+
+.labelHeadersSeccion{
+    color: #013064;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.labelDtaCleinte{
+    color: #013064;
+}
+
+.divDocumentos{
+    margin-bottom: 15px;
+    border-bottom: 0.5px solid #62A3EB;
+    color: #013064;
+}
+
+.headerDocs{
+    font-size: 15px;
+    color: #013064;
+    font-weight: bold !important;
+}
+
+.color_span_estatusSuc{
+    color: white !important;
+    width: auto;
+    height: auto;
+    background-color: #0E6F0D;
+    margin-top: 18px;
+    border-radius: 20px;
+}
+
+.color_span_estatusErr{
+    color: white !important;
+    width: auto;
+    height: auto;
+    background-color: #AE2A1A;
+    margin-top: 18px;
+    border-radius: 20px;
+}
+
+.color_span_estatusWar{
+    width: auto;
+    height: auto;
+    background-color: #DBDE24;
+    margin-top: 18px;
+    border-radius: 20px;
+}
+
+.spanSeguimiento{
+    border: 0.5px solid #A0C9F7;
+    font-size: 15px;
+    width: 100%;
+    height: 35px;
+}
+
+.spanSeguimientoDinero{
+    border: 0.5px solid #A0C9F7;
+    font-size: 15px;
+    color: #013064; 
+    width: 100%;
+    height: 54px;
+    padding-top: 25px;
+    background-color: #E3F0FF;
+    font-weight: bold;
+}
+
+.cabeceraData{
+    font-size: 18px; 
+    color: black;
+}
+
+.color_texto_aprobar{
+    color: green !important;
+}
+
+.color_texto_rechazar{
+    color: red !important;
+}
+
+.btn-cir-success:hover{
+    background-color: green !important;
+    color: white !important;
+}
+
+.btn-cir-error:hover{
+    background-color: red !important;
+    color: white !important;
+}
+
+.btn-cir-view:hover{
+    background-color: #71C4D0 !important;
+    color: white !important;
+}
+
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    line-height: 1.428571429;
+    border-radius: 15px;
+    background-color: transparent !important;
+    color: #62A3EB !important;
+}
+
+.imgDocumento {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    width: 100%;
+}
+
+.divWizard {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px; 
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px; 
+    text-align: center; 
+    font-size: 10px !important;
+    border: solid 1px;
+    height: 70px;
+    width: 70px;
+    margin-left: 2.5%;
+}
+  
+.wizardActive{
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px; 
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px; 
+    text-align: center; 
+    font-size: 10px !important;
+    border: solid 1px;
+    height: 70px;
+    width: 70px;
+    margin-left: 2.5%;
+    background-color: #006AAF;
+    color: white !important;
+}
+
+.labelIdCliente{
+    color: #013064;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.labelDocumentos{
+    color: #013064;
+    font-weight: bold;
+  }
+
+  /*
+Full screen Modal 
+*/
+.fullscreen-modal .modal-dialog {
+    margin: 0;
+    margin-right: auto;
+    margin-left: auto;
+    width: 100%;
+  }
+  @media (min-width: 768px) {
+    .fullscreen-modal .modal-dialog {
+      width: 750px;
+    }
+  }
+  @media (min-width: 992px) {
+    .fullscreen-modal .modal-dialog {
+      width: 970px;
+    }
+  }
+  @media (min-width: 1200px) {
+    .fullscreen-modal .modal-dialog {
+       width: 1170px;
+    }
+  }
+
+.divBancos{
+    -webkit-box-shadow: 6px 7px 5px 0px rgba(125,121,125,1);
+    -moz-box-shadow: 6px 7px 5px 0px rgba(125,121,125,1);
+    box-shadow: 6px 7px 5px 0px rgba(125,121,125,1);
+    border: solid #A29FA2 0.5px;
+    padding: 10px;
+    margin-left: 70px; 
+    margin-right: 102px;
+}
+
+.btnSolicitar{
+    width: 120px;
+    background-color: #62A3EB;
+    border-radius: 50px;
+    color: white;
+    margin-top: -13px;
+}
