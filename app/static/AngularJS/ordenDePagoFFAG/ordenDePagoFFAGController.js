@@ -545,11 +545,14 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
     }
 
     $scope.changeEstatus = function(){
-        $('#loading').modal('show');
-        ordenDePagoFFAGRepository.changeEstatusFA($scope.idPerTra,$scope.tipoTramite, $scope.consecutivoTramite).then((res)=>{
-            if( res.data[0].success == 1 ){
-                $('#loading').modal('hide');
-                swal( 'Listo', 'Se compro la orden de pago', 'success' );
+        //TODO: changeEstatusFA SE IMPLEMENTARA CUANDO SE EJECUTE CORRECTAMENTE EL API DE BPRO
+       
+        // $('#loading').modal('show');
+       // ordenDePagoFFAGRepository.changeEstatusFA($scope.idPerTra,$scope.tipoTramite, $scope.consecutivoTramite).then((res)=>{
+        //    if( res.data[0].success == 1 ){
+        //        $('#loading').modal('hide');
+        //        swal( 'Listo', 'Se compro la orden de pago', 'success' );
+        
                 if($scope.idTramite == 10)
                 {
                     $scope.getDataOrdenPagoFF();
@@ -576,22 +579,23 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                     $scope.nombreTramite ='FONDO FIJO'
                     $scope.avanzaReembolso();
                 }
-            }else{
-                $('#loading').modal('hide');
-                swal( 'Alto', 'Error al compar la orden de pago', 'error' );
+    //TODO SE DEBE DE EJECUTAR SI FALLA BPRO
+            // }else{
+            //     $('#loading').modal('hide');
+            //     swal( 'Alto', 'Error al compar la orden de pago', 'error' );
 
-                if($scope.idTramite == 10)
-                {
-                    $scope.getDataOrdenPagoFF();
-                    $scope.nombreTramite ='FONDO FIJO'
-                }
-                if($scope.idTramite == 9)
-                {
-                    $scope.getDataOrdenPagoGV();
-                    $scope.nombreTramite ='ANTICIPO DE GASTOS'
-                }
-            };
-        });
+            //     if($scope.idTramite == 10)
+            //     {
+            //         $scope.getDataOrdenPagoFF();
+            //         $scope.nombreTramite ='FONDO FIJO'
+            //     }
+            //     if($scope.idTramite == 9)
+            //     {
+            //         $scope.getDataOrdenPagoGV();
+            //         $scope.nombreTramite ='ANTICIPO DE GASTOS'
+            //     }
+            // };
+        //});
     };
 
     $scope.avanzaReembolso = function () {
@@ -654,6 +658,9 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
         let AuthToken;
         let AG = `AG-${$scope.emp_nombrecto}-${$scope.suc_nombrecto}-${$scope.dep_nombrecto}-${$scope.idPerTra}-${$scope.incremental}`
         let resPoliza
+        let respUpdate
+
+        $('#loading').modal('show');
 
         $scope.Poliza.Proceso = `GVOP${$scope.complementoPolizas}`
         $scope.Poliza.DocumentoOrigen = AG
@@ -736,8 +743,36 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             datalog.jsonRespuesta = JSON.stringify(resPoliza.Poliza[0])
             datalog.codigo = resPoliza.Codigo
             datalog.resuelto = 1
+
+            respUpdate = await promiseActualizaTramite($scope.idPerTra,'GVOP', AG, $scope.incremental)
+
+            $scope.getDataOrdenPagoGV();
+            $scope.nombreTramite ='ANTICIPO DE GASTOS'
+
+            $('#loading').modal('hide');
+
+            swal({
+                title:"Aviso",
+                type:"info",
+                width: 1000,
+                text:`La orden de pago genero la siguiente póliza
+                Año póliza: ${datalog.anioPol}
+                Mes póliza: ${datalog.mesPol}
+                Cons póliza: ${datalog.consPol}
+                Tipo póliza: ${datalog.tipoPol}
+                
+                No olvide subir el archivo PDF de la orden de pago al sistema`,
+                showConfirmButton: true,
+                showCloseButton:  false,
+                timer:10000
+            })
             
         }else{
+
+
+
+            $('#loading').modal('hide');
+
 
             datalog.jsonRespuesta = JSON.stringify(resPoliza)
 
@@ -750,18 +785,34 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                 datalog.codigo = resPoliza.Codigo
                 datalog.resuelto = 0
             }
+
+            swal({
+                title:"Aviso",
+                type:"error",
+                width: 1000,
+                text: `Se presento un problema al procesar la póliza en BPRO
+                El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                
+                Codigo: ${datalog.codigo }
+                Respuesta BPRO:  ${datalog.mensajeError}
+                
+                Reitentar cuando se le notifique la solución a la incidencia`,
+                showConfirmButton: true,
+                showCloseButton:  false,
+                timer:10000
+            })
         }
 
         respLog = await LogApiBpro(datalog)
 
-        console.log(resPoliza)
+        console.log(respUpdate)
 
-        var tipoProceso = true;
+        //var tipoProceso = true;
         // tipoProceso = await promiseInsertaDatos($rootScope.user.usu_idusuario, $scope.idSucursal, 15,'AG', $scope.monto,'AC', $scope.nombreDep, $scope.idPerTra,banco,'');
         // tipoProceso = await promiseInsertaDatos($rootScope.user.usu_idusuario, $scope.idSucursal, 16,'AG', $scope.monto,'AC', $scope.nombreDep, $scope.idPerTra,banco,'');
                 
-        if(!tipoProceso)
-        {   swal('Alto', 'Ocurrio un error al crear la poliza', 'warning');}
+        // if(!tipoProceso)
+        // {   swal('Alto', 'Ocurrio un error al crear la poliza', 'warning');}
     
     }
 
@@ -806,6 +857,29 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
     
         });
     }
+
+    /**
+     * 
+     * @param {number} id_perTra 
+     * @param {string} poliza 
+     * @param {string} documentoConcepto 
+     * @param {number} incremental 
+     * @returns 
+     */
+    async function promiseActualizaTramite(id_perTra,poliza,documentoConcepto,incremental) {
+        return new Promise((resolve, reject) => {
+            anticipoGastoRepository.ActualizaTramitePoliza(id_perTra,poliza,documentoConcepto,incremental).then(function (result) {
+                if (result.data.length > 0) {
+                    resolve(result.data[0]);
+                }
+            }).catch(err => {
+                reject(result.data[0]);
+            });
+    
+        });
+    }
+
+
 function zeroDelete (item)
 {
     var x = '';
