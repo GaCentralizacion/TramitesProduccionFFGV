@@ -18,6 +18,106 @@ registrationModule.controller('FondoFijoController', function ($scope, $rootScop
     $scope.html1 = "<div style=\"width:310px;height:140px\"><center><img style=\"width: 100% \" src=\"https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png\" alt=\"GrupoAndrade\" />" +
         "</center></div><div><p><br>";
     $scope.html2 = ".</p></div>";
+
+
+    
+    // --INICIO BPRO ENPOINT FF -- //
+    $scope.complementoPolizas = '';
+    $scope.emp_nombrecto = '';
+    $scope.suc_nombrecto = '';
+    $scope.dep_nombrecto = '';
+    $scope.incremental = 0;
+
+
+    $scope.Detalle = {
+        ConceptoContable: '',
+        Cantidad:         0,
+        Producto:         '',
+        PrecioUnitario:   0,
+        TasaIva:          0,
+        Descuento:        0
+    }
+    
+    $scope.OrdenCompra = {
+        IdProveedor:        0,
+        ArePed:             '',
+        TipoComprobante:    '',
+        FechaOrden:         '',
+        FechaAplicacion:    '',
+        anticipo:           0,
+        CantidadAnticipo:   0,
+        PorcentajeAnticipo: 0,
+        FechaAnticipo:      '',
+        Detalle:            []
+    }
+
+    $scope.Deta = {
+        DocumentoOrigen:   '',
+        Partida:           '',
+        TipoProducto:      '',
+        SubProducto:       '',
+        Origen:            '',
+        Destino:           '',
+        Moneda:            'PE',
+        TipoCambio:        '1',
+        CostoUnitario:      0,
+        VentaUnitario:      0,
+        DescuentoUnitario:  0,
+        TasaIva:            0,
+        IVA:                0,
+        Persona1:           0,
+        Persona2:          '0',
+        DocumentoAfectado: '',
+        Referencia2:       '',
+    }
+
+    $scope.Deta2 = {
+        DocumentoOrigen:   '',
+        Partida:           '',
+        TipoProducto:      '',
+        SubProducto:       '',
+        Origen:            '',
+        Destino:           '',
+        Moneda:            'PE',
+        TipoCambio:        '1',
+        CostoUnitario:      0,
+        VentaUnitario:      0,
+        DescuentoUnitario:  0,
+        TasaIva:            0,
+        IVA:                0,
+        Persona1:           0,
+        Persona2:          '0',
+        DocumentoAfectado: '',
+        Referencia2:       '',
+    }
+
+    $scope.Poliza = {
+        Proceso:         '',
+        DocumentoOrigen: '',
+        Canal:           '',
+        NumeroControl:   '',
+        Documento:       '',
+        Referencia2:     '',
+        Deta:            []
+    }
+
+    $scope.ArrPoliza = []
+
+    $scope.ContabilidadMasiva = {
+        Polizas: []
+    }
+  
+
+    $scope.BproEndPoint = {
+        IdEmpresa:          0,
+        IdSucursal:         0,
+        Tipo:               0,
+        OrdenCompra:       $scope.OrdenCompra,
+        ContabilidadMasiva: $scope.ContabilidadMasiva
+    }
+
+    // -- FIN BPRO ENPOINT FF -- //
+
     $scope.init = () => {
         $scope.toleranciaVales()
         $scope.idUsuario=JSON.parse(localStorage.getItem('usuario')).usu_idusuario;
@@ -26,6 +126,7 @@ registrationModule.controller('FondoFijoController', function ($scope, $rootScop
         $scope.tipoUsuario = response.data[0].tipoUsuarioFF;
         $scope.nombreUsuario=JSON.parse(localStorage.getItem('usuario')).nombre;
         $scope.traeEmpresas();
+        $scope.idTramite = localStorage.getItem('idTramite');
         //$scope.traerAutorizadores();
         if (!localStorage.getItem('borrador')) {
           $scope.getDocumentosByTramite();
@@ -181,82 +282,259 @@ $scope.listaValesFF = function (id_perTra, idVale) {
     });
 }
 
-$scope.actualizarVale = function (accion) {
-  
+$scope.actualizarVale = function (accion) {  
   let errorvale = $scope.EvidenciaVale == undefined || $scope.EvidenciaVale == null   ? true : false;
   if(accion == 3 && errorvale)
-  {
-    swal('Alto', 'Para autorizar el vale debes adjuntar la evidencia', 'warning');
-    return false;
-  }
+    {
+        swal('Alto', 'Para autorizar el vale debes adjuntar la evidencia', 'warning');
+        return false;
+    }
   var sendData= null;
   if(accion == 3)
-  {
-    sendData = 
     {
-    idVale : $scope.idValeFF,
-    accion : accion,
-    nombreArchivo: $scope.EvidenciaVale.nombreArchivo.split('.')[0],
-    extensionArchivo: $scope.EvidenciaVale.nombreArchivo.split('.')[1],
-    saveUrl: $scope.urlValeAutorizado + 'FondoFijo/' + 'FondoFijo_' + $scope.id_perTra + '/Vales_' + $scope.idValeFF,
-    archivo: $scope.EvidenciaVale.archivo,
-    idUsuario: $rootScope.user.usu_idusuario
-    }
-  }
-  else 
-  {
-    sendData = 
-    {
-    idVale : $scope.idValeFF,
-    accion : accion,
-    comentario: ''
-    }
-  }
-  swal({
-    title: accion == 2 ? '¿Deseas Autorizar el Vale?' : 'Entrega',
-    text: accion == 2 ? 'Se autorizara el Vale' : 'Entrega de Efectivo',
-    type: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Aceptar',
-    cancelButtonText: 'Cancelar',
-    closeOnConfirm: true,
-    closeOnCancel: true
-},
-async function(isConfirm) {
-    if (isConfirm) {
-        $('#loading').modal('show');   
-        var tipoProceso = false;
-        let CCDepto = zeroDelete($scope.cuentaContable);
-        //tipoProceso = await promiseInsertaDatosOrden($scope.empresa, $scope.sucursalVale, 'PVFF', $scope.nombreVale,  $scope.importeValeFF, 0)
-        tipoProceso = await promiseInsertaDatos($scope.idUsuario, $scope.sucursalVale, 6, $scope.nombreVale, $scope.importeValeFF,  $scope.nombreDepartamentoVale, 'PVFF',JSON.parse(localStorage.getItem('borrador')).idPerTra ,'', CCDepto);          
-        if(tipoProceso)
-        {        
-                    aprobarValeRepository.updateTramiteVale(sendData).then((resf) => {
-                     if (resf.data[0].success == 1) {
-                        $scope.guardarBitacoraProceso($rootScope.user.usu_idusuario, JSON.parse(localStorage.getItem('borrador')).idPerTra, 0, 'Se entrego Efectivo vale '+ resf.data[0].vale, 1, 0);
-                      $scope.listaValeFondoFijo(JSON.parse(localStorage.getItem('borrador')).idPerTra);
-                      $('#loading').modal('hide');
-                      $("#aprobarVale").modal("hide");
-                      $scope.regresarVale();
-                     }
-                     else{
-                      $('#loading').modal('hide');
-                      swal('Error', 'No se aplicaron los cambios', 'error');
-                     }
-                 });     
-        }
-        else
+        sendData = 
         {
-            $('#loading').modal('hide');
-            swal('Atencion', 'No se guardo correctamente, intentelo mas tarde', 'warning');
-        }       
-    } else {
-        swal('Cancelado', 'No se aplicaron los cambios', 'error');
-        $('#loading').modal('hide');
+        idVale : $scope.idValeFF,
+        accion : accion,
+        nombreArchivo: $scope.EvidenciaVale.nombreArchivo.split('.')[0],
+        extensionArchivo: $scope.EvidenciaVale.nombreArchivo.split('.')[1],
+        saveUrl: $scope.urlValeAutorizado + 'FondoFijo/' + 'FondoFijo_' + $scope.id_perTra + '/Vales_' + $scope.idValeFF,
+        archivo: $scope.EvidenciaVale.archivo,
+        idUsuario: $rootScope.user.usu_idusuario
+        }
     }
-});
+  else 
+    {
+        sendData = {
+                        idVale : $scope.idValeFF,
+                        accion : accion,
+                        comentario: ''
+                    }
+    }
+    swal({
+            title: accion == 2 ? '¿Deseas Autorizar el Vale?' : 'Entrega',
+            text: accion == 2 ? 'Se autorizara el Vale' : 'Entrega de Efectivo',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar',
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+    async function(isConfirm) {
+    if (isConfirm) {
+            $('#loading').modal('show');   
+            var tipoProceso = false;
+            let CCDepto = zeroDelete($scope.cuentaContable);
+            // INICIO API Bpro Poliza PVFF
+
+            console.log($scope)
+            console.log(accion)
+            console.log(sendData)
+
+            $scope.insertaPolizaFF();
+            
+
+            $scope.regresarVale();
+            // if($scope.idTramite == 10)
+            // {           
+            // }
+            // tipoProceso = await promiseInsertaDatos($scope.idUsuario, $scope.sucursalVale, 6, $scope.nombreVale, $scope.importeValeFF,  $scope.nombreDepartamentoVale, 'PVFF',JSON.parse(localStorage.getItem('borrador')).idPerTra ,'', CCDepto);          
+            // if(tipoProceso)
+            // {        
+            //         //     aprobarValeRepository.updateTramiteVale(sendData).then((resf) => {
+            //         //      if (resf.data[0].success == 1) {
+            //         //       $scope.guardarBitacoraProceso($rootScope.user.usu_idusuario, JSON.parse(localStorage.getItem('borrador')).idPerTra, 0, 'Se entrego Efectivo vale '+ resf.data[0].vale, 1, 0);
+            //         //       $scope.listaValeFondoFijo(JSON.parse(localStorage.getItem('borrador')).idPerTra);
+            //         //       $('#loading').modal('hide');
+            //         //       $("#aprobarVale").modal("hide");
+            //         //       $scope.regresarVale();
+            //         //      }
+            //         //      else{
+            //         //       $('#loading').modal('hide');
+            //         //       swal('Error', 'No se aplicaron los cambios', 'error');
+            //         //      }
+            //         //  });     
+            // }
+            // else
+            // {
+            //     $('#loading').modal('hide');
+            //     swal('Atencion', 'No se guardo correctamente, intentelo mas tarde', 'warning');
+            // }
+            // FIN API Bpro Poliza PVFF       
+        } else { 
+                swal('Cancelado', 'No se aplicaron los cambios', 'error'); $('#loading').modal('hide');
+            }
+    });
+}
+
+// API 11Julio
+$scope.getDataOrdenPagoFF = function () {
+    ordenDePagoFFAGRepository.getDataOrdenPagoFF($scope.idPerTra,$scope.tipoTramite,$scope.consecutivoTramite).then((res) => {
+        console.log( "DatoGeneraPolizaFF", res );
+    });
+};
+
+$scope.insertaPolizaFF = async function () {
+    let banco = zeroDelete($scope.cuentaContableSalida);
+    let AuthToken;
+    let FF = `FF-${$scope.emp_nombrecto}-${$scope.suc_nombrecto}-${$scope.dep_nombrecto}-${$scope.idPerTra}-${$scope.incremental}`
+    let resPoliza
+    let respUpdate
+
+    $('#loading').modal('show');
+
+    $scope.Poliza.Proceso = `GVOP${$scope.complementoPolizas}`
+    $scope.Poliza.DocumentoOrigen = AG
+    $scope.Poliza.Canal = `GVOP${$scope.complementoPolizas}`
+    $scope.Poliza.Documento = AG
+    $scope.Poliza.Referencia2 = AG
+
+    $scope.Deta.DocumentoOrigen= AG
+    $scope.Deta.Partida = '1'
+    $scope.Deta.TipoProducto='AC'
+    $scope.Deta.Origen = 'FF'
+    $scope.Deta.Persona1 = $scope.idCliente
+    $scope.Deta.DocumentoAfectado = AG 
+    $scope.Deta.Moneda = 'PE'
+    $scope.Deta.VentaUnitario = $scope.monto
+    $scope.Deta.Referencia2 = AG
+    $scope.Poliza.Deta.push($scope.Deta)
+
+    $scope.Deta2.DocumentoOrigen= AG
+    $scope.Deta2.Partida = '2'
+    $scope.Deta2.TipoProducto='DD'
+    $scope.Deta2.Origen = 'FF'
+    $scope.Deta2.Persona1 = $scope.idCliente
+    $scope.Deta2.DocumentoAfectado = AG 
+    $scope.Deta2.Moneda = 'PE'
+    $scope.Deta2.Referencia2 = AG
+    $scope.Deta2.VentaUnitario = $scope.monto
+    $scope.Poliza.Deta.push($scope.Deta2)
+
+    $scope.ContabilidadMasiva.Polizas.push(... [$scope.Poliza])
+
+    $scope.OrdenCompra.Detalle.push($scope.Detalle)  
+    $scope.BproEndPoint.IdEmpresa = $scope.idEmpresa
+    $scope.BproEndPoint.IdSucursal = $scope.idSucursal
+    $scope.BproEndPoint.Tipo = 2
+    $scope.BproEndPoint.OrdenCompra = $scope.OrdenCompra
+    $scope.BproEndPoint.ContabilidadMasiva = $scope.ContabilidadMasiva
+
+    console.log(JSON.stringify($scope.BproEndPoint))
+
+    let datalog ={
+        idSucursal : $scope.idSucursal,
+        unniqIdGenerado: '',
+        tokenGenerado: '',
+        id_perTra : $scope.idPerTra,
+        idVale: '',
+        jsonEnvio: '',
+        jsonRespuesta: '',
+        tipoPol: '',
+        consPol: '',
+        anioPol: '',
+        mesPol: '',
+        empresaPol: '',
+        opcion: 1,
+        consecutivo:0,
+        codigo:'',
+        mensajeError:'',
+        resuelto: 0
+    }
+
+    AuthToken = await promiseAutBPRO();
+    
+    console.log(AuthToken)
+
+    datalog.tokenGenerado = AuthToken.Token
+    datalog.unniqIdGenerado = AuthToken.UnniqId
+    datalog.jsonEnvio = JSON.stringify($scope.BproEndPoint)
+
+    let respLog = await LogApiBpro(datalog)
+
+    datalog.consecutivo = respLog.folio
+    datalog.opcion = 2
+
+    resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify($scope.BproEndPoint))
+
+    if(resPoliza.Codigo === '200 OK'){
+        datalog.anioPol = resPoliza.Poliza[0].añoPoliza
+        datalog.consPol = resPoliza.Poliza[0].ConsecutivoPoliza
+        datalog.empresaPol = resPoliza.Poliza[0].EmpresaPoliza
+        datalog.mesPol =  resPoliza.Poliza[0].MesPoliza
+        datalog.tipoPol = resPoliza.Poliza[0].TipoPoliza
+        datalog.jsonRespuesta = JSON.stringify(resPoliza.Poliza[0])
+        datalog.codigo = resPoliza.Codigo
+        datalog.resuelto = 1
+
+        respUpdate = await promiseActualizaTramite($scope.idPerTra,'GVOP', AG, $scope.incremental)
+
+        $scope.getDataOrdenPagoGV();
+        $scope.nombreTramite ='ANTICIPO DE GASTOS'
+
+        $('#loading').modal('hide');
+
+        swal({
+            title:"Aviso",
+            type:"info",
+            width: 1000,
+            text:`La orden de pago genero la siguiente póliza
+            Año póliza: ${datalog.anioPol}
+            Mes póliza: ${datalog.mesPol}
+            Cons póliza: ${datalog.consPol}
+            Tipo póliza: ${datalog.tipoPol}
+            
+            No olvide subir el archivo PDF de la orden de pago al sistema`,
+            showConfirmButton: true,
+            showCloseButton:  false,
+            timer:10000
+        })
+        
+    }else{
+
+
+
+        $('#loading').modal('hide');
+
+
+        datalog.jsonRespuesta = JSON.stringify(resPoliza)
+
+        if(resPoliza.data !== undefined){
+            datalog.mensajeError = resPoliza.data.Message 
+            datalog.codigo = resPoliza.status.toString()
+            datalog.resuelto = 0
+        }else{
+            datalog.mensajeError = resPoliza.Mensaje
+            datalog.codigo = resPoliza.Codigo
+            datalog.resuelto = 0
+        }
+
+        swal({
+            title:"Aviso",
+            type:"error",
+            width: 1000,
+            text: `Se presento un problema al procesar la póliza en BPRO
+            El trámite no ha sido procesado, favor de notificar al área de sistemas 
+            
+            Codigo: ${datalog.codigo }
+            Respuesta BPRO:  ${datalog.mensajeError}
+            
+            Reitentar cuando se le notifique la solución a la incidencia`,
+            showConfirmButton: true,
+            showCloseButton:  false,
+            timer:10000
+        })
+    }
+
+    respLog = await LogApiBpro(datalog)
+
+    console.log(respUpdate)
+
+
+
 }
 
 $scope.AumentoDisminucionFF = function () {
