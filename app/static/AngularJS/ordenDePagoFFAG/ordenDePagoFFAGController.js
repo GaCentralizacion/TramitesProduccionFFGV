@@ -30,93 +30,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
     $scope.dep_nombrecto = '';
     $scope.incremental = 0;
 
-
-    $scope.Detalle = {
-        ConceptoContable: '',
-        Cantidad:         0,
-        Producto:         '',
-        PrecioUnitario:   0,
-        TasaIva:          0,
-        Descuento:        0
-    }
-    
-    $scope.OrdenCompra = {
-        IdProveedor:        0,
-        ArePed:             '',
-        TipoComprobante:    '',
-        FechaOrden:         '',
-        FechaAplicacion:    '',
-        anticipo:           0,
-        CantidadAnticipo:   0,
-        PorcentajeAnticipo: 0,
-        FechaAnticipo:      '',
-        Detalle:            []
-    }
-
-    $scope.Deta = {
-        DocumentoOrigen:   '',
-        Partida:           '',
-        TipoProducto:      '',
-        SubProducto:       '',
-        Origen:            '',
-        Destino:           '',
-        Moneda:            'PE',
-        TipoCambio:        '1',
-        CostoUnitario:      0,
-        VentaUnitario:      0,
-        DescuentoUnitario:  0,
-        TasaIva:            0,
-        IVA:                0,
-        Persona1:           0,
-        Persona2:          '0',
-        DocumentoAfectado: '',
-        Referencia2:       '',
-    }
-
-    $scope.Deta2 = {
-        DocumentoOrigen:   '',
-        Partida:           '',
-        TipoProducto:      '',
-        SubProducto:       '',
-        Origen:            '',
-        Destino:           '',
-        Moneda:            'PE',
-        TipoCambio:        '1',
-        CostoUnitario:      0,
-        VentaUnitario:      0,
-        DescuentoUnitario:  0,
-        TasaIva:            0,
-        IVA:                0,
-        Persona1:           0,
-        Persona2:          '0',
-        DocumentoAfectado: '',
-        Referencia2:       '',
-    }
-
-    $scope.Poliza = {
-        Proceso:         '',
-        DocumentoOrigen: '',
-        Canal:           '',
-        NumeroControl:   '',
-        Documento:       '',
-        Referencia2:     '',
-        Deta:            []
-    }
-
-    $scope.ArrPoliza = []
-
-    $scope.ContabilidadMasiva = {
-        Polizas: []
-    }
-  
-
-    $scope.BproEndPoint = {
-        IdEmpresa:          0,
-        IdSucursal:         0,
-        Tipo:               0,
-        OrdenCompra:       $scope.OrdenCompra,
-        ContabilidadMasiva: $scope.ContabilidadMasiva
-    }
+    $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
 
     $scope.init = () => {
         $rootScope.user = JSON.parse(localStorage.getItem('usuario'));
@@ -662,77 +576,56 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
 
         $('#loading').modal('show');
 
-        $scope.Poliza.Proceso = `GVOP${$scope.complementoPolizas}`
-        $scope.Poliza.DocumentoOrigen = AG
-        $scope.Poliza.Canal = `GVOP${$scope.complementoPolizas}`
-        $scope.Poliza.Documento = AG
-        $scope.Poliza.Referencia2 = AG
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `GVOP${$scope.complementoPolizas}`
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = AG
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `GVOP${$scope.complementoPolizas}`
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = AG
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  AG
 
-        $scope.Deta.DocumentoOrigen= AG
-        $scope.Deta.Partida = '1'
-        $scope.Deta.TipoProducto='AC'
-        $scope.Deta.Origen = 'FF'
-        $scope.Deta.Persona1 = $scope.idCliente
-        $scope.Deta.DocumentoAfectado = AG 
-        $scope.Deta.Moneda = 'PE'
-        $scope.Deta.VentaUnitario = $scope.monto
-        $scope.Deta.Referencia2 = AG
-        $scope.Poliza.Deta.push($scope.Deta)
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= AG
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto='AC'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Origen = 'FF'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.idCliente
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = AG 
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.monto
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = AG
 
-        $scope.Deta2.DocumentoOrigen= AG
-        $scope.Deta2.Partida = '2'
-        $scope.Deta2.TipoProducto='DD'
-        $scope.Deta2.Origen = 'FF'
-        $scope.Deta2.Persona1 = $scope.idCliente
-        $scope.Deta2.DocumentoAfectado = AG 
-        $scope.Deta2.Moneda = 'PE'
-        $scope.Deta2.Referencia2 = AG
-        $scope.Deta2.VentaUnitario = $scope.monto
-        $scope.Poliza.Deta.push($scope.Deta2)
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoOrigen= AG
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Partida = '2'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoProducto='DD'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Origen = 'FF'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.idCliente
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado = AG 
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Moneda = 'PE'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = AG 
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.monto
 
-        $scope.ContabilidadMasiva.Polizas.push(... [$scope.Poliza])
+        $scope.apiJson.IdEmpresa = $scope.idEmpresa
+        $scope.apiJson.IdSucursal = $scope.idSucursal
+        $scope.apiJson.Tipo = 2
 
-        $scope.OrdenCompra.Detalle.push($scope.Detalle)  
-        $scope.BproEndPoint.IdEmpresa = $scope.idEmpresa
-        $scope.BproEndPoint.IdSucursal = $scope.idSucursal
-        $scope.BproEndPoint.Tipo = 2
-        $scope.BproEndPoint.OrdenCompra = $scope.OrdenCompra
-        $scope.BproEndPoint.ContabilidadMasiva = $scope.ContabilidadMasiva
+        console.log(JSON.stringify($scope.apiJson))
 
-        console.log(JSON.stringify($scope.BproEndPoint))
-
-        let datalog ={
-            idSucursal : $scope.idSucursal,
-            unniqIdGenerado: '',
-            tokenGenerado: '',
-            id_perTra : $scope.idPerTra,
-            idVale: '',
-            jsonEnvio: '',
-            jsonRespuesta: '',
-            tipoPol: '',
-            consPol: '',
-            anioPol: '',
-            mesPol: '',
-            empresaPol: '',
-            opcion: 1,
-            consecutivo:0,
-            codigo:'',
-            mensajeError:'',
-            resuelto: 0
-        }
+        let datalog = structuredClone(datalogAPI)
+      
+            datalog.idSucursal = $scope.idSucursal
+            datalog.id_perTra = $scope.idPerTra
+            datalog.opcion = 1        
 
         AuthToken = await promiseAutBPRO();
 
         datalog.tokenGenerado = AuthToken.Token
         datalog.unniqIdGenerado = AuthToken.UnniqId
-        datalog.jsonEnvio = JSON.stringify($scope.BproEndPoint)
+        datalog.jsonEnvio = JSON.stringify($scope.apiJson)
 
         let respLog = await LogApiBpro(datalog)
 
         datalog.consecutivo = respLog.folio
         datalog.opcion = 2
 
-        resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify($scope.BproEndPoint))
+        resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify($scope.apiJson))
 
         if(resPoliza.Codigo === '200 OK'){
             datalog.anioPol = resPoliza.Poliza[0].añoPoliza
