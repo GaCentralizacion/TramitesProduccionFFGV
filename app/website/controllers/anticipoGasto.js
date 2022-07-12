@@ -2077,11 +2077,20 @@ anticipoGasto.prototype.get_ActualizaTramitePoliza = function(req, res, next) {
     var documentoConcepto = req.query.documentoConcepto;
     var incremental = req.query.incremental;
 
+    var ordenCompra = req.query.ordenCompra;
+    var consPol = req.query.consPol;
+    var mesPol = req.query.mesPol;
+    var anioPol = req.query.anioPol;
+
     var params = [
         { name: 'id_perTra', value: id_perTra, type: self.model.types.INT },
         { name: 'poliza', value: poliza, type: self.model.types.STRING },
         { name: 'documentoConcepto', value: documentoConcepto, type: self.model.types.STRING },
-        { name: 'incremental', value: incremental, type: self.model.types.INT }
+        { name: 'incremental', value: incremental, type: self.model.types.INT },
+        { name: 'ordenCompra', value: ordenCompra, type: self.model.types.STRING },
+        { name: 'consPol', value: consPol, type: self.model.types.INT },
+        { name: 'mesPol', value: mesPol, type: self.model.types.INT },
+        { name: 'anioPol', value: anioPol, type: self.model.types.INT }
     ];
     
     this.model.query('UPD_TRAMITE_GASTO_VIAJE', params, function(error, result) {
