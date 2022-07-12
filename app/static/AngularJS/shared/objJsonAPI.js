@@ -154,5 +154,6 @@ var apiJsonBPRO2detalles = {
     consecutivo:0,
     codigo:'',
     mensajeError:'',
-    resuelto: 0
+    resuelto: 0,
+    ordenCompra:''
 }

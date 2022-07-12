@@ -1324,7 +1324,14 @@ registrationModule.factory('anticipoGastoRepository', function ($http) {
 
             });
         },
-        ActualizaTramitePoliza:(id_perTra,poliza,documentoConcepto,incremental)=>{
+        ActualizaTramitePoliza:(id_perTra
+            ,poliza,documentoConcepto = ''
+            ,incremental = 0
+            ,ordenCompra = ''
+            ,consPol = 0
+            ,mesPol = 0
+            ,anioPol= 0
+            )=>{
             return $http({
                 url: `${anticipoGasto}ActualizaTramitePoliza`,
                 method: "GET",
@@ -1333,6 +1340,10 @@ registrationModule.factory('anticipoGastoRepository', function ($http) {
                     poliza,
                     documentoConcepto,
                     incremental
+                    ,ordenCompra
+                    ,consPol 
+                    ,mesPol 
+                    ,anioPol
                 },
                 headers: {
                     'Content-Type': 'application/json'

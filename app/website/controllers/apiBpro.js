@@ -34,6 +34,7 @@ apiBpro.prototype.get_insertaLog = function(req, res, next) {
     var codigo          =  req.query.codigo
     var mensajeError    =  req.query.mensajeError
     var resuelto        =  req.query.resuelto
+    var ordenCompra     =  req.query.ordenCompra
 
     var params = [
         { name: 'idSucursal',       value: idSucursal,      type: self.model.types.INT },
@@ -52,7 +53,9 @@ apiBpro.prototype.get_insertaLog = function(req, res, next) {
         { name: 'mesPol',           value: mesPol,          type: self.model.types.STRING },
         { name: 'codigo',           value: codigo,          type: self.model.types.STRING },
         { name: 'mensajeError',     value: mensajeError,    type: self.model.types.STRING },
-        { name: 'resuelto',         value: resuelto,        type: self.model.types.INT }
+        { name: 'resuelto',         value: resuelto,        type: self.model.types.INT },
+        { name: 'ordenCompra',      value: ordenCompra,     type: self.model.types.STRING }
+
     ];
     this.model.query('SP_LOG_APIBRPO_FFGV', params, function(error, result) {
         self.view.expositor(res, {
