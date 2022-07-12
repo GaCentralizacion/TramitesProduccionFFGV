@@ -57,6 +57,8 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
 
     $scope.distancia = 50;
 
+    $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
+
     $scope.init = () => {
         if (getParameterByName('idSolicitud') != '') {    
             $scope.idSolicitud = getParameterByName('idSolicitud');
