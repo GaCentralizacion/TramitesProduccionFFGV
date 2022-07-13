@@ -26,6 +26,8 @@ registrationModule.controller('FondoFijoController', function ($scope, $rootScop
     $scope.dep_nombrecto = '';
     $scope.incremental = 0;
     $scope.iPersonaDevFF = 0;
+    $scope.tipoProcesoAPI = 0;
+    
 
     $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
 
@@ -244,11 +246,10 @@ $scope.actualizarVale = function (accion) {
             // INICIO API Bpro Poliza PVFF
 
              console.log("INICIO API Bpro Poliza PVFF")
-            // console.log(accion)
-            // console.log(sendData)
- 
-           // $scope.dataComplementoFF();
-            $scope.insertaPolizaFF();            
+
+             // $scope.dataComplementoFF();
+            $scope.tipoProcesoAPI = 6
+            $scope.insertaPolizaFFPVFF();            
 
             // if($scope.idTramite == 10)
             // {           
@@ -291,7 +292,7 @@ $scope.dataComplementoFF = function () {
     });
 };
 
-$scope.insertaPolizaFF = async function () {
+$scope.insertaPolizaFFPVFF = async function () {
     let banco = zeroDelete($scope.cuentaContable);
     let AuthToken;
     let FFVale = $scope.nombreVale 
@@ -390,7 +391,7 @@ $scope.insertaPolizaFF = async function () {
             Cons póliza: ${datalog.consPol}
             Tipo póliza: ${datalog.tipoPol}
             
-            No olvide subir sus comprobaciones en tiempo y forma al sistema`,
+            No olvide dar seguimiento.`,
             showConfirmButton: true,
             showCloseButton:  false,
             timer:10000         
@@ -398,11 +399,7 @@ $scope.insertaPolizaFF = async function () {
         })
         
     }else{
-
-
-
         $('#loading').modal('hide');
-
         datalog.jsonRespuesta = JSON.stringify(resPoliza)
 
         if(resPoliza.data !== undefined){
@@ -436,9 +433,8 @@ $scope.insertaPolizaFF = async function () {
 
     $('#loading').modal('hide');
     $("#aprobarVale").modal("hide");
-    $scope.regresarVale();
 
-    console.log(respUpdate)
+    $scope.regresarVale();
 };
 
 async function promiseAutBPRO(){
@@ -490,6 +486,153 @@ async function LogApiBpro(data){
         });
 
     });
+};
+
+
+//  $scope.insertaPolizaFrontAPI();
+$scope.insertaPolizaFrontAPI = async function () {
+    let banco = zeroDelete($scope.cuentaContable);
+    let AuthToken;
+    let FFVale = $scope.nombreVale 
+    let FF = $scope.idFondoFijo 
+    let resPoliza
+    let respUpdate
+
+    $('#loading').modal('show');
+    //Encabezado
+    $scope.apiJson.IdEmpresa = $scope.idEmpresa
+    $scope.apiJson.IdSucursal = $scope.idSucursal
+    $scope.apiJson.Tipo = 2    
+    //ContabilidadMasiva
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `PVFF${$scope.complementoPolizas}`
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = FFVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `PVFF${$scope.complementoPolizas}`
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = FFVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  FFVale
+
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= FFVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto = $scope.nombreDepartamentoVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].SubProducto = banco
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Origen = 'DD'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.importeValeFF
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.idPersona    
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = FFVale 
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = FFVale
+
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoOrigen= FFVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Partida = '2'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoProducto = $scope.nombreDepartamentoVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].SubProducto = banco
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Origen = 'FF'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Moneda = 'PE'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoCambio = '1'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.importeValeFF
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.idPersona
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado = FF 
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = FFVale     
+
+    console.log(JSON.stringify($scope.apiJson))
+
+    let datalog = structuredClone(datalogAPI)
+  
+        datalog.idSucursal = $scope.idSucursal
+        datalog.idVale = $scope.idValeFF
+        datalog.opcion = 1        
+
+        AuthToken = await promiseAutBPRO();
+
+        datalog.tokenGenerado = AuthToken.Token
+        datalog.unniqIdGenerado = AuthToken.UnniqId
+        datalog.jsonEnvio = JSON.stringify($scope.apiJson)
+
+    let respLog = await LogApiBpro(datalog)
+
+        console.log(datalog)
+        console.log(respLog)
+
+        datalog.consecutivo = respLog.folio
+        datalog.opcion = 2
+
+   resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify($scope.apiJson))
+
+    if(resPoliza.Codigo === '200 OK'){
+        datalog.anioPol = resPoliza.Poliza[0].añoPoliza
+        datalog.consPol = resPoliza.Poliza[0].ConsecutivoPoliza
+        datalog.empresaPol = resPoliza.Poliza[0].EmpresaPoliza
+        datalog.mesPol =  resPoliza.Poliza[0].MesPoliza
+        datalog.tipoPol = resPoliza.Poliza[0].TipoPoliza
+        datalog.jsonRespuesta = JSON.stringify(resPoliza.Poliza[0])
+        datalog.codigo = resPoliza.Codigo
+        datalog.resuelto = 1
+
+        respUpdate = await promiseActualizaTramiteFF($scope.idValeFF,$scope.idUsuario ,'PVFF', FFVale, $scope.incremental)
+        console.log(respUpdate)
+
+        //$scope.getDataOrdenPagoGV();
+        $scope.nombreTramite ='APROBAR VALE FF'
+
+        html = $scope.html1 + 'Entrega de efectivo del vale:  ' + FFVale +'  de  Fondo Fijo' + "<br><br> Estimado " + respUpdate.nombreAutorizador + " se realizó la entrega de efectivo por el monto de:  $"+ formatMoney($scope.importeValeFF) + ".  No olvide subir sus comprobaciones en tiempo y forma "  + $scope.html2;
+        $scope.sendMail(respUpdate.correo, respUpdate.asunto, html);
+
+        $('#loading').modal('hide');
+
+        swal({
+            title:"Aviso",
+            type:"info",
+            width: 1000,
+            text:`La entrega de efectivo genero la siguiente póliza
+            Año póliza: ${datalog.anioPol}
+            Mes póliza: ${datalog.mesPol}
+            Cons póliza: ${datalog.consPol}
+            Tipo póliza: ${datalog.tipoPol}
+            
+            No olvide dar seguimiento.`,
+            showConfirmButton: true,
+            showCloseButton:  false,
+            timer:10000         
+
+        })
+        
+    }else{
+        $('#loading').modal('hide');
+        datalog.jsonRespuesta = JSON.stringify(resPoliza)
+
+        if(resPoliza.data !== undefined){
+            datalog.mensajeError = resPoliza.data.Message 
+            datalog.codigo = resPoliza.status.toString()
+            datalog.resuelto = 0
+        }else{
+            datalog.mensajeError = resPoliza.Mensaje
+            datalog.codigo = resPoliza.Codigo
+            datalog.resuelto = 0
+        }
+
+        swal({
+            title:"Aviso",
+            type:"error",
+            width: 1000,
+            text: `Se presento un problema al procesar la póliza en BPRO
+            No ha sido procesado, favor de notificar al área de sistemas 
+            
+            Codigo: ${datalog.codigo }
+            Respuesta BPRO:  ${datalog.mensajeError}
+            
+            Reitentar cuando se le notifique la solución a la incidencia`,
+            showConfirmButton: true,
+            showCloseButton:  false,
+            timer:10000
+        })
+    }
+
+    respLog = await LogApiBpro(datalog)
+
+    $('#loading').modal('hide');
+    $("#aprobarVale").modal("hide");
+
+    $scope.regresarVale();
 };
 
 $scope.AumentoDisminucionFF = function () {
@@ -2144,16 +2287,6 @@ $scope.AutorizarRechazarEvidencia = function (item,tipo) {
             $('#loading').modal('show');
             misTramitesValesRepository.updateTramiteValeEvidencia(item.idValeEvidencia,tipo,'',0, $rootScope.user.usu_idusuario).then(async function (result) {
                 if (result.data.length > 0) {
-                    // if(item.esFactura == 'S')
-                    // {
-                    //     //tipoProceso = await promiseInsertaDatosOrden($scope.empresa, $scope.sucursalVale, 'AVFF', $scope.nombreVale,  item.monto, 0);
-                    //     tipoProceso = await promiseInsertaDatos($scope.idUsuario, $scope.sucursalVale , 7,$scope.nombreVale , item.monto, '', $scope.nombreDepartamentoVale, 0, '' );
-                    //     $('#loading').modal('hide');  
-                    // }
-                    // else
-                    // {
-
-                    
 
                     var estatusVales = await verificaVale(item.idEmpresa, item.idSucursal, item.nombreVale, item.monto);
                     var estatusVale = await verificaValesEvidencia(item.idVale);
@@ -2175,7 +2308,11 @@ $scope.AutorizarRechazarEvidencia = function (item,tipo) {
                     {
                         if(estatusVales.justificado == 0  && estatusVales.JustificoMas == 0)
                         {
-                            tipoProceso = await promiseInsertaDatosFront($scope.idUsuario, $scope.sucursalVale , 7,item.idComprobacionVale , item.monto, '', $scope.nombreDepartamentoVale, 0, '','' );
+                            //  7.-Aplicación vale EYH
+                            // tipoProceso = await promiseInsertaDatosFront($scope.idUsuario, $scope.sucursalVale , 7,item.idComprobacionVale , item.monto, '', $scope.nombreDepartamentoVale, 0, '','' );
+                            $scope.tipoProcesoAPI = 7
+                            $scope.insertaPolizaFrontAPI();
+
                         }
                         else
                         {
