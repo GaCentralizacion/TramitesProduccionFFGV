@@ -29,6 +29,11 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
     $scope.suc_nombrecto = '';
     $scope.dep_nombrecto = '';
     $scope.incremental = 0;
+    $scope.idComprobacionConcepto = ''
+    $scope.ordenCompra=''
+    $scope.documentoConcepto= ''
+    $scope.idPersonaRFC = 0
+    $scope.cuentaEnvio = ''
 
     $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
 
@@ -208,6 +213,11 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             $scope.suc_nombrecto = res.data[0].suc_nombrecto;
             $scope.dep_nombrecto = res.data[0].dep_nombrecto;
             $scope.incremental = res.data[0].incremental;
+            $scope.idComprobacionConcepto = res.data[0].idComprobacionConcepto
+            $scope.ordenCompra = res.data[0].ordenCompra
+            $scope.documentoConcepto = res.data[0].documentoConcepto
+            $scope.idPersonaRFC = res.data[0].idPersonaRFC
+            $scope.cuentaEnvio = res.data[0].cuentaEnvio
             //----------------------------------------------------
 
             $scope.DatosPolizaOP( res.data[0].id_cuenta );
@@ -576,9 +586,9 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
 
         $('#loading').modal('show');
 
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `GVOP${$scope.complementoPolizas}`
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `CGFR${$scope.complementoPolizas}`
         $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = AG
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `GVOP${$scope.complementoPolizas}`
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `CGFR${$scope.complementoPolizas}`
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = AG
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  AG
 
@@ -812,11 +822,136 @@ function zeroDelete (item)
         }
     }
 
-    $scope.sendPoliza = function(){
-        ordenDePagoFFAGRepository.sendPoliza( $scope.paramsPolizaCGFN ).then( (res) => {
-            console.log("La poliza se ha creado", res);
+    $scope.sendPoliza = async function(){
+        $('#loading').modal('show');
+        let resPoliza
+        let respUpdate
+        let AuthToken;
+
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `CGFR${$scope.complementoPolizas}`
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.idComprobacionConcepto
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `CGFR${$scope.complementoPolizas}`
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = $scope.ordenCompra
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  $scope.ordenCompra
+
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.idComprobacionConcepto
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto='OT'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].SubProducto = 'PA'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Origen = 'FAC'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 =  $scope.idPersonaRFC 
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = $scope.ordenCompra 
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.monto
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.idComprobacionConcepto
+
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoOrigen= $scope.idComprobacionConcepto
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Partida = '2'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoProducto='OT'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].SubProducto =  $scope.cuentaEnvio
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Origen = 'FAC'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 =  $scope.idCliente 
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado = $scope.documentoConcepto  
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Moneda = 'PE'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = $scope.ordenCompra  
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.monto
+
+        $scope.apiJson.IdEmpresa = $scope.idEmpresa
+        $scope.apiJson.IdSucursal = $scope.idSucursal
+        $scope.apiJson.Tipo = 2
+
+        console.log(JSON.stringify($scope.apiJson))
+
+        let datalog = structuredClone(datalogAPI)
+      
+            datalog.idSucursal = $scope.idSucursal
+            datalog.id_perTra = $scope.idPerTra
+            datalog.opcion = 1        
+
+        AuthToken = await promiseAutBPRO();
+
+        datalog.tokenGenerado = AuthToken.Token
+        datalog.unniqIdGenerado = AuthToken.UnniqId
+        datalog.jsonEnvio = JSON.stringify($scope.apiJson)
+
+        let respLog = await LogApiBpro(datalog)
+
+        datalog.consecutivo = respLog.folio
+        datalog.opcion = 2
+
+        resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify($scope.apiJson))
+
+        if(resPoliza.Codigo === '200 OK'){
+            datalog.anioPol = resPoliza.Poliza[0].añoPoliza
+            datalog.consPol = resPoliza.Poliza[0].ConsecutivoPoliza
+            datalog.empresaPol = resPoliza.Poliza[0].EmpresaPoliza
+            datalog.mesPol =  resPoliza.Poliza[0].MesPoliza
+            datalog.tipoPol = resPoliza.Poliza[0].TipoPoliza
+            datalog.jsonRespuesta = JSON.stringify(resPoliza.Poliza[0])
+            datalog.codigo = resPoliza.Codigo
+            datalog.resuelto = 1
+
+            respUpdate = await promiseActualizaTramite($scope.idPerTra,'CGFR', $scope.idComprobacionConcepto, $scope.incremental)
+
             $scope.getDataOrdenPagoGV();
-        });
+
+            $('#loading').modal('hide');
+
+            swal({
+                title:"Aviso",
+                type:"info",
+                width: 1000,
+                text:`La orden de pago genero la siguiente póliza
+                Año póliza: ${datalog.anioPol}
+                Mes póliza: ${datalog.mesPol}
+                Cons póliza: ${datalog.consPol}
+                Tipo póliza: ${datalog.tipoPol}
+                
+                No olvide subir el archivo PDF de la orden de pago al sistema`,
+                showConfirmButton: true,
+                showCloseButton:  false,
+                timer:10000
+            })
+            
+        }else{
+
+            $('#loading').modal('hide');
+
+            datalog.jsonRespuesta = JSON.stringify(resPoliza)
+
+            if(resPoliza.data !== undefined){
+                datalog.mensajeError = resPoliza.data.Message 
+                datalog.codigo = resPoliza.status.toString()
+                datalog.resuelto = 0
+            }else{
+                datalog.mensajeError = resPoliza.Mensaje
+                datalog.codigo = resPoliza.Codigo
+                datalog.resuelto = 0
+            }
+
+            swal({
+                title:"Aviso",
+                type:"error",
+                width: 1000,
+                text: `Se presento un problema al procesar la póliza en BPRO
+                El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                
+                Codigo: ${datalog.codigo }
+                Respuesta BPRO:  ${datalog.mensajeError}
+                
+                Reitentar cuando se le notifique la solución a la incidencia`,
+                showConfirmButton: true,
+                showCloseButton:  false,
+                timer:10000
+            })
+        }
+
+        respLog = await LogApiBpro(datalog)
+
+        // ordenDePagoFFAGRepository.sendPoliza( $scope.paramsPolizaCGFN ).then( (res) => {
+        //     console.log("La poliza se ha creado", res);
+        //     $scope.getDataOrdenPagoGV();
+        // });
     }
     function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
         try {
