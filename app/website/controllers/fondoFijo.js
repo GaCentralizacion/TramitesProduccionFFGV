@@ -3127,6 +3127,7 @@ fondoFijo.prototype.get_ValidaNotificacion = function(req, res, next) {
     var self = this;
     var id_perTra =  req.query.id_perTra;
     var idVale =  req.query.idVale;
+
     var params = [
         { name: 'id_perTra', value: id_perTra, type: self.model.types.INT },
         { name: 'idVale', value: idVale, type: self.model.types.INT }
@@ -3139,5 +3140,22 @@ fondoFijo.prototype.get_ValidaNotificacion = function(req, res, next) {
     });
 };
 
+fondoFijo.prototype.get_dataComplementoFF = function(req, res, next) {
+    var self = this;
+    var id_perTra   =  req.query.id_perTra;
+    var idVale      =  req.query.idVale;
+
+    var params = [
+        { name: 'id_perTra', value: id_perTra, type: self.model.types.INT },
+        { name: 'idVale', value: idVale, type: self.model.types.INT }
+    ];
+
+    this.model.query('[dbo].[SEL_DATACOMPLEMENTOFF_SP]', params, function(error, result) {
+        self.view.expositor(res, {
+            error: error,
+            result: result
+        });
+    });
+};
 
 module.exports = fondoFijo;

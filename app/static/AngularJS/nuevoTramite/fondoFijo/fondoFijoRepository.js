@@ -1034,5 +1034,19 @@ registrationModule.factory('fondoFijoRepository', function($http) {
 
             });
         },
+        getDataComplementoFF: (id_perTra, idVale) => {
+            return $http({
+                url: fondoFijo + 'get_dataComplementoFF/',
+                method: "GET",
+                params: {
+                    id_perTra: id_perTra,
+                    idVale: idVale
+                }
+                    ,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        },       
     };
 });
