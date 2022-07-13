@@ -1,4 +1,4 @@
-registrationModule.controller('FondoFijoController', function ($scope, $rootScope, $location, localStorageService, fondoFijoRepository, devolucionesRepository, misTramitesValesRepository, aprobarValeRepository, aprobarRepository,anticipoGastoRepository, clientesRepository,aprobarDevRepository, aprobarFondoRepository ) {
+registrationModule.controller('FondoFijoController', function ($scope, $rootScope, $location, localStorageService, fondoFijoRepository, devolucionesRepository, misTramitesValesRepository, aprobarValeRepository, aprobarRepository,anticipoGastoRepository, clientesRepository,aprobarDevRepository, aprobarFondoRepository,apiBproRepository ) {
     $scope.tab = 1;
     $scope.documentosCliente = [];
     $scope.modalTitle = '';
@@ -18,6 +18,19 @@ registrationModule.controller('FondoFijoController', function ($scope, $rootScop
     $scope.html1 = "<div style=\"width:310px;height:140px\"><center><img style=\"width: 100% \" src=\"https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png\" alt=\"GrupoAndrade\" />" +
         "</center></div><div><p><br>";
     $scope.html2 = ".</p></div>";
+    
+    //----------BPRO ENPOINT GV------------
+    $scope.complementoPolizas = '';
+    $scope.emp_nombrecto = '';
+    $scope.suc_nombrecto = '';
+    $scope.dep_nombrecto = '';
+    $scope.incremental = 0;
+    $scope.iPersonaDevFF = 0;
+
+    $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
+
+    // -- FIN BPRO ENPOINT FF -- //
+
     $scope.init = () => {
         $scope.toleranciaVales()
         $scope.idUsuario=JSON.parse(localStorage.getItem('usuario')).usu_idusuario;
@@ -26,6 +39,7 @@ registrationModule.controller('FondoFijoController', function ($scope, $rootScop
         $scope.tipoUsuario = response.data[0].tipoUsuarioFF;
         $scope.nombreUsuario=JSON.parse(localStorage.getItem('usuario')).nombre;
         $scope.traeEmpresas();
+        $scope.idTramite = localStorage.getItem('idTramite');
         //$scope.traerAutorizadores();
         if (!localStorage.getItem('borrador')) {
           $scope.getDocumentosByTramite();
@@ -181,83 +195,296 @@ $scope.listaValesFF = function (id_perTra, idVale) {
     });
 }
 
-$scope.actualizarVale = function (accion) {
-  
+$scope.actualizarVale = function (accion) {  
   let errorvale = $scope.EvidenciaVale == undefined || $scope.EvidenciaVale == null   ? true : false;
   if(accion == 3 && errorvale)
-  {
-    swal('Alto', 'Para autorizar el vale debes adjuntar la evidencia', 'warning');
-    return false;
-  }
+    {
+        swal('Alto', 'Para autorizar el vale debes adjuntar la evidencia', 'warning');
+        return false;
+    }
   var sendData= null;
   if(accion == 3)
-  {
-    sendData = 
     {
-    idVale : $scope.idValeFF,
-    accion : accion,
-    nombreArchivo: $scope.EvidenciaVale.nombreArchivo.split('.')[0],
-    extensionArchivo: $scope.EvidenciaVale.nombreArchivo.split('.')[1],
-    saveUrl: $scope.urlValeAutorizado + 'FondoFijo/' + 'FondoFijo_' + $scope.id_perTra + '/Vales_' + $scope.idValeFF,
-    archivo: $scope.EvidenciaVale.archivo,
-    idUsuario: $rootScope.user.usu_idusuario
-    }
-  }
-  else 
-  {
-    sendData = 
-    {
-    idVale : $scope.idValeFF,
-    accion : accion,
-    comentario: ''
-    }
-  }
-  swal({
-    title: accion == 2 ? '¿Deseas Autorizar el Vale?' : 'Entrega',
-    text: accion == 2 ? 'Se autorizara el Vale' : 'Entrega de Efectivo',
-    type: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Aceptar',
-    cancelButtonText: 'Cancelar',
-    closeOnConfirm: true,
-    closeOnCancel: true
-},
-async function(isConfirm) {
-    if (isConfirm) {
-        $('#loading').modal('show');   
-        var tipoProceso = false;
-        let CCDepto = zeroDelete($scope.cuentaContable);
-        //tipoProceso = await promiseInsertaDatosOrden($scope.empresa, $scope.sucursalVale, 'PVFF', $scope.nombreVale,  $scope.importeValeFF, 0)
-        tipoProceso = await promiseInsertaDatos($scope.idUsuario, $scope.sucursalVale, 6, $scope.nombreVale, $scope.importeValeFF,  $scope.nombreDepartamentoVale, 'PVFF',JSON.parse(localStorage.getItem('borrador')).idPerTra ,'', CCDepto);          
-        if(tipoProceso)
-        {        
-                    aprobarValeRepository.updateTramiteVale(sendData).then((resf) => {
-                     if (resf.data[0].success == 1) {
-                        $scope.guardarBitacoraProceso($rootScope.user.usu_idusuario, JSON.parse(localStorage.getItem('borrador')).idPerTra, 0, 'Se entrego Efectivo vale '+ resf.data[0].vale, 1, 0);
-                      $scope.listaValeFondoFijo(JSON.parse(localStorage.getItem('borrador')).idPerTra);
-                      $('#loading').modal('hide');
-                      $("#aprobarVale").modal("hide");
-                      $scope.regresarVale();
-                     }
-                     else{
-                      $('#loading').modal('hide');
-                      swal('Error', 'No se aplicaron los cambios', 'error');
-                     }
-                 });     
-        }
-        else
+        sendData = 
         {
-            $('#loading').modal('hide');
-            swal('Atencion', 'No se guardo correctamente, intentelo mas tarde', 'warning');
-        }       
-    } else {
-        swal('Cancelado', 'No se aplicaron los cambios', 'error');
-        $('#loading').modal('hide');
+        idVale : $scope.idValeFF,
+        accion : accion,
+        nombreArchivo: $scope.EvidenciaVale.nombreArchivo.split('.')[0],
+        extensionArchivo: $scope.EvidenciaVale.nombreArchivo.split('.')[1],
+        saveUrl: $scope.urlValeAutorizado + 'FondoFijo/' + 'FondoFijo_' + $scope.id_perTra + '/Vales_' + $scope.idValeFF,
+        archivo: $scope.EvidenciaVale.archivo,
+        idUsuario: $rootScope.user.usu_idusuario
+        }
     }
-});
+  else 
+    {
+        sendData = {
+                        idVale : $scope.idValeFF,
+                        accion : accion,
+                        comentario: ''
+                    }
+    }
+    swal({
+            title: accion == 2 ? '¿Deseas Autorizar el Vale?' : 'Entrega',
+            text: accion == 2 ? 'Se autorizara el Vale' : 'Entrega de Efectivo',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Aceptar',
+            cancelButtonText: 'Cancelar',
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },
+    async function(isConfirm) {
+    if (isConfirm) {
+            $('#loading').modal('show');   
+            var tipoProceso = false;
+            let CCDepto = zeroDelete($scope.cuentaContable);
+            // INICIO API Bpro Poliza PVFF
+
+             console.log("INICIO API Bpro Poliza PVFF")
+            // console.log(accion)
+            // console.log(sendData)
+ 
+           // $scope.dataComplementoFF();
+            $scope.insertaPolizaFF();            
+
+            // if($scope.idTramite == 10)
+            // {           
+            // }
+            // tipoProceso = await promiseInsertaDatos($scope.idUsuario, $scope.sucursalVale, 6, $scope.nombreVale, $scope.importeValeFF,  $scope.nombreDepartamentoVale, 'PVFF',JSON.parse(localStorage.getItem('borrador')).idPerTra ,'', CCDepto);          
+            // if(tipoProceso)
+            // {        
+            //         //     aprobarValeRepository.updateTramiteVale(sendData).then((resf) => {
+            //         //      if (resf.data[0].success == 1) {
+            //         //       $scope.guardarBitacoraProceso($rootScope.user.usu_idusuario, JSON.parse(localStorage.getItem('borrador')).idPerTra, 0, 'Se entrego Efectivo vale '+ resf.data[0].vale, 1, 0);
+            //         //       $scope.listaValeFondoFijo(JSON.parse(localStorage.getItem('borrador')).idPerTra);
+            //         //       $('#loading').modal('hide');
+            //         //       $("#aprobarVale").modal("hide");
+            //         //       $scope.regresarVale();
+            //         //      }
+            //         //      else{
+            //         //       $('#loading').modal('hide');
+            //         //       swal('Error', 'No se aplicaron los cambios', 'error');
+            //         //      }
+            //         //  });     
+            // }
+            // else
+            // {
+            //     $('#loading').modal('hide');
+            //     swal('Atencion', 'No se guardo correctamente, intentelo mas tarde', 'warning');
+            // }
+            // FIN API Bpro Poliza PVFF       
+        } else { 
+                swal('Cancelado', 'No se aplicaron los cambios', 'error'); $('#loading').modal('hide');
+            }
+    });
 }
+
+// API 11Julio
+$scope.dataComplementoFF = function () {
+    fondoFijoRepository.getDataComplementoFF($scope.id_perTra,$scope.idValeFF).then((res) => {
+        if (res.data[0].success == 1) {
+            $scope.iPersonaDevFF = res.data[0].PER_IDPERSONA;
+        }       
+    });
+};
+
+$scope.insertaPolizaFF = async function () {
+    let banco = zeroDelete($scope.cuentaContable);
+    let AuthToken;
+    let FFVale = $scope.nombreVale 
+    let FF = $scope.idFondoFijo 
+    let resPoliza
+    let respUpdate
+
+    $('#loading').modal('show');
+    //Encabezado
+    $scope.apiJson.IdEmpresa = $scope.idEmpresa
+    $scope.apiJson.IdSucursal = $scope.idSucursal
+    $scope.apiJson.Tipo = 2    
+    //ContabilidadMasiva
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `PVFF${$scope.complementoPolizas}`
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = FFVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `PVFF${$scope.complementoPolizas}`
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = FFVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  FFVale
+
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= FFVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto = $scope.nombreDepartamentoVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].SubProducto = banco
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Origen = 'DD'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.importeValeFF
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.idPersona    
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = FFVale 
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = FFVale
+
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoOrigen= FFVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Partida = '2'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoProducto = $scope.nombreDepartamentoVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].SubProducto = banco
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Origen = 'FF'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Moneda = 'PE'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoCambio = '1'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.importeValeFF
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.idPersona
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado = FF 
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = FFVale     
+
+    console.log(JSON.stringify($scope.apiJson))
+
+    let datalog = structuredClone(datalogAPI)
+  
+        datalog.idSucursal = $scope.idSucursal
+        datalog.idVale = $scope.idValeFF
+        datalog.opcion = 1        
+
+        AuthToken = await promiseAutBPRO();
+
+        datalog.tokenGenerado = AuthToken.Token
+        datalog.unniqIdGenerado = AuthToken.UnniqId
+        datalog.jsonEnvio = JSON.stringify($scope.apiJson)
+
+    let respLog = await LogApiBpro(datalog)
+
+        console.log(datalog)
+        console.log(respLog)
+
+        datalog.consecutivo = respLog.folio
+        datalog.opcion = 2
+
+   resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify($scope.apiJson))
+
+    if(resPoliza.Codigo === '200 OK'){
+        datalog.anioPol = resPoliza.Poliza[0].añoPoliza
+        datalog.consPol = resPoliza.Poliza[0].ConsecutivoPoliza
+        datalog.empresaPol = resPoliza.Poliza[0].EmpresaPoliza
+        datalog.mesPol =  resPoliza.Poliza[0].MesPoliza
+        datalog.tipoPol = resPoliza.Poliza[0].TipoPoliza
+        datalog.jsonRespuesta = JSON.stringify(resPoliza.Poliza[0])
+        datalog.codigo = resPoliza.Codigo
+        datalog.resuelto = 1
+
+       // respUpdate = await promiseActualizaTramite($scope.idPerTra,'PVFF', AG, $scope.incremental)
+
+        //$scope.getDataOrdenPagoGV();
+        $scope.nombreTramite ='APROBAR VALE FF'
+
+        $('#loading').modal('hide');
+
+        swal({
+            title:"Aviso",
+            type:"info",
+            width: 1000,
+            text:`La entrega de efectivo genero la siguiente póliza
+            Año póliza: ${datalog.anioPol}
+            Mes póliza: ${datalog.mesPol}
+            Cons póliza: ${datalog.consPol}
+            Tipo póliza: ${datalog.tipoPol}
+            
+            No olvide subir sus comprobaciones en tiempo y forma al sistema`,
+            showConfirmButton: true,
+            showCloseButton:  false,
+            timer:10000
+        })
+        
+    }else{
+
+
+
+        $('#loading').modal('hide');
+
+        datalog.jsonRespuesta = JSON.stringify(resPoliza)
+
+        if(resPoliza.data !== undefined){
+            datalog.mensajeError = resPoliza.data.Message 
+            datalog.codigo = resPoliza.status.toString()
+            datalog.resuelto = 0
+        }else{
+            datalog.mensajeError = resPoliza.Mensaje
+            datalog.codigo = resPoliza.Codigo
+            datalog.resuelto = 0
+        }
+
+        swal({
+            title:"Aviso",
+            type:"error",
+            width: 1000,
+            text: `Se presento un problema al procesar la póliza en BPRO
+            No ha sido procesado, favor de notificar al área de sistemas 
+            
+            Codigo: ${datalog.codigo }
+            Respuesta BPRO:  ${datalog.mensajeError}
+            
+            Reitentar cuando se le notifique la solución a la incidencia`,
+            showConfirmButton: true,
+            showCloseButton:  false,
+            timer:10000
+        })
+    }
+
+    respLog = await LogApiBpro(datalog)
+
+    $('#loading').modal('hide');
+    $("#aprobarVale").modal("hide");
+    $scope.regresarVale();
+
+    console.log(respUpdate)
+};
+
+async function promiseAutBPRO(){
+    return new Promise((resolve, reject) => {
+        apiBproRepository.GetTokenBPRO().then(resp =>{
+            console.log('token: ',resp.data)
+            resolve(resp.data)
+        })
+    })
+}
+
+async function GeneraPolizaBPRO(token, data){
+    return new Promise((resolve, reject) => {
+        apiBproRepository.GeneraPolizaBPRO(token, data).then(resp =>{
+            console.log('respuesta: ',resp.data)
+            resolve(resp.data)
+        }).catch(error => {
+            resolve(error)
+        })
+    })
+}
+
+async function LogApiBpro(data){
+    return new Promise((resolve, reject) => {
+        apiBproRepository.LogApiBpro(data).then(resp =>{
+            console.log('resp: ',resp)
+            resolve(resp.data[0])
+        })
+    })
+}
+
+/**
+     * 
+     * @param {number} id_perTra 
+     * @param {string} poliza 
+     * @param {string} documentoConcepto 
+     * @param {number} incremental 
+     * @returns 
+     */
+ async function promiseActualizaTramite(id_perTra,poliza,documentoConcepto,incremental) {
+    return new Promise((resolve, reject) => {
+        anticipoGastoRepository.ActualizaTramitePoliza(id_perTra,poliza,documentoConcepto,incremental).then(function (result) {
+            if (result.data.length > 0) {
+                resolve(result.data[0]);
+            }
+        }).catch(err => {
+            reject(result.data[0]);
+        });
+
+    });
+};
 
 $scope.AumentoDisminucionFF = function () {
     let errorvale = $scope.ADmonto  == undefined || $scope.ADmonto == null ||
