@@ -43,7 +43,8 @@ registrationModule.factory('apiBproRepository', function ($http) {
                     mesPol: data.mesPol,
                     codigo: data.codigo,
                     mensajeError: data.mensajeError,
-                    resuelto:data.resuelto
+                    resuelto:data.resuelto,
+                    ordenCompra: data.ordenCompra,
                 },
                 headers:{
                     'Content-Type': 'application/json'
