@@ -207,6 +207,24 @@ registrationModule.controller('gastosDeMasController', function ($scope, $rootSc
                     $scope.montoDiferencia = $scope.montoAprobado - $scope.montoGastado;
                 }
             }
+            else{
+                swal({
+                    title:"Aviso",
+                    type:"error",
+                    width: 1000,
+                    text: `No fue posible obtener la relación de los conceptos contables
+                    Por el momento no se podra generar la salida de efectivo 
+                    
+                    Sistema: 1
+                    Tramite: 9
+                    Incidencia: 1
+                    
+                    Reitentar cuando se le notifique la solución a la incidencia`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    timer:10000
+                })
+            }
             $('#spinner-loading').modal('hide');
 
             if(opcion === 1){
