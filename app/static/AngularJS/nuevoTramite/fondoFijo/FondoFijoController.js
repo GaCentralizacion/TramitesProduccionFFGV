@@ -369,10 +369,14 @@ $scope.insertaPolizaFF = async function () {
         datalog.codigo = resPoliza.Codigo
         datalog.resuelto = 1
 
-       // respUpdate = await promiseActualizaTramite($scope.idPerTra,'PVFF', AG, $scope.incremental)
+        respUpdate = await promiseActualizaTramiteFF($scope.idValeFF,$scope.idUsuario ,'PVFF', FFVale, $scope.incremental)
+        console.log(respUpdate)
 
         //$scope.getDataOrdenPagoGV();
         $scope.nombreTramite ='APROBAR VALE FF'
+
+        html = $scope.html1 + 'Entrega de efectivo del vale:  ' + FFVale +'  de  Fondo Fijo' + "<br><br> Estimado " + respUpdate.nombreAutorizador + " se realizó la entrega de efectivo por el monto de:  $"+ formatMoney($scope.importeValeFF) + ".  No olvide subir sus comprobaciones en tiempo y forma "  + $scope.html2;
+        $scope.sendMail(respUpdate.correo, respUpdate.asunto, html);
 
         $('#loading').modal('hide');
 
@@ -389,7 +393,8 @@ $scope.insertaPolizaFF = async function () {
             No olvide subir sus comprobaciones en tiempo y forma al sistema`,
             showConfirmButton: true,
             showCloseButton:  false,
-            timer:10000
+            timer:10000         
+
         })
         
     }else{
@@ -467,15 +472,16 @@ async function LogApiBpro(data){
 
 /**
      * 
-     * @param {number} id_perTra 
+     * @param {number} idValeFF 
+     * @param {number} idusuario 
      * @param {string} poliza 
      * @param {string} documentoConcepto 
      * @param {number} incremental 
      * @returns 
      */
- async function promiseActualizaTramite(id_perTra,poliza,documentoConcepto,incremental) {
+ async function promiseActualizaTramiteFF(idValeFF,idusuario,poliza,documentoConcepto,incremental) {
     return new Promise((resolve, reject) => {
-        anticipoGastoRepository.ActualizaTramitePoliza(id_perTra,poliza,documentoConcepto,incremental).then(function (result) {
+        fondoFijoRepository.ActualizaTramitePolizaFF(idValeFF,idusuario,poliza,documentoConcepto,incremental).then(function (result) {
             if (result.data.length > 0) {
                 resolve(result.data[0]);
             }

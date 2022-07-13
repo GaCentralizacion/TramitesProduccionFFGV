@@ -1047,6 +1047,37 @@ registrationModule.factory('fondoFijoRepository', function($http) {
                     'Content-Type': 'application/json'
                 }
             });
-        },       
+        },        
+        ActualizaTramitePolizaFF:(
+            idValeFF
+            ,idUsuario
+            ,poliza
+            ,documentoConcepto = ''
+            ,incremental = 0
+            ,ordenCompra = ''
+            ,consPol = 0
+            ,mesPol = 0
+            ,anioPol= 0
+            )=>{
+            return $http({
+                url: fondoFijo + 'ActualizaTramitePolizaFF',
+                method: "GET",
+                params: {
+                    idValeFF,
+                    idUsuario,
+                    poliza,
+                    documentoConcepto,
+                    incremental
+                    ,ordenCompra
+                    ,consPol 
+                    ,mesPol 
+                    ,anioPol
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+
+            });
+        }       
     };
 });
