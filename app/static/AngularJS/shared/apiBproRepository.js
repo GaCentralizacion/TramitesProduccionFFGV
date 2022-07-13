@@ -11,6 +11,7 @@ registrationModule.factory('apiBproRepository', function ($http) {
                 "apiSecret":"xVgUwolpX8qQ75TF5Ionny6iz5vu+LbO9gm9qxTsR9nvYfJ0N8y5Bfi7L2EI2AxS6PTbNnCaGfLs+7u69UdJtODCeBO+ZJpc"
             }
             , {headers:{
+                '24779r0j-1802-2010-06ag-201f768348tg':'',
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': 'true'

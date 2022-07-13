@@ -1,4 +1,4 @@
-registrationModule.controller('FondoFijoController', function ($scope, $rootScope, $location, localStorageService, fondoFijoRepository, devolucionesRepository, misTramitesValesRepository, aprobarValeRepository, aprobarRepository,anticipoGastoRepository, clientesRepository,aprobarDevRepository, aprobarFondoRepository ) {
+registrationModule.controller('FondoFijoController', function ($scope, $rootScope, $location, localStorageService, fondoFijoRepository, devolucionesRepository, misTramitesValesRepository, aprobarValeRepository, aprobarRepository,anticipoGastoRepository, clientesRepository,aprobarDevRepository, aprobarFondoRepository,apiBproRepository ) {
     $scope.tab = 1;
     $scope.documentosCliente = [];
     $scope.modalTitle = '';
@@ -18,103 +18,16 @@ registrationModule.controller('FondoFijoController', function ($scope, $rootScop
     $scope.html1 = "<div style=\"width:310px;height:140px\"><center><img style=\"width: 100% \" src=\"https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png\" alt=\"GrupoAndrade\" />" +
         "</center></div><div><p><br>";
     $scope.html2 = ".</p></div>";
-
-
     
-    // --INICIO BPRO ENPOINT FF -- //
+    //----------BPRO ENPOINT GV------------
     $scope.complementoPolizas = '';
     $scope.emp_nombrecto = '';
     $scope.suc_nombrecto = '';
     $scope.dep_nombrecto = '';
     $scope.incremental = 0;
+    $scope.iPersonaDevFF = 0;
 
-
-    $scope.Detalle = {
-        ConceptoContable: '',
-        Cantidad:         0,
-        Producto:         '',
-        PrecioUnitario:   0,
-        TasaIva:          0,
-        Descuento:        0
-    }
-    
-    $scope.OrdenCompra = {
-        IdProveedor:        0,
-        ArePed:             '',
-        TipoComprobante:    '',
-        FechaOrden:         '',
-        FechaAplicacion:    '',
-        anticipo:           0,
-        CantidadAnticipo:   0,
-        PorcentajeAnticipo: 0,
-        FechaAnticipo:      '',
-        Detalle:            []
-    }
-
-    $scope.Deta = {
-        DocumentoOrigen:   '',
-        Partida:           '',
-        TipoProducto:      '',
-        SubProducto:       '',
-        Origen:            '',
-        Destino:           '',
-        Moneda:            'PE',
-        TipoCambio:        '1',
-        CostoUnitario:      0,
-        VentaUnitario:      0,
-        DescuentoUnitario:  0,
-        TasaIva:            0,
-        IVA:                0,
-        Persona1:           0,
-        Persona2:          '0',
-        DocumentoAfectado: '',
-        Referencia2:       '',
-    }
-
-    $scope.Deta2 = {
-        DocumentoOrigen:   '',
-        Partida:           '',
-        TipoProducto:      '',
-        SubProducto:       '',
-        Origen:            '',
-        Destino:           '',
-        Moneda:            'PE',
-        TipoCambio:        '1',
-        CostoUnitario:      0,
-        VentaUnitario:      0,
-        DescuentoUnitario:  0,
-        TasaIva:            0,
-        IVA:                0,
-        Persona1:           0,
-        Persona2:          '0',
-        DocumentoAfectado: '',
-        Referencia2:       '',
-    }
-
-    $scope.Poliza = {
-        Proceso:         '',
-        DocumentoOrigen: '',
-        Canal:           '',
-        NumeroControl:   '',
-        Documento:       '',
-        Referencia2:     '',
-        Deta:            []
-    }
-
-    $scope.ArrPoliza = []
-
-    $scope.ContabilidadMasiva = {
-        Polizas: []
-    }
-  
-
-    $scope.BproEndPoint = {
-        IdEmpresa:          0,
-        IdSucursal:         0,
-        Tipo:               0,
-        OrdenCompra:       $scope.OrdenCompra,
-        ContabilidadMasiva: $scope.ContabilidadMasiva
-    }
+    $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
 
     // -- FIN BPRO ENPOINT FF -- //
 
@@ -330,14 +243,13 @@ $scope.actualizarVale = function (accion) {
             let CCDepto = zeroDelete($scope.cuentaContable);
             // INICIO API Bpro Poliza PVFF
 
-            console.log($scope)
-            console.log(accion)
-            console.log(sendData)
+             console.log("INICIO API Bpro Poliza PVFF")
+            // console.log(accion)
+            // console.log(sendData)
+ 
+           // $scope.dataComplementoFF();
+            $scope.insertaPolizaFF();            
 
-            $scope.insertaPolizaFF();
-            
-
-            $scope.regresarVale();
             // if($scope.idTramite == 10)
             // {           
             // }
@@ -371,94 +283,81 @@ $scope.actualizarVale = function (accion) {
 }
 
 // API 11Julio
-$scope.getDataOrdenPagoFF = function () {
-    ordenDePagoFFAGRepository.getDataOrdenPagoFF($scope.idPerTra,$scope.tipoTramite,$scope.consecutivoTramite).then((res) => {
-        console.log( "DatoGeneraPolizaFF", res );
+$scope.dataComplementoFF = function () {
+    fondoFijoRepository.getDataComplementoFF($scope.id_perTra,$scope.idValeFF).then((res) => {
+        if (res.data[0].success == 1) {
+            $scope.iPersonaDevFF = res.data[0].PER_IDPERSONA;
+        }       
     });
 };
 
 $scope.insertaPolizaFF = async function () {
-    let banco = zeroDelete($scope.cuentaContableSalida);
+    let banco = zeroDelete($scope.cuentaContable);
     let AuthToken;
-    let FF = `FF-${$scope.emp_nombrecto}-${$scope.suc_nombrecto}-${$scope.dep_nombrecto}-${$scope.idPerTra}-${$scope.incremental}`
+    let FFVale = $scope.nombreVale 
+    let FF = $scope.idFondoFijo 
     let resPoliza
     let respUpdate
 
     $('#loading').modal('show');
+    //Encabezado
+    $scope.apiJson.IdEmpresa = $scope.idEmpresa
+    $scope.apiJson.IdSucursal = $scope.idSucursal
+    $scope.apiJson.Tipo = 2    
+    //ContabilidadMasiva
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `PVFF${$scope.complementoPolizas}`
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = FFVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `PVFF${$scope.complementoPolizas}`
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = FFVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  FFVale
 
-    $scope.Poliza.Proceso = `GVOP${$scope.complementoPolizas}`
-    $scope.Poliza.DocumentoOrigen = AG
-    $scope.Poliza.Canal = `GVOP${$scope.complementoPolizas}`
-    $scope.Poliza.Documento = AG
-    $scope.Poliza.Referencia2 = AG
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= FFVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto = $scope.nombreDepartamentoVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].SubProducto = banco
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Origen = 'DD'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.importeValeFF
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.idPersona    
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = FFVale 
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = FFVale
 
-    $scope.Deta.DocumentoOrigen= AG
-    $scope.Deta.Partida = '1'
-    $scope.Deta.TipoProducto='AC'
-    $scope.Deta.Origen = 'FF'
-    $scope.Deta.Persona1 = $scope.idCliente
-    $scope.Deta.DocumentoAfectado = AG 
-    $scope.Deta.Moneda = 'PE'
-    $scope.Deta.VentaUnitario = $scope.monto
-    $scope.Deta.Referencia2 = AG
-    $scope.Poliza.Deta.push($scope.Deta)
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoOrigen= FFVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Partida = '2'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoProducto = $scope.nombreDepartamentoVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].SubProducto = banco
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Origen = 'FF'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Moneda = 'PE'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoCambio = '1'
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.importeValeFF
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.idPersona
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado = FF 
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = FFVale     
 
-    $scope.Deta2.DocumentoOrigen= AG
-    $scope.Deta2.Partida = '2'
-    $scope.Deta2.TipoProducto='DD'
-    $scope.Deta2.Origen = 'FF'
-    $scope.Deta2.Persona1 = $scope.idCliente
-    $scope.Deta2.DocumentoAfectado = AG 
-    $scope.Deta2.Moneda = 'PE'
-    $scope.Deta2.Referencia2 = AG
-    $scope.Deta2.VentaUnitario = $scope.monto
-    $scope.Poliza.Deta.push($scope.Deta2)
+    console.log(JSON.stringify($scope.apiJson))
 
-    $scope.ContabilidadMasiva.Polizas.push(... [$scope.Poliza])
+    let datalog = structuredClone(datalogAPI)
+  
+        datalog.idSucursal = $scope.idSucursal
+        datalog.idVale = $scope.idValeFF
+        datalog.opcion = 1        
 
-    $scope.OrdenCompra.Detalle.push($scope.Detalle)  
-    $scope.BproEndPoint.IdEmpresa = $scope.idEmpresa
-    $scope.BproEndPoint.IdSucursal = $scope.idSucursal
-    $scope.BproEndPoint.Tipo = 2
-    $scope.BproEndPoint.OrdenCompra = $scope.OrdenCompra
-    $scope.BproEndPoint.ContabilidadMasiva = $scope.ContabilidadMasiva
+        AuthToken = await promiseAutBPRO();
 
-    console.log(JSON.stringify($scope.BproEndPoint))
-
-    let datalog ={
-        idSucursal : $scope.idSucursal,
-        unniqIdGenerado: '',
-        tokenGenerado: '',
-        id_perTra : $scope.idPerTra,
-        idVale: '',
-        jsonEnvio: '',
-        jsonRespuesta: '',
-        tipoPol: '',
-        consPol: '',
-        anioPol: '',
-        mesPol: '',
-        empresaPol: '',
-        opcion: 1,
-        consecutivo:0,
-        codigo:'',
-        mensajeError:'',
-        resuelto: 0
-    }
-
-    AuthToken = await promiseAutBPRO();
-    
-    console.log(AuthToken)
-
-    datalog.tokenGenerado = AuthToken.Token
-    datalog.unniqIdGenerado = AuthToken.UnniqId
-    datalog.jsonEnvio = JSON.stringify($scope.BproEndPoint)
+        datalog.tokenGenerado = AuthToken.Token
+        datalog.unniqIdGenerado = AuthToken.UnniqId
+        datalog.jsonEnvio = JSON.stringify($scope.apiJson)
 
     let respLog = await LogApiBpro(datalog)
 
-    datalog.consecutivo = respLog.folio
-    datalog.opcion = 2
+        console.log(datalog)
+        console.log(respLog)
 
-    resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify($scope.BproEndPoint))
+        datalog.consecutivo = respLog.folio
+        datalog.opcion = 2
+
+   resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify($scope.apiJson))
 
     if(resPoliza.Codigo === '200 OK'){
         datalog.anioPol = resPoliza.Poliza[0].añoPoliza
@@ -470,10 +369,10 @@ $scope.insertaPolizaFF = async function () {
         datalog.codigo = resPoliza.Codigo
         datalog.resuelto = 1
 
-        respUpdate = await promiseActualizaTramite($scope.idPerTra,'GVOP', AG, $scope.incremental)
+       // respUpdate = await promiseActualizaTramite($scope.idPerTra,'PVFF', AG, $scope.incremental)
 
-        $scope.getDataOrdenPagoGV();
-        $scope.nombreTramite ='ANTICIPO DE GASTOS'
+        //$scope.getDataOrdenPagoGV();
+        $scope.nombreTramite ='APROBAR VALE FF'
 
         $('#loading').modal('hide');
 
@@ -481,13 +380,13 @@ $scope.insertaPolizaFF = async function () {
             title:"Aviso",
             type:"info",
             width: 1000,
-            text:`La orden de pago genero la siguiente póliza
+            text:`La entrega de efectivo genero la siguiente póliza
             Año póliza: ${datalog.anioPol}
             Mes póliza: ${datalog.mesPol}
             Cons póliza: ${datalog.consPol}
             Tipo póliza: ${datalog.tipoPol}
             
-            No olvide subir el archivo PDF de la orden de pago al sistema`,
+            No olvide subir sus comprobaciones en tiempo y forma al sistema`,
             showConfirmButton: true,
             showCloseButton:  false,
             timer:10000
@@ -498,7 +397,6 @@ $scope.insertaPolizaFF = async function () {
 
 
         $('#loading').modal('hide');
-
 
         datalog.jsonRespuesta = JSON.stringify(resPoliza)
 
@@ -517,7 +415,7 @@ $scope.insertaPolizaFF = async function () {
             type:"error",
             width: 1000,
             text: `Se presento un problema al procesar la póliza en BPRO
-            El trámite no ha sido procesado, favor de notificar al área de sistemas 
+            No ha sido procesado, favor de notificar al área de sistemas 
             
             Codigo: ${datalog.codigo }
             Respuesta BPRO:  ${datalog.mensajeError}
@@ -531,11 +429,62 @@ $scope.insertaPolizaFF = async function () {
 
     respLog = await LogApiBpro(datalog)
 
+    $('#loading').modal('hide');
+    $("#aprobarVale").modal("hide");
+    $scope.regresarVale();
+
     console.log(respUpdate)
+};
 
-
-
+async function promiseAutBPRO(){
+    return new Promise((resolve, reject) => {
+        apiBproRepository.GetTokenBPRO().then(resp =>{
+            console.log('token: ',resp.data)
+            resolve(resp.data)
+        })
+    })
 }
+
+async function GeneraPolizaBPRO(token, data){
+    return new Promise((resolve, reject) => {
+        apiBproRepository.GeneraPolizaBPRO(token, data).then(resp =>{
+            console.log('respuesta: ',resp.data)
+            resolve(resp.data)
+        }).catch(error => {
+            resolve(error)
+        })
+    })
+}
+
+async function LogApiBpro(data){
+    return new Promise((resolve, reject) => {
+        apiBproRepository.LogApiBpro(data).then(resp =>{
+            console.log('resp: ',resp)
+            resolve(resp.data[0])
+        })
+    })
+}
+
+/**
+     * 
+     * @param {number} id_perTra 
+     * @param {string} poliza 
+     * @param {string} documentoConcepto 
+     * @param {number} incremental 
+     * @returns 
+     */
+ async function promiseActualizaTramite(id_perTra,poliza,documentoConcepto,incremental) {
+    return new Promise((resolve, reject) => {
+        anticipoGastoRepository.ActualizaTramitePoliza(id_perTra,poliza,documentoConcepto,incremental).then(function (result) {
+            if (result.data.length > 0) {
+                resolve(result.data[0]);
+            }
+        }).catch(err => {
+            reject(result.data[0]);
+        });
+
+    });
+};
 
 $scope.AumentoDisminucionFF = function () {
     let errorvale = $scope.ADmonto  == undefined || $scope.ADmonto == null ||
