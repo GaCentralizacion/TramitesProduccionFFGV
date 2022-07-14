@@ -586,9 +586,9 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
 
         $('#loading').modal('show');
 
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `CGFR${$scope.complementoPolizas}`
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `GVOP${$scope.complementoPolizas}`
         $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = AG
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `CGFR${$scope.complementoPolizas}`
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `GVOP${$scope.complementoPolizas}`
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = AG
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  AG
 
