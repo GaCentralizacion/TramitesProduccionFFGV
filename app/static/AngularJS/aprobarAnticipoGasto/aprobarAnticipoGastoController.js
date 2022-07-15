@@ -1005,8 +1005,8 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
     
         let fecha = new Date()
         let anio = fecha.getFullYear().toString()
-        let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()}`: fecha.getMonth().toString()
-        let dia = fecha.getDay().toString().length < 2 ? `0${fecha.getDay()}`: fecha.getDay().toString()
+        let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
+        let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
                 if($scope.idEstatusConcepto == 9)
                 {
