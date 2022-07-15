@@ -74,7 +74,8 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
             $scope.numeroSolicitud = 'Solicitud número: ' + $scope.idSolicitud;
             $scope.getAnticipoGastoItem();
            // $scope.tipoDescuento = [{ id:2, text:'Deposito'},{ id:1, text:'Caja'},{ id:3, text:'Nomina'}]
-           $scope.tipoDescuento = [{ id:2, text:'Deposito'},{ id:1, text:'Caja'}]
+           //$scope.tipoDescuento = [{ id:2, text:'Deposito'},{ id:1, text:'Caja'}]
+           $scope.tipoDescuento = [{ id:2, text:'Deposito'}]
         }
     };
 
@@ -113,7 +114,9 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                     correosFinanzas: res.data[0].correosFinanzas,
                     idPersona:  res.data[0].PER_IDPERSONA,
                     departamentoArea:res.data[0].departamentoArea,
-                    complementoPoliza: res.data[0].complementoPoliza
+                    complementoPoliza: res.data[0].complementoPoliza,
+                    documentoConcepto: res.data[0].documentoConcepto,
+                    cuentaEnvio : res.data[0].cuentaEnvio
                 };
                 $scope.concepto.idEstatus = $scope.tramite.idEstatus;
                 $scope.correoTesoreria = res.data[0].correoTesoreria;
@@ -1033,8 +1036,8 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                     $scope.apiJson.OrdenCompra.Detalle[0].ConceptoContable = $scope.archivo.idConceptoContable
                     $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
                     $scope.apiJson.OrdenCompra.Detalle[0].Producto = $scope.archivo.idComprobacionConcepto
-                    $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario =( $scope.archivo.importe/1.16).toFixed(2)
-                    $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.archivo.iva > 0 ? 16 : 0
+                    $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario =( $scope.archivo.totalOC).toFixed(2)
+                    $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.archivo.ivaOC
 
                     $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `AGVV${$scope.tramite.complementoPoliza}`
                     $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.archivo.documentoOrigen
@@ -1048,8 +1051,8 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.tramite.idPersona
                     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = $scope.archivo.documentoOrigen 
                     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].IVA = ($scope.archivo.importe - ($scope.archivo.importe/1.16).toFixed(2)).toFixed(2)
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario =  $scope.archivo.importe
+                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].IVA = ($scope.archivo.ivaPoliza).toFixed(2)
+                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario =  $scope.archivo.totalPoliza
                     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.archivo.idComprobacionConcepto
             
                     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoOrigen= $scope.archivo.idComprobacionConcepto
@@ -1060,8 +1063,8 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.archivo.idRfcFactura
                     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado = '' 
                     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Moneda = 'PE'
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].IVA = ($scope.archivo.importe - ($scope.archivo.importe/1.16).toFixed(2)).toFixed(2)
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.archivo.importe
+                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].IVA = ($scope.archivo.ivaPoliza).toFixed(2)
+                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.archivo.totalPoliza
                     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = $scope.archivo.idComprobacionConcepto 
 
                     let datalog = structuredClone(datalogAPI)
@@ -1520,55 +1523,34 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
             concepto += '-' + decimalToHexString(conceptosContables);
           
                     var estatusVales = await verificaArchivosEvidenciaGral($scope.idSolicitud);
-                //     if(estatusVales == undefined)
-                //     {
-                //     let monto = $scope.montoSolicitado;
-                //     var tipoProceso = false;
-                //     if($scope.descuentoSelected == 1)
-                //     {
-                //         tipoProceso = await promiseInsertaDatos($rootScope.usuario.usu_idusuario, $scope.tramite.idSucursal, 22,'AG-' + concepto, monto, $scope.tramite.dep_nombrecto,$scope.tramite.dep_nombrecto,$scope.idSolicitud,'' );                    
-                //     }
-                //     else if($scope.descuentoSelected == 2)
-                //     {
-                //         tipoProceso = await promiseInsertaDatos($rootScope.usuario.usu_idusuario, $scope.tramite.idSucursal, 23,'AG-' + concepto, monto, $scope.tramite.dep_nombrecto,$scope.tramite.dep_nombrecto,$scope.idSolicitud,'' );
-                //     }
-                //     else
-                //     {
-                //         tipoProceso = await promiseInsertaDatos($rootScope.usuario.usu_idusuario, $scope.tramite.idSucursal, 24,'AG-' + concepto, monto, $scope.tramite.dep_nombrecto,$scope.tramite.dep_nombrecto,$scope.idSolicitud,'' );                   
-                //     }
-                    
-                //     anticipoGastoRepository.actualizaConceptos($scope.idSolicitud).then(function (result) {
-                //         if (result.data.length > 0) {
-                //             $('#loading').modal('hide');
-                //         }
-                //     }); 
-                //     $scope.getAnticipoGastoItem()
-                //     $('#loading').modal('hide');
-                // }
-                // else
-                // {
+
                   for (var i = 0; i < estatusVales.length; i++) {
                     if( estatusVales[i].justifico == 0)
                     {
                     let monto = estatusVales[i].montoSolicitado - estatusVales[i].montoJustificado
-                    if($scope.descuentoSelected == 1)
-                    {
-                        tipoProceso = await promiseInsertaDatos($rootScope.usuario.usu_idusuario, $scope.tramite.idSucursal, 23, estatusVales[i].documentoConcepto, monto, $scope.tramite.dep_nombrecto,$scope.tramite.dep_nombrecto,$scope.idSolicitud,'' );                    
-                    }
-                    else if($scope.descuentoSelected == 2)
-                    {
-                        tipoProceso = await promiseInsertaDatos($rootScope.usuario.usu_idusuario, $scope.tramite.idSucursal, 22, estatusVales[i].documentoConcepto, monto, $scope.tramite.dep_nombrecto,$scope.tramite.dep_nombrecto,$scope.idSolicitud,'' );
-                    }
-                    else
-                    {
-                        tipoProceso = await promiseInsertaDatos($rootScope.usuario.usu_idusuario, $scope.tramite.idSucursal, 24, estatusVales[i].documentoConcepto, monto, $scope.tramite.dep_nombrecto,$scope.tramite.dep_nombrecto,$scope.idSolicitud,'' );                   
-                    }
+
+                    $scope.AplicaPolizaCGFM(monto)
+
+                    //TODO SE COMENTO ESTA SECCION EN LA IMPLEMENTACION DEL API
+                    // if($scope.descuentoSelected == 1)
+                    // {
+                    //     tipoProceso = await promiseInsertaDatos($rootScope.usuario.usu_idusuario, $scope.tramite.idSucursal, 23, estatusVales[i].documentoConcepto, monto, $scope.tramite.dep_nombrecto,$scope.tramite.dep_nombrecto,$scope.idSolicitud,'' );                    
+                    // }
+                    // else if($scope.descuentoSelected == 2)
+                    // {
+                    //     tipoProceso = await promiseInsertaDatos($rootScope.usuario.usu_idusuario, $scope.tramite.idSucursal, 22, estatusVales[i].documentoConcepto, monto, $scope.tramite.dep_nombrecto,$scope.tramite.dep_nombrecto,$scope.idSolicitud,'' );
+                    // }
+                    // else
+                    // {
+                    //     tipoProceso = await promiseInsertaDatos($rootScope.usuario.usu_idusuario, $scope.tramite.idSucursal, 24, estatusVales[i].documentoConcepto, monto, $scope.tramite.dep_nombrecto,$scope.tramite.dep_nombrecto,$scope.idSolicitud,'' );                   
+                    // }
                     
                     anticipoGastoRepository.actualizaConceptos($scope.idSolicitud).then(function (result) {
                         if (result.data.length > 0) {
                             $('#loading').modal('hide');
                         }
                     }); 
+
                     $scope.getAnticipoGastoItem()
                     $('#loading').modal('hide');
                     }
@@ -2415,6 +2397,123 @@ return x;
         }
 
         return total
+     }
+
+     $scope.AplicaPolizaCGFM = async function(monto){
+
+        let apiJson1Detalle = structuredClone(apiJsonBPRO1detalle)
+        apiJson1Detalle.IdEmpresa = $scope.tramite.idCompania
+        apiJson1Detalle.IdSucursal = $scope.tramite.idSucursal
+        apiJson1Detalle.Tipo = 2
+
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = `CGFM${$scope.tramite.complementoPoliza}`
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.tramite.documentoConcepto
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `CGFM${$scope.tramite.complementoPoliza}`
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = $scope.tramite.documentoConcepto
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 = $scope.tramite.documentoConcepto
+
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.tramite.documentoConcepto
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '0'
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto= $scope.tramite.dep_nombrecto
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Origen = $scope.tramite.cuentaEnvio
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.tramite.idPersona
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado =  $scope.tramite.documentoConcepto
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario =  monto
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.tramite.documentoConcepto
+
+
+        let datalog = structuredClone(datalogAPI)
+        datalog.idSucursal = $scope.tramite.idSucursal
+        datalog.id_perTra = $scope.tramite.idSolicitud
+        datalog.opcion = 1
+        
+        let AuthToken;
+        AuthToken = await promiseAutBPRO();
+
+        datalog.tokenGenerado = AuthToken.Token
+        datalog.unniqIdGenerado = AuthToken.UnniqId
+        datalog.jsonEnvio = JSON.stringify(apiJson1Detalle)
+
+        let respLog = await LogApiBpro(datalog)
+
+        datalog.consecutivo = respLog.folio
+        datalog.opcion = 2
+
+        resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify(apiJson1Detalle))
+
+        if(resPoliza.Codigo === '200 OK'){
+
+            datalog.anioPol = resPoliza.Poliza[0].añoPoliza
+            datalog.consPol = resPoliza.Poliza[0].ConsecutivoPoliza
+            datalog.empresaPol = resPoliza.Poliza[0].EmpresaPoliza
+            datalog.mesPol =  resPoliza.Poliza[0].MesPoliza
+            datalog.tipoPol = resPoliza.Poliza[0].TipoPoliza
+            datalog.jsonRespuesta = JSON.stringify(resPoliza.Poliza[0])
+            datalog.codigo = resPoliza.Codigo
+            datalog.resuelto = 1
+            datalog.ordenCompra = resPoliza.Folio
+
+           // respUpdate = await promiseActualizaTramite($scope.tramite.idSolicitud,'CGFM', $scope.archivo.idComprobacionConcepto , 0,datalog.ordenCompra,datalog.consPol,datalog.mesPol,datalog.anioPol)
+
+            $scope.archivo.idEstatus = $scope.idEstatusConcepto;
+            
+
+            $('#spinner-loading').modal('hide');
+
+            swal({
+                title:"Aviso",
+                type:"info",
+                width: 1000,
+                text:`La aprobación generó la siguiente póliza
+
+                Año póliza: ${datalog.anioPol}
+                Mes póliza: ${datalog.mesPol}
+                Cons póliza: ${datalog.consPol}
+                Tipo póliza: ${datalog.tipoPol}
+                `,
+                showConfirmButton: true,
+                showCloseButton:  false,
+                timer:10000,
+                timerProgressBar: true
+            })
+
+            $scope.getConceptosPorSolicitud();
+            
+        }else{
+
+            $('#spinner-loading').modal('hide');
+
+            datalog.jsonRespuesta = JSON.stringify(resPoliza)
+
+            if(resPoliza.data !== undefined){
+                datalog.mensajeError = resPoliza.data.Message 
+                datalog.codigo = resPoliza.status.toString()
+                datalog.resuelto = 0
+            }else{
+                datalog.mensajeError = resPoliza.Mensaje
+                datalog.codigo = resPoliza.Codigo
+                datalog.resuelto = 0
+            }
+
+            swal({
+                title:"Aviso",
+                type:"error",
+                width: 1000,
+                text: `Se presento un problema al procesar la póliza en BPRO
+                El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                
+                Codigo: ${datalog.codigo }
+                Respuesta BPRO:  ${datalog.mensajeError}
+                
+                Reitentar cuando se le notifique la solución a la incidencia`,
+                showConfirmButton: true,
+                showCloseButton:  false,
+                timer:10000
+            })
+        }
+
+        respLog = await LogApiBpro(datalog)
      }
 
 });
