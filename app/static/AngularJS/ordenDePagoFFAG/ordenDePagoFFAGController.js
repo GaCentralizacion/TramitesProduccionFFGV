@@ -597,15 +597,6 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
     
     }
 
-    async function promiseAutBPRO(){
-        return new Promise((resolve, reject) => {
-            apiBproRepository.GetTokenBPRO().then(resp =>{
-                console.log('token: ',resp.data)
-                resolve(resp.data)
-            })
-        })
-    }
-
     async function GeneraPolizaBPRO(token, data){
         return new Promise((resolve, reject) => {
             apiBproRepository.GeneraPolizaBPRO(token, data).then(resp =>{
@@ -623,6 +614,16 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                 console.log('resp: ',resp)
                 resolve(resp.data[0])
             })
+        })
+    }
+
+    async function promiseAutBPRO(){
+        return new Promise((resolve, reject) => {
+            apiBproRepository.GetTokenBPRO().then(resp =>{
+                console.log('resp: ',resp)
+                resolve(resp.data)
+            })
+
         })
     }
 
@@ -931,6 +932,7 @@ function zeroDelete (item)
                 datalog.opcion = 1        
 
             AuthToken = await promiseAutBPRO();
+            //AuthToken = await AuthApi()
 
             datalog.tokenGenerado = AuthToken.Token
             datalog.unniqIdGenerado = AuthToken.UnniqId
