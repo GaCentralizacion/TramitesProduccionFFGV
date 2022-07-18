@@ -2454,7 +2454,7 @@ return x;
             datalog.resuelto = 1
             datalog.ordenCompra = resPoliza.Folio
 
-           // respUpdate = await promiseActualizaTramite($scope.tramite.idSolicitud,'CGFM', $scope.archivo.idComprobacionConcepto , 0,datalog.ordenCompra,datalog.consPol,datalog.mesPol,datalog.anioPol)
+            respUpdate = await promiseActualizaTramite($scope.tramite.idSolicitud,'CGFM', $scope.tramite.documentoConcepto , 0,'',datalog.consPol,datalog.mesPol,datalog.anioPol)
 
             $scope.archivo.idEstatus = $scope.idEstatusConcepto;
             

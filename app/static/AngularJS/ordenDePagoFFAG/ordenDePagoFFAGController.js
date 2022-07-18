@@ -640,17 +640,21 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
         });
     }
 
-    /**
-     * 
-     * @param {number} id_perTra 
-     * @param {string} poliza 
-     * @param {string} documentoConcepto 
-     * @param {number} incremental 
-     * @returns 
-     */
-    async function promiseActualizaTramite(id_perTra,poliza,documentoConcepto,incremental) {
+        /**
+         * 
+         * @param {number} id_perTra 
+         * @param {string} poliza 
+         * @param {string} documentoConcepto 
+         * @param {number} incremental 
+         * @param {string} ordenCompra 
+         * @param {number} consPol 
+         * @param {number} mesPol 
+         * @param {number} anioPol 
+         * @returns 
+         */
+    async function promiseActualizaTramite(id_perTra,poliza,documentoConcepto= '',incremental = 0,ordenCompra = '', consPol = 0, mesPol= 0, anioPol = 0 )  {
         return new Promise((resolve, reject) => {
-            anticipoGastoRepository.ActualizaTramitePoliza(id_perTra,poliza,documentoConcepto,incremental).then(function (result) {
+            anticipoGastoRepository.ActualizaTramitePoliza(id_perTra,poliza,documentoConcepto,incremental,ordenCompra, consPol, mesPol, anioPol).then(function (result) {
                 if (result.data.length > 0) {
                     resolve(result.data[0]);
                 }
@@ -770,7 +774,7 @@ function zeroDelete (item)
             datalog.codigo = resPoliza.Codigo
             datalog.resuelto = 1
 
-            respUpdate = await promiseActualizaTramite($scope.idPerTra,'CGFR', $scope.idComprobacionConcepto, $scope.consecutivoTramite)
+            respUpdate = await promiseActualizaTramite($scope.idPerTra,'CGFR', $scope.idComprobacionConcepto, $scope.consecutivoTramite,'',datalog.consPol,datalog.mesPol,datalog.anioPol)
 
             $scope.getDataOrdenPagoGV();
 
@@ -955,7 +959,7 @@ function zeroDelete (item)
                 datalog.codigo = resPoliza.Codigo
                 datalog.resuelto = 1
 
-                respUpdate = await promiseActualizaTramite($scope.idPerTra,'GVOP', AG, $scope.consecutivoTramite)
+                respUpdate = await promiseActualizaTramite($scope.idPerTra,'GVOP', AG, $scope.consecutivoTramite,'',datalog.consPol,datalog.mesPol,datalog.anioPol)
 
                 $scope.getDataOrdenPagoGV();
                 $scope.nombreTramite ='ANTICIPO DE GASTOS'
@@ -1085,6 +1089,8 @@ function zeroDelete (item)
                 datalog.jsonRespuesta = JSON.stringify(resPoliza.Poliza[0])
                 datalog.codigo = resPoliza.Codigo
                 datalog.resuelto = 1
+
+                respUpdate = await promiseActualizaTramite($scope.idPerTra,'GVTE', AG, $scope.consecutivoTramite,'',datalog.consPol,datalog.mesPol,datalog.anioPol)
 
                 $('#loading').modal('hide');
 
