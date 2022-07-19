@@ -18,12 +18,14 @@
     "nodemailer": "^6.3.0",
     "nodemon": "^2.0.4",
     "phantom": "^2.1.21",
+    "rxjs": "^6.5.5",
     "save": "^2.4.0",
     "serve-favicon": "^2.1.6",
     "soap": "^0.24.0",
     "socket.io": "^1.2.0",
     "swig": "^1.4.2",
     "webpage": "^0.3.0",
-    "xml2js": "^0.4.22"
+    "xml2js": "^0.4.22",
+    "xmlhttprequest": "^1.8.0"
   }
 }
