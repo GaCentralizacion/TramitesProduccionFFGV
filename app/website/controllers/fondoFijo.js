@@ -3192,4 +3192,20 @@ fondoFijo.prototype.get_ActualizaTramitePolizaFF = function(req, res, next) {
     });
 };
 
+fondoFijo.prototype.obtenerDatosOrdenesMasivasFF = function(req, res, next) {
+    var self = this;
+    var idUsuario =  req.query.idUsuario;
+
+    var params = [
+        { name: 'idUsuario', value: idUsuario, type: self.model.types.INT }
+    ];
+
+    this.model.queryAllRecordSet('SEL_obtenerDatosOrdenesMasivasFF_SP', params, function(error, result) {
+        self.view.expositor(res, {
+            error: error,
+            result: result
+        });
+    });
+};
+
 module.exports = fondoFijo;

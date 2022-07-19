@@ -489,6 +489,19 @@ async function LogApiBpro(data){
 };
 
 
+$scope.obtenerDatosOrdenesMasivas = function () {
+    fondoFijoRepository.obtenerDatosOrdenesMasivasFF(idUsuario).then(function (result) {
+        if (result.data.length > 0) {
+            resolve(result.data[0]);
+            }
+        }).catch(err => {
+           reject(result.data[0]);
+        });
+    };
+
+
+
+
 //  $scope.insertaPolizaFrontAPI();
 $scope.insertaPolizaFrontAPI = async function () {
     let banco = zeroDelete($scope.cuentaContable);
@@ -2323,7 +2336,9 @@ $scope.AutorizarRechazarEvidencia = function (item,tipo) {
                             $scope.idValeEvidenciaAPI = item.idValeEvidencia
                             $scope.nombreSolicitanteAPI = item.nombreSolicitante
                             $scope.montoAPI = item.monto
-                            $scope.insertaPolizaFrontAPI();
+                            
+                            $scope.obtenerDatosOrdenesMasivas();
+                            //$scope.insertaPolizaFrontAPI();
 
                         } 
                         else
@@ -2399,6 +2414,7 @@ $scope.AutorizarRechazarEvidencia = function (item,tipo) {
                         $scope.idValeEvidenciaAPI = result.data[0].idComprobacion
                         $scope.nombreSolicitanteAPI = item.nombreSolicitante
                         $scope.montoAPI = item.monto
+                        $scope.obtenerDatosOrdenesMasivas();
                         $scope.insertaPolizaFrontAPI();
 
                         // dataOrden = 
@@ -2464,6 +2480,7 @@ $scope.ComprbarNoAutorizadoEvidencia = function (item,tipo) {
                     producto: item.idComprobacionVale
                     }
                     let orden = await guardaOrdenMasiva(dataOrden);
+
                    console.log(orden);
                    $scope.listaValesFF(JSON.parse(localStorage.getItem('borrador')).idPerTra, item.idVale);
                     // // if(item.esFactura == 'S')

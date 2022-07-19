@@ -1023,7 +1023,8 @@ registrationModule.factory('fondoFijoRepository', function($http) {
                     'Content-Type': 'application/json'
                 }
             });
-        },getReembolsoBancos: (id_perTra) => {
+        },
+        getReembolsoBancos: (id_perTra) => {
             return $http({
                 url: fondoFijo + 'reembolsoBancos/',
                 method: "GET",
@@ -1078,6 +1079,22 @@ registrationModule.factory('fondoFijoRepository', function($http) {
                 }
 
             });
-        }       
+        },
+        obtenerDatosOrdenesMasivasFF:(
+            idUsuario
+          
+            )=>{
+            return $http({
+                url: fondoFijo + 'obtenerDatosOrdenesMasivasFF',
+                method: "GET",
+                params: {
+                    idUsuario
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+
+            });
+        }        
     };
 });
