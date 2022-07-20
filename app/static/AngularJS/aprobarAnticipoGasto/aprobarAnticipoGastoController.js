@@ -1140,7 +1140,7 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                                 title:"Aviso",
                                 type:"info",
                                 width: 1000,
-                                text:`La aprobación unicamente generó orden de compra, esto es porque, el monto de la comprobación y el monto de gasto de más son iguales
+                                text:`La aprobación unicamente generó orden de compra, la cual se saldará cuando se haga el proceso de comprobación de más
     
                                 Orden Compra: ${datalog.ordenCompra}
 
