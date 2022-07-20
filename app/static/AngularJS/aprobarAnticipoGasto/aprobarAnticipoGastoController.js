@@ -1109,15 +1109,22 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
 
                     if(resPoliza.Codigo === '200 OK'){
 
-                        datalog.anioPol = resPoliza.Poliza[0].añoPoliza
-                        datalog.consPol = resPoliza.Poliza[0].ConsecutivoPoliza
-                        datalog.empresaPol = resPoliza.Poliza[0].EmpresaPoliza
-                        datalog.mesPol =  resPoliza.Poliza[0].MesPoliza
-                        datalog.tipoPol = resPoliza.Poliza[0].TipoPoliza
-                        datalog.jsonRespuesta = JSON.stringify(resPoliza.Poliza[0])
-                        datalog.codigo = resPoliza.Codigo
-                        datalog.resuelto = 1
-                        datalog.ordenCompra = resPoliza.Folio
+                        if($scope.archivo.totalPoliza == 0){
+                            datalog.jsonRespuesta = JSON.stringify(resPoliza)
+                            datalog.codigo = resPoliza.Codigo
+                            datalog.resuelto = 1
+                            datalog.ordenCompra = resPoliza.Folio  
+                        }else{
+                            datalog.anioPol = resPoliza.Poliza[0].añoPoliza
+                            datalog.consPol = resPoliza.Poliza[0].ConsecutivoPoliza
+                            datalog.empresaPol = resPoliza.Poliza[0].EmpresaPoliza
+                            datalog.mesPol =  resPoliza.Poliza[0].MesPoliza
+                            datalog.tipoPol = resPoliza.Poliza[0].TipoPoliza
+                            datalog.jsonRespuesta = JSON.stringify(resPoliza)
+                            datalog.codigo = resPoliza.Codigo
+                            datalog.resuelto = 1
+                            datalog.ordenCompra = resPoliza.Folio  
+                        }
 
                         respAprobarRechazar = await aprobarRechazarArchivo(data)
             
@@ -1128,23 +1135,41 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
             
                         $('#spinner-loading').modal('hide');
             
-                        swal({
-                            title:"Aviso",
-                            type:"info",
-                            width: 1000,
-                            text:`La aprobación generó la siguiente póliza
+                        if($scope.archivo.totalPoliza == 0){
+                            swal({
+                                title:"Aviso",
+                                type:"info",
+                                width: 1000,
+                                text:`La aprobación unicamente generó orden de compra, esto es porque, el monto de la comprobación y el monto de gasto de más son iguales
+    
+                                Orden Compra: ${datalog.ordenCompra}
 
-                            Orden Compra: ${datalog.ordenCompra}
-                            Año póliza: ${datalog.anioPol}
-                            Mes póliza: ${datalog.mesPol}
-                            Cons póliza: ${datalog.consPol}
-                            Tipo póliza: ${datalog.tipoPol}
-                            `,
-                            showConfirmButton: true,
-                            showCloseButton:  false,
-                            timer:10000,
-                            timerProgressBar: true
-                        })
+                                `,
+                                showConfirmButton: true,
+                                showCloseButton:  false,
+                                timer:10000,
+                                timerProgressBar: true
+                            })
+                        }else{
+                            swal({
+                                title:"Aviso",
+                                type:"info",
+                                width: 1000,
+                                text:`La aprobación generó la siguiente póliza
+    
+                                Orden Compra: ${datalog.ordenCompra}
+                                Año póliza: ${datalog.anioPol}
+                                Mes póliza: ${datalog.mesPol}
+                                Cons póliza: ${datalog.consPol}
+                                Tipo póliza: ${datalog.tipoPol}
+                                `,
+                                showConfirmButton: true,
+                                showCloseButton:  false,
+                                timer:10000,
+                                timerProgressBar: true
+                            })
+                        }
+
                         
                     }else{
 
