@@ -1020,52 +1020,73 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                     producto: $scope.archivo.idComprobacionConcepto
                     }
                     
-                    //TODO: SE DEBE DE LLAMAR AL API DE BPRO PARA GENERAR LA ORDEN MASIVA
-                    //let orden = await guardaOrdenMasiva(dataOrden);
+                    
+                    /** Si el monto total de la poliza es cero solo debe de generar la OC */
+                    if($scope.archivo.totalPoliza == 0){
 
-                    $scope.apiJson.IdEmpresa = $scope.tramite.idCompania
-                    $scope.apiJson.IdSucursal = $scope.tramite.idSucursal
-                    $scope.apiJson.Tipo = 1
+                        $scope.apiJson = structuredClone(apiOC)
 
-                    $scope.apiJson.OrdenCompra.IdProveedor = $scope.tramite.idPersona
-                    $scope.apiJson.OrdenCompra.ArePed = $scope.tramite.dep_nombrecto
-                    $scope.apiJson.OrdenCompra.TipoComprobante = '1'
-                    $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
-                    $scope.apiJson.OrdenCompra.FechaAplicacion = `${anio}-${mes}-${dia}`
+                        $scope.apiJson.IdEmpresa = $scope.tramite.idCompania
+                        $scope.apiJson.IdSucursal = $scope.tramite.idSucursal
+                        $scope.apiJson.Tipo = 3
+    
+                        $scope.apiJson.OrdenCompra.IdProveedor = $scope.tramite.idPersona
+                        $scope.apiJson.OrdenCompra.ArePed = $scope.tramite.dep_nombrecto
+                        $scope.apiJson.OrdenCompra.TipoComprobante = '1'
+                        $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
+                        $scope.apiJson.OrdenCompra.FechaAplicacion = `${anio}-${mes}-${dia}`
+    
+                        $scope.apiJson.OrdenCompra.Detalle[0].ConceptoContable = $scope.archivo.idConceptoContable
+                        $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
+                        $scope.apiJson.OrdenCompra.Detalle[0].Producto = $scope.archivo.idComprobacionConcepto
+                        $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario =( $scope.archivo.totalOC).toFixed(2)
+                        $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.archivo.ivaOC
 
-                    $scope.apiJson.OrdenCompra.Detalle[0].ConceptoContable = $scope.archivo.idConceptoContable
-                    $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
-                    $scope.apiJson.OrdenCompra.Detalle[0].Producto = $scope.archivo.idComprobacionConcepto
-                    $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario =( $scope.archivo.totalOC).toFixed(2)
-                    $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.archivo.ivaOC
-
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `AGVV${$scope.tramite.complementoPoliza}`
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.archivo.documentoOrigen
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `AGVV${$scope.tramite.complementoPoliza}`
-   
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.archivo.idComprobacionConcepto
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto='OT'
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].SubProducto='DD'
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Origen = 'FAC'
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.tramite.idPersona
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = $scope.archivo.documentoOrigen 
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].IVA = ($scope.archivo.ivaPoliza).toFixed(2)
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario =  $scope.archivo.totalPoliza
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.archivo.idComprobacionConcepto
-            
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoOrigen= $scope.archivo.idComprobacionConcepto
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Partida = '2'
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoProducto='OT'
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].SubProducto='PA'
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Origen = 'FAC'
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.archivo.idRfcFactura
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado = '' 
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Moneda = 'PE'
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].IVA = ($scope.archivo.ivaPoliza).toFixed(2)
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.archivo.totalPoliza
-                    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = $scope.archivo.idComprobacionConcepto 
+                    }else{
+                        $scope.apiJson.IdEmpresa = $scope.tramite.idCompania
+                        $scope.apiJson.IdSucursal = $scope.tramite.idSucursal
+                        $scope.apiJson.Tipo = 1
+    
+                        $scope.apiJson.OrdenCompra.IdProveedor = $scope.tramite.idPersona
+                        $scope.apiJson.OrdenCompra.ArePed = $scope.tramite.dep_nombrecto
+                        $scope.apiJson.OrdenCompra.TipoComprobante = '1'
+                        $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
+                        $scope.apiJson.OrdenCompra.FechaAplicacion = `${anio}-${mes}-${dia}`
+    
+                        $scope.apiJson.OrdenCompra.Detalle[0].ConceptoContable = $scope.archivo.idConceptoContable
+                        $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
+                        $scope.apiJson.OrdenCompra.Detalle[0].Producto = $scope.archivo.idComprobacionConcepto
+                        $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario =( $scope.archivo.totalOC).toFixed(2)
+                        $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.archivo.ivaOC
+    
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `AGVV${$scope.tramite.complementoPoliza}`
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.archivo.documentoOrigen
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `AGVV${$scope.tramite.complementoPoliza}`
+       
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.archivo.idComprobacionConcepto
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto='OT'
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].SubProducto='DD'
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Origen = 'FAC'
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.tramite.idPersona
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = $scope.archivo.documentoOrigen 
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].IVA = ($scope.archivo.ivaPoliza).toFixed(2)
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario =  $scope.archivo.totalPoliza
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.archivo.idComprobacionConcepto
+                
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoOrigen= $scope.archivo.idComprobacionConcepto
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Partida = '2'
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoProducto='OT'
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].SubProducto='PA'
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Origen = 'FAC'
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.archivo.idRfcFactura
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado = '' 
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Moneda = 'PE'
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].IVA = ($scope.archivo.ivaPoliza).toFixed(2)
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.archivo.totalPoliza
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = $scope.archivo.idComprobacionConcepto 
+                    }
 
                     let datalog = structuredClone(datalogAPI)
                     datalog.idSucursal = $scope.tramite.idSucursal
