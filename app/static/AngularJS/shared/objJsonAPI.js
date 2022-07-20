@@ -137,6 +137,34 @@ var apiJsonBPRO2detalles = {
     }
   }
 
+  var apiOC ={
+    "IdEmpresa": 0,
+    "IdSucursal": 0,
+    "Tipo": 3,
+    "OrdenCompra":
+    {
+        "IdProveedor":0,
+        "ArePed": "M",
+        "TipoComprobante":"",
+        "FechaOrden": "",
+        "FechaAplicacion":"",
+        "anticipo": 0,
+        "CantidadAnticipo": 0,
+        "PorcentajeAnticipo":0,
+        "FechaAnticipo":"",
+        "Detalle":[
+            {
+                "ConceptoContable":"",
+                "Cantidad":1,
+                "Producto": "",
+                "PrecioUnitario": 0,
+                "TasaIva": 0,
+                "Descuento": 0
+            }
+        ]
+ }
+}
+
   var datalogAPI = {
     idSucursal : 0,
     unniqIdGenerado: '',
