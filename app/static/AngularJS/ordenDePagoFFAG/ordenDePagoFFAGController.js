@@ -568,12 +568,23 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
     }
 
     $scope.insertaPolizaFF = async function () {
-    let CCDepto = zeroDelete($scope.cuentaContable);
-    let banco = zeroDelete($scope.cuentaContableSalida);
-    var tipoProceso = true;
-    tipoProceso = await promiseInsertaDatos($rootScope.user.usu_idusuario, $scope.idSucursal, $scope.tipo == 'FS' ? 1 : 12, $scope.idFondoFijo, $scope.monto, 'FONFIJ', $scope.tipo == 'FS' ? 'FFOP' : $scope.nombreDep, $scope.idPerTra, banco, CCDepto);
-    if(!tipoProceso)
-    {   swal('Alto', 'Ocurrio un error al crear la poliza', 'warning');}
+        let CCDepto = zeroDelete($scope.cuentaContable);
+        let banco = zeroDelete($scope.cuentaContableSalida);
+        let respRFCE
+        let respRFCS
+
+        respRFCE = await AplicaPolizaRFCE()
+
+        if(respRFCE == true){
+            respRFCS = await AplicaPolizaRFCS()
+        }
+
+        // var tipoProceso = true;
+        // tipoProceso = await promiseInsertaDatos($rootScope.user.usu_idusuario, $scope.idSucursal, $scope.tipo == 'FS' ? 1 : 12, $scope.idFondoFijo, $scope.monto, 'FONFIJ', $scope.tipo == 'FS' ? 'FFOP' : $scope.nombreDep, $scope.idPerTra, banco, CCDepto);
+        // if(!tipoProceso)
+        // {   swal('Alto', 'Ocurrio un error al crear la poliza', 'warning');}
+
+
 
     }
 
@@ -888,6 +899,135 @@ function zeroDelete (item)
         
     }
 
+    async function AplicaPolizaGVTE (){
+        return new Promise( async (resolve, reject) => {
+            let banco = zeroDelete($scope.cuentaContableSalida);
+            let AuthToken;
+            let AG = `AG-${$scope.emp_nombrecto}-${$scope.suc_nombrecto}-${$scope.dep_nombrecto}-${$scope.idPerTra}-${$scope.incremental}`
+            let resPoliza
+            let respUpdate
+
+            $('#loading').modal('show');
+
+            let apiJson1Detalle = structuredClone(apiJsonBPRO1detalle)
+    
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = `GVTE${$scope.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].DocumentoOrigen = AG
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `GVTE${$scope.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = AG
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 = AG
+    
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= AG
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '0'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto= 'AC'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Origen = banco
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.idCliente
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado =  AG
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario =  $scope.monto
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = AG
+
+            apiJson1Detalle.IdEmpresa = $scope.idEmpresa
+            apiJson1Detalle.IdSucursal = $scope.idSucursal
+            apiJson1Detalle.Tipo = 2
+
+            console.log(JSON.stringify(apiJson1Detalle))
+
+            let datalog = structuredClone(datalogAPI)
+        
+                datalog.idSucursal = $scope.idSucursal
+                datalog.id_perTra = $scope.idPerTra
+                datalog.opcion = 1        
+
+            AuthToken = await promiseAutBPRO();
+
+            datalog.tokenGenerado = AuthToken.Token
+            datalog.unniqIdGenerado = AuthToken.UnniqId
+            datalog.jsonEnvio = JSON.stringify(apiJson1Detalle)
+
+            let respLog = await LogApiBpro(datalog)
+
+            datalog.consecutivo = respLog.folio
+            datalog.opcion = 2
+
+            resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify(apiJson1Detalle))
+
+            if(resPoliza.Codigo === '200 OK'){
+                datalog.anioPol = resPoliza.Poliza[0].añoPoliza
+                datalog.consPol = resPoliza.Poliza[0].ConsecutivoPoliza
+                datalog.empresaPol = resPoliza.Poliza[0].EmpresaPoliza
+                datalog.mesPol =  resPoliza.Poliza[0].MesPoliza
+                datalog.tipoPol = resPoliza.Poliza[0].TipoPoliza
+                datalog.jsonRespuesta = JSON.stringify(resPoliza.Poliza[0])
+                datalog.codigo = resPoliza.Codigo
+                datalog.resuelto = 1
+
+                respUpdate = await promiseActualizaTramite($scope.idPerTra,'GVTE', AG, $scope.consecutivoTramite,'',datalog.consPol,datalog.mesPol,datalog.anioPol)
+
+                $('#loading').modal('hide');
+
+                swal({
+                    title:"Aviso",
+                    type:"info",
+                    width: 1000,
+                    text:`La orden de pago genero la siguiente póliza
+                    Año póliza: ${datalog.anioPol}
+                    Mes póliza: ${datalog.mesPol}
+                    Cons póliza: ${datalog.consPol}
+                    Tipo póliza: ${datalog.tipoPol}
+                    
+                    No olvide subir el archivo PDF de la orden de pago al sistema`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    timer:10000
+                })
+
+                resolve(true)
+                
+            }else{
+
+                $('#loading').modal('hide');
+
+
+                datalog.jsonRespuesta = JSON.stringify(resPoliza)
+
+                if(resPoliza.data !== undefined){
+                    datalog.mensajeError = resPoliza.data.Message 
+                    datalog.codigo = resPoliza.status.toString()
+                    datalog.resuelto = 0
+                }else{
+                    datalog.mensajeError = resPoliza.Mensaje
+                    datalog.codigo = resPoliza.Codigo
+                    datalog.resuelto = 0
+                }
+
+                swal({
+                    title:"Aviso",
+                    type:"error",
+                    width: 1000,
+                    text: `Se presento un problema al procesar la póliza en BPRO
+                    El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                    
+                    Codigo: ${datalog.codigo }
+                    Respuesta BPRO:  ${datalog.mensajeError}
+                    
+                    Reitentar cuando se le notifique la solución a la incidencia`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    timer:10000
+                })
+
+                resolve(false)
+            }
+
+            respLog = await LogApiBpro(datalog)
+
+            console.log(respUpdate)
+
+        })
+    }
+
+
     async function AplicaPolizaGVOP (){
         return new Promise( async (resolve, reject) => {
             let AuthToken;
@@ -1027,37 +1167,44 @@ function zeroDelete (item)
         })
     }
 
-    async function AplicaPolizaGVTE (){
+    $scope.AplicaPolizaRFCE = function async (){
+        
+    }
+
+    async function AplicaPolizaRFCE (){
         return new Promise( async (resolve, reject) => {
-            let banco = zeroDelete($scope.cuentaContableSalida);
+            let SubProducto = zeroDelete($scope.cuentaContable);   
+            let Origen = zeroDelete($scope.cuentaContableSalida);   
             let AuthToken;
-            let AG = `AG-${$scope.emp_nombrecto}-${$scope.suc_nombrecto}-${$scope.dep_nombrecto}-${$scope.idPerTra}-${$scope.incremental}`
+            let FF =  $scope.idFondoFijo
             let resPoliza
             let respUpdate
 
             $('#loading').modal('show');
 
             let apiJson1Detalle = structuredClone(apiJsonBPRO1detalle)
-    
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = `GVTE${$scope.complementoPolizas}`
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].DocumentoOrigen = AG
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `GVTE${$scope.complementoPolizas}`
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = AG
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 = AG
-    
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= AG
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '0'
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto= 'AC'
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Origen = banco
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.idCliente
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado =  AG
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario =  $scope.monto
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = AG
 
             apiJson1Detalle.IdEmpresa = $scope.idEmpresa
             apiJson1Detalle.IdSucursal = $scope.idSucursal
             apiJson1Detalle.Tipo = 2
+
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = `RFCE${$scope.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].DocumentoOrigen = FF
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `RFCE${$scope.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = FF
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 =  FF
+
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= FF
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto= $scope.nombreDep
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].SubProducto = SubProducto
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Origen = Origen
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.monto
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.idCliente
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = FF 
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = FF
 
             console.log(JSON.stringify(apiJson1Detalle))
 
@@ -1068,6 +1215,7 @@ function zeroDelete (item)
                 datalog.opcion = 1        
 
             AuthToken = await promiseAutBPRO();
+            //AuthToken = await AuthApi()
 
             datalog.tokenGenerado = AuthToken.Token
             datalog.unniqIdGenerado = AuthToken.UnniqId
@@ -1090,15 +1238,156 @@ function zeroDelete (item)
                 datalog.codigo = resPoliza.Codigo
                 datalog.resuelto = 1
 
-                respUpdate = await promiseActualizaTramite($scope.idPerTra,'GVTE', AG, $scope.consecutivoTramite,'',datalog.consPol,datalog.mesPol,datalog.anioPol)
+                //respUpdate = await promiseActualizaTramite($scope.idPerTra,'GVOP', AG, $scope.consecutivoTramite,'',datalog.consPol,datalog.mesPol,datalog.anioPol)
+
+               // $scope.getDataOrdenPagoFF();
+                $scope.nombreTramite ='REEMBOLSO ORDEN PAGO RFCE'
 
                 $('#loading').modal('hide');
 
                 swal({
                     title:"Aviso",
-                    type:"info",
+                    type:"success",
                     width: 1000,
-                    text:`La orden de pago genero la siguiente póliza
+                    text:`El rembolso por orden de pago genero la siguiente póliza
+                    Año póliza: ${datalog.anioPol}
+                    Mes póliza: ${datalog.mesPol}
+                    Cons póliza: ${datalog.consPol}
+                    Tipo póliza: ${datalog.tipoPol}
+                    
+                    No olvide subir el archivo PDF de la orden de pago al sistema`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    timer:10000
+                })
+
+                resolve(true)
+                
+            }else{
+
+                $('#loading').modal('hide');
+
+
+                datalog.jsonRespuesta = JSON.stringify(resPoliza)
+
+                if(resPoliza.data !== undefined){
+                    datalog.mensajeError = resPoliza.data.Message 
+                    datalog.codigo = resPoliza.status.toString()
+                    datalog.resuelto = 0
+                }else{
+                    datalog.mensajeError = resPoliza.Mensaje
+                    datalog.codigo = resPoliza.Codigo
+                    datalog.resuelto = 0
+                }
+
+                swal({
+                    title:"Aviso",
+                    type:"error",
+                    width: 1000,
+                    text: `Se presento un problema al procesar la póliza en BPRO
+                    El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                    
+                    Codigo: ${datalog.codigo }
+                    Respuesta BPRO:  ${datalog.mensajeError}
+                    
+                    Reitentar cuando se le notifique la solución a la incidencia`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    timer:10000
+                })
+
+                resolve(false)
+            }
+
+            respLog = await LogApiBpro(datalog)
+
+            console.log(respUpdate)
+
+        })
+    }
+
+    async function AplicaPolizaRFCS (){
+        return new Promise( async (resolve, reject) => {
+            let SubProducto = zeroDelete($scope.cuentaContable);   
+            let Origen = zeroDelete($scope.cuentaContableSalida);   
+            let AuthToken;
+            let FF =  $scope.idFondoFijo
+            let resPoliza
+            let respUpdate
+
+            $('#loading').modal('show');
+
+            let apiJson1Detalle = structuredClone(apiJsonBPRO1detalle)
+
+            apiJson1Detalle.IdEmpresa = $scope.idEmpresa
+            apiJson1Detalle.IdSucursal = $scope.idSucursal
+            apiJson1Detalle.Tipo = 2
+
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = `RFCS${$scope.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].DocumentoOrigen = FF
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `RFCS${$scope.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = FF
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 =  FF
+
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= FF
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto= $scope.nombreDep
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].SubProducto = SubProducto
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Origen = Origen
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.monto
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.idCliente
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = FF 
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = FF
+
+            console.log(JSON.stringify(apiJson1Detalle))
+
+            let datalog = structuredClone(datalogAPI)
+        
+                datalog.idSucursal = $scope.idSucursal
+                datalog.id_perTra = $scope.idPerTra
+                datalog.opcion = 1        
+
+            AuthToken = await promiseAutBPRO();
+            //AuthToken = await AuthApi()
+
+            datalog.tokenGenerado = AuthToken.Token
+            datalog.unniqIdGenerado = AuthToken.UnniqId
+            datalog.jsonEnvio = JSON.stringify(apiJson1Detalle)
+
+            let respLog = await LogApiBpro(datalog)
+
+            datalog.consecutivo = respLog.folio
+            datalog.opcion = 2
+
+            resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify(apiJson1Detalle))
+
+            if(resPoliza.Codigo === '200 OK'){
+                datalog.anioPol = resPoliza.Poliza[0].añoPoliza
+                datalog.consPol = resPoliza.Poliza[0].ConsecutivoPoliza
+                datalog.empresaPol = resPoliza.Poliza[0].EmpresaPoliza
+                datalog.mesPol =  resPoliza.Poliza[0].MesPoliza
+                datalog.tipoPol = resPoliza.Poliza[0].TipoPoliza
+                datalog.jsonRespuesta = JSON.stringify(resPoliza.Poliza[0])
+                datalog.codigo = resPoliza.Codigo
+                datalog.resuelto = 1
+
+                //respUpdate = await promiseActualizaTramite($scope.idPerTra,'GVOP', AG, $scope.consecutivoTramite,'',datalog.consPol,datalog.mesPol,datalog.anioPol)
+
+                //$scope.getDataOrdenPagoFF();
+                $scope.nombreTramite ='REEMBOLSO ORDEN PAGO'
+
+                html = $scope.html1 + 'Se Proceso el Reembolso al fondo fijo:  ' + $scope.idFondoFijo +' ' + "<br><br> Se realizó reembolso por orden de pago por el monto de:  $"+ formatMoney($scope.monto) + "  " + $scope.html2;
+                $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', $scope.nombreTramite, html);
+                //$scope.sendMail(respUpdate.correo, respUpdate.asunto, html);
+                $('#loading').modal('hide');
+
+                swal({
+                    title:"Aviso",
+                    type:"success",
+                    width: 1000,
+                    text:`El rembolso por orden de pago genero la siguiente póliza
                     Año póliza: ${datalog.anioPol}
                     Mes póliza: ${datalog.mesPol}
                     Cons póliza: ${datalog.consPol}
