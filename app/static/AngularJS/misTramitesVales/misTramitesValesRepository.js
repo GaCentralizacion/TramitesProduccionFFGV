@@ -449,7 +449,7 @@ registrationModule.factory('misTramitesValesRepository', function($http) {
             });
         },
 
-	getValidaNotificacion: function(id_perTra, idVale) {
+	    getValidaNotificacion: function(id_perTra, idVale) {
             return $http({
                 url: misTramitesVales + 'ValidaNotificacion/',
                 method: "GET",
@@ -461,6 +461,20 @@ registrationModule.factory('misTramitesValesRepository', function($http) {
                     'Content-Type': 'application/json'
                 }
 
+            });
+        },
+
+        getDataComplementoFF: (id_perTra,idVale) => {
+            return $http({
+                url: misTramitesVales + 'getDataComplementoFF/',
+                method: "GET",
+                params: {
+                    id_perTra: id_perTra,
+                    idVale: idVale
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             });
         },
 
