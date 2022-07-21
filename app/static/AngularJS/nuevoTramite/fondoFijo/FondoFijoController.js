@@ -480,241 +480,237 @@ async function LogApiBpro(data){
 
 
 
-$scope.dataComplementoFF = function () {
-    if($scope.opcionFF == undefined ){$scope.opcionFF = 0}
-    if($scope.idVale == undefined ){$scope.idVale = 0}
-    if($scope.opcionFF == undefined ){$scope.opcionFF = 0}
-    if($scope.ProcesoPol == undefined ){$scope.ProcesoPol = "0"}
-    
-    $scope.nombreValeAPI = $scope.nombreVale
-
-    if (tipoProcesoAPI = 7 ) {$scope.nombreValeAPI = $scope.idValeEvidenciaAPI}
-    if (tipoProcesoAPI = 7 ) {$scope.ProcesoPol = 'AVFF'}    
-
-    fondoFijoRepository.dataComplementoFF($scope.id_perTra,$scope.idVale,$scope.idUsuario,$scope.idEmpresa,$scope.idSucursal,$scope.ProcesoPol,$scope.nombreValeAPI,$scope.opcionFF).then(resp => {
-        $scope.iPersonaDevFF = resp.data[0].PER_IDPERSONA;
-        $scope.areaAfectacion = resp.data[0].areaAfectacion;
-        $scope.precioUnitario = resp.data[0].precioUnitario;
-        $scope.tasaIVA = resp.data[0].tasaIVA;
-        $scope.conceptoContable = resp.data[0].conceptoContable;
-        $scope.banderaComprobacionMas =  resp.data[0].banderaComprobacionMas;
+    $scope.dataComplementoFF = function () {
+        if($scope.opcionFF == undefined ){$scope.opcionFF = 0}
+        if($scope.idVale == undefined ){$scope.idVale = 0}
+        if($scope.opcionFF == undefined ){$scope.opcionFF = 0}
+        if($scope.ProcesoPol == undefined ){$scope.ProcesoPol = "0"}
         
-        $scope.montoValeAVFF =  resp.data[0].montoValeAVFF;
-        $scope.montoValeCVFR =  resp.data[0].montoValeCVFR;
-        $scope.ivaAVFF =  resp.data[0].ivaAVFF;
-        $scope.ivaCVFR =  resp.data[0].ivaCVFR;
-        $scope.montoAVFFo =  resp.data[0].montoAVFFo;
-        $scope.montoCVFRo =  resp.data[0].montoCVFRo; 
+        $scope.nombreValeAPI = $scope.nombreVale
 
-        $scope.cuentaEnvio =  resp.data[0].cuentaEnvio;
-        $scope.montoSaldo =  resp.data[0].montoSaldo
+        if (tipoProcesoAPI = 7 ) {$scope.nombreValeAPI = $scope.idValeEvidenciaAPI}
+        if (tipoProcesoAPI = 7 ) {$scope.ProcesoPol = 'AVFF'}    
 
-
-    });    
-}
-
-//Generacion de poliza y oc AVFF
-$scope.insertaPolizaFrontAPI = async function () {
-    let banco = zeroDelete($scope.cuentaContable);
-    let AuthToken;
-    let FFVale = $scope.nombreVale 
-    let FF = $scope.idFondoFijo 
-    let resPoliza
-
-    if (tipoProcesoAPI = 7 ) {$scope.ProcesoPol = 'AVFF'}
-
-    let fecha = new Date()
-    let anio = fecha.getFullYear().toString()
-    let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
-    let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
-
-    $('#loading').modal('show');
-    //Encabezado
-    $scope.apiJson.IdEmpresa = $scope.idEmpresa
-    $scope.apiJson.IdSucursal = $scope.idSucursal
-    $scope.apiJson.Tipo = 1
-
-    //DatosOrdenesCompra
-    $scope.apiJson.OrdenCompra.IdProveedor = $scope.iPersonaDevFF
-    $scope.apiJson.OrdenCompra.ArePed = $scope.areaAfectacion
-    $scope.apiJson.OrdenCompra.TipoComprobante = '1'
-    $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
-    $scope.apiJson.OrdenCompra.FechaAplicacion = `${anio}-${mes}-${dia}`
-
-    //DatosOrdenesCompra DETALLE
-    $scope.apiJson.OrdenCompra.Detalle[0].ConceptoContable = $scope.conceptoContable
-    $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
-    $scope.apiJson.OrdenCompra.Detalle[0].Producto = $scope.idValeEvidenciaAPI
-    if( $scope.tasaIVA > 0){ 
-        $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = ( $scope.precioUnitario / $scope.tasaIVA )
-      } else {
-        $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.precioUnitario
-      }    
-    $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.tasaIVA
-
-    //ContabilidadMasiva
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = $scope.ProcesoPol+$scope.complementoPolizas
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.idValeEvidenciaAPI
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = $scope.ProcesoPol+$scope.complementoPolizas
-    // $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = 'OC' //OC
-    // $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  'OC' //OC
-
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.idValeEvidenciaAPI
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto = $scope.nombreDepartamentoVale
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].SubProducto = 'DD'
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Origen = 'FAC'
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
-
-    if( $scope.montoValeCVFR > 0 ){ 
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.montoValeAVFF 
-    }else{        
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.montoAPI
-        if( $scope.tasaIVA > 0){
-            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].IVA = ( $scope.montoAPI / $scope.tasaIVA * 0.16)
-        }        
+        fondoFijoRepository.dataComplementoFF($scope.id_perTra,$scope.idVale,$scope.idUsuario,$scope.idEmpresa,$scope.idSucursal,$scope.ProcesoPol,$scope.nombreValeAPI,$scope.opcionFF).then(resp => {
+            $scope.iPersonaDevFF            = resp.data[0].PER_IDPERSONA;
+            $scope.areaAfectacion           = resp.data[0].areaAfectacion;
+            $scope.precioUnitario           = resp.data[0].precioUnitario;
+            $scope.tasaIVA                  = resp.data[0].tasaIVA;
+            $scope.conceptoContable         = resp.data[0].conceptoContable;
+            $scope.banderaComprobacionMas   = resp.data[0].banderaComprobacionMas;        
+            $scope.montoValeAVFF            = resp.data[0].montoValeAVFF;
+            $scope.montoValeCVFR            = resp.data[0].montoValeCVFR;
+            $scope.ivaAVFF                  = resp.data[0].ivaAVFF;
+            $scope.ivaCVFR                  = resp.data[0].ivaCVFR;
+            $scope.montoAVFFo               = resp.data[0].montoAVFFo;
+            $scope.montoCVFRo               = resp.data[0].montoCVFRo; 
+            $scope.cuentaEnvio              = resp.data[0].cuentaEnvio;
+            $scope.montoSaldo               = resp.data[0].montoSaldo
+        });    
     }
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.idPersona    
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = FFVale 
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.idValeEvidenciaAPI
+
+    //Generacion de poliza y oc AVFF
+    $scope.insertaPolizaFrontAPI = async function () {
+        let banco = zeroDelete($scope.cuentaContable);
+        let AuthToken;
+        let FFVale = $scope.nombreVale 
+        let FF = $scope.idFondoFijo 
+        let resPoliza
+
+        if (tipoProcesoAPI = 7 ) {$scope.ProcesoPol = 'AVFF'}
+
+        let fecha = new Date()
+        let anio = fecha.getFullYear().toString()
+        let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
+        let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
+
+        $('#loading').modal('show');
+        //Encabezado
+        $scope.apiJson.IdEmpresa = $scope.idEmpresa
+        $scope.apiJson.IdSucursal = $scope.idSucursal
+        $scope.apiJson.Tipo = 1
+
+        //DatosOrdenesCompra
+        $scope.apiJson.OrdenCompra.IdProveedor = $scope.iPersonaDevFF
+        $scope.apiJson.OrdenCompra.ArePed = $scope.areaAfectacion
+        $scope.apiJson.OrdenCompra.TipoComprobante = '1'
+        $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
+        $scope.apiJson.OrdenCompra.FechaAplicacion = `${anio}-${mes}-${dia}`
+
+        //DatosOrdenesCompra DETALLE
+        $scope.apiJson.OrdenCompra.Detalle[0].ConceptoContable = $scope.conceptoContable
+        $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
+        $scope.apiJson.OrdenCompra.Detalle[0].Producto = $scope.idValeEvidenciaAPI
+        if( $scope.tasaIVA > 0){ 
+            $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = ( $scope.precioUnitario / $scope.tasaIVA )
+        } else {
+            $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.precioUnitario
+        }    
+        $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.tasaIVA
+
+        //ContabilidadMasiva
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = $scope.ProcesoPol+$scope.complementoPolizas
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.idValeEvidenciaAPI
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = $scope.ProcesoPol+$scope.complementoPolizas
+        // $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = 'OC' //OC
+        // $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  'OC' //OC
+
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.idValeEvidenciaAPI
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto = $scope.nombreDepartamentoVale
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].SubProducto = 'DD'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Origen = 'FAC'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
+
+        if( $scope.montoValeCVFR > 0 ){ 
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.montoValeAVFF 
+        }else{        
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.montoAPI
+            if( $scope.tasaIVA > 0){
+                $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].IVA = ( $scope.montoAPI / $scope.tasaIVA * 0.16)
+            }        
+        }
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.idPersona    
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = FFVale 
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.idValeEvidenciaAPI
 
 
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoOrigen= $scope.idValeEvidenciaAPI
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Partida = '2'
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoProducto = $scope.nombreDepartamentoVale
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].SubProducto = 'PA'
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Origen = 'FAC'
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Moneda = 'PE'
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoCambio = '1'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoOrigen= $scope.idValeEvidenciaAPI
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Partida = '2'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoProducto = $scope.nombreDepartamentoVale
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].SubProducto = 'PA'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Origen = 'FAC'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Moneda = 'PE'
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoCambio = '1'
 
-    if( $scope.montoValeCVFR > 0 ){ 
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.montoValeAVFF 
-    }else{        
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.montoAPI
-        if( $scope.tasaIVA > 0){
-            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].IVA = ( $scope.montoAPI / $scope.tasaIVA * 0.16)
-        }        
-    }
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.iPersonaDevFF 
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = $scope.idValeEvidenciaAPI     
+        if( $scope.montoValeCVFR > 0 ){ 
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.montoValeAVFF 
+        }else{        
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.montoAPI
+            if( $scope.tasaIVA > 0){
+                $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].IVA = ( $scope.montoAPI / $scope.tasaIVA * 0.16)
+            }        
+        }
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.iPersonaDevFF 
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = $scope.idValeEvidenciaAPI     
 
-    console.log(JSON.stringify($scope.apiJson))
+        console.log(JSON.stringify($scope.apiJson))
 
-    let datalog = structuredClone(datalogAPI)
-  
-        datalog.idSucursal = $scope.idSucursal
-        datalog.idVale = $scope.idVale
-        datalog.opcion = 1        
-
-        AuthToken = await promiseAutBPRO();
-
-        datalog.tokenGenerado = AuthToken.Token
-        datalog.unniqIdGenerado = AuthToken.UnniqId
-        datalog.jsonEnvio = JSON.stringify($scope.apiJson)
-
-    let respLog = await LogApiBpro(datalog)
-
-        console.log(datalog)
-        console.log(respLog)
-
-        datalog.consecutivo = respLog.folio
-        datalog.opcion = 2
-
+        let datalog = structuredClone(datalogAPI)
     
-    resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify($scope.apiJson))
+            datalog.idSucursal = $scope.idSucursal
+            datalog.idVale = $scope.idVale
+            datalog.opcion = 1        
 
-    if(resPoliza.Codigo === '200 OK'){
-        datalog.anioPol = resPoliza.Poliza[0].añoPoliza
-        datalog.consPol = resPoliza.Poliza[0].ConsecutivoPoliza
-        datalog.empresaPol = resPoliza.Poliza[0].EmpresaPoliza
-        datalog.mesPol =  resPoliza.Poliza[0].MesPoliza
-        datalog.tipoPol = resPoliza.Poliza[0].TipoPoliza
-        datalog.jsonRespuesta = JSON.stringify(resPoliza.Poliza[0])
-        datalog.codigo = resPoliza.Codigo
-        datalog.resuelto = 1
-        datalog.ordenCompra = resPoliza.Folio
+            AuthToken = await promiseAutBPRO();
 
-        $scope.ordenCompraAVFF =  resPoliza.Folio
+            datalog.tokenGenerado = AuthToken.Token
+            datalog.unniqIdGenerado = AuthToken.UnniqId
+            datalog.jsonEnvio = JSON.stringify($scope.apiJson)
 
-       // respUpdate = await promiseActualizaTramiteFF($scope.idValeFF,$scope.idUsuario ,'PVFF', FFVale, $scope.incremental)
-       // console.log(respUpdate)
+        let respLog = await LogApiBpro(datalog)
 
-        //$scope.getDataOrdenPagoGV();
-        $scope.nombreTramite ='APROBAR EVIDENCIA FF'
-        console.log($scope.nombreTramite)
+            console.log(datalog)
+            console.log(respLog)
+
+            datalog.consecutivo = respLog.folio
+            datalog.opcion = 2
+
         
-        console.log($scope.ordenCompraAVFF)
+        resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify($scope.apiJson))
 
-        html = $scope.html1 + 'Comprobación de vale evidencia :  ' + $scope.idValeEvidenciaAPI +' del vale '  + FFVale + "<br><br> Estimado " + $scope.nombreSolicitanteAPI + " se realizó la comprobacion del vale por el monto de:  $"+ formatMoney(($scope.montoAPI - $scope.montoValeCVFR)) + $scope.html2;
-        $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de vales evidencias  ' + $scope.idValeEvidenciaAPI, html);
-
-        $('#loading').modal('hide');
-
-        swal({
-            title:"Aviso",
-            type:"success",
-            icon: "success",
-            width: 1000,
-            text:`Se proceso con éxito la evidencia; ` + $scope.idValeEvidenciaAPI + `
-            
-            Orden Compra: ${datalog.ordenCompra}
-            Año póliza: ${datalog.anioPol}
-            Mes póliza: ${datalog.mesPol}
-            Cons póliza: ${datalog.consPol}
-            Tipo póliza: ${datalog.tipoPol}
-            
-            No olvide dar seguimiento.`,
-            showConfirmButton: true,
-            showCloseButton:  false,
-            timer:10000         
-
-        })
-        
-    }else{
-        $('#loading').modal('hide');
-        datalog.jsonRespuesta = JSON.stringify(resPoliza)
-
-        if(resPoliza.data !== undefined){
-            datalog.mensajeError = resPoliza.data.Message 
-            datalog.codigo = resPoliza.status.toString()
-            datalog.resuelto = 0
-        }else{
-            datalog.mensajeError = resPoliza.Mensaje
+        if(resPoliza.Codigo === '200 OK'){
+            datalog.anioPol = resPoliza.Poliza[0].añoPoliza
+            datalog.consPol = resPoliza.Poliza[0].ConsecutivoPoliza
+            datalog.empresaPol = resPoliza.Poliza[0].EmpresaPoliza
+            datalog.mesPol =  resPoliza.Poliza[0].MesPoliza
+            datalog.tipoPol = resPoliza.Poliza[0].TipoPoliza
+            datalog.jsonRespuesta = JSON.stringify(resPoliza.Poliza[0])
             datalog.codigo = resPoliza.Codigo
-            datalog.resuelto = 0
+            datalog.resuelto = 1
+            datalog.ordenCompra = resPoliza.Folio
+
+            $scope.ordenCompraAVFF =  resPoliza.Folio
+
+        // respUpdate = await promiseActualizaTramiteFF($scope.idValeFF,$scope.idUsuario ,'PVFF', FFVale, $scope.incremental)
+        // console.log(respUpdate)
+
+            //$scope.getDataOrdenPagoGV();
+            $scope.nombreTramite ='APROBAR EVIDENCIA FF'
+            console.log($scope.nombreTramite)
+            
+            console.log($scope.ordenCompraAVFF)
+
+            html = $scope.html1 + 'Comprobación de vale evidencia :  ' + $scope.idValeEvidenciaAPI +' del vale '  + FFVale + "<br><br> Estimado " + $scope.nombreSolicitanteAPI + " se realizó la comprobacion del vale por el monto de:  $"+ formatMoney(($scope.montoAPI - $scope.montoValeCVFR)) + $scope.html2;
+            $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de vales evidencias  ' + $scope.idValeEvidenciaAPI, html);
+
+            $('#loading').modal('hide');
+
+            swal({
+                title:"Aviso",
+                type:"success",
+                icon: "success",
+                width: 1000,
+                text:`Se proceso con éxito la evidencia; ` + $scope.idValeEvidenciaAPI + `
+                
+                Orden Compra: ${datalog.ordenCompra}
+                Año póliza: ${datalog.anioPol}
+                Mes póliza: ${datalog.mesPol}
+                Cons póliza: ${datalog.consPol}
+                Tipo póliza: ${datalog.tipoPol}
+                
+                No olvide dar seguimiento.`,
+                showConfirmButton: true,
+                showCloseButton:  false,
+                timer:10000         
+
+            })
+            
+        }else{
+            $('#loading').modal('hide');
+            datalog.jsonRespuesta = JSON.stringify(resPoliza)
+
+            if(resPoliza.data !== undefined){
+                datalog.mensajeError = resPoliza.data.Message 
+                datalog.codigo = resPoliza.status.toString()
+                datalog.resuelto = 0
+            }else{
+                datalog.mensajeError = resPoliza.Mensaje
+                datalog.codigo = resPoliza.Codigo
+                datalog.resuelto = 0
+            }
+
+            swal({
+                title:"Aviso",
+                type:"error",
+                width: 1000,
+                text: `Se presento un problema al procesar la póliza en BPRO
+                No ha sido procesado, favor de notificar al área de sistemas 
+                
+                Codigo: ${datalog.codigo }
+                Respuesta BPRO:  ${datalog.mensajeError}
+                
+                Reitentar cuando se le notifique la solución a la incidencia`,
+                showConfirmButton: true,
+                showCloseButton:  false,
+                timer:10000
+            })
         }
 
-        swal({
-            title:"Aviso",
-            type:"error",
-            width: 1000,
-            text: `Se presento un problema al procesar la póliza en BPRO
-            No ha sido procesado, favor de notificar al área de sistemas 
-            
-            Codigo: ${datalog.codigo }
-            Respuesta BPRO:  ${datalog.mensajeError}
-            
-            Reitentar cuando se le notifique la solución a la incidencia`,
-            showConfirmButton: true,
-            showCloseButton:  false,
-            timer:10000
-        })
-    }
+        respLog = await LogApiBpro(datalog)
 
-    respLog = await LogApiBpro(datalog)
+        $('#loading').modal('hide');
+        $("#aprobarVale").modal("hide");
 
-    $('#loading').modal('hide');
-    $("#aprobarVale").modal("hide");
+        $scope.regresarVale();
 
-    $scope.regresarVale();
+        if($scope.banderaComprobacionMas != 0 && $scope.montoValeCVFR > 0 )
+            {
+                $scope.insertaPolizaFrontCVFR()
 
-    if($scope.banderaComprobacionMas != 0 && $scope.montoValeCVFR > 0 )
-        {
-            $scope.insertaPolizaFrontCVFR()
-
-        }
-};
+            }
+    };
 
 // Se Genera Poliza CVFR/POLIZA - Comprobacion de mas!
 $scope.insertaPolizaFrontCVFR = async function () {
@@ -738,15 +734,11 @@ $scope.insertaPolizaFrontCVFR = async function () {
 
     if($scope.montoValeAVFF>0){
         $scope.apiJson.Tipo = 2
-
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = $scope.ordenCompraAVFF //OC
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 = $scope.ordenCompraAVFF //OC
-
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado =  $scope.ordenCompraAVFF 
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 =  $scope.ordenCompraAVFF
-
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = $scope.ordenCompraAVFF
-
     }
     if($scope.montoValeAVFF==0){
         
@@ -2331,101 +2323,105 @@ $scope.miles = function(num){
     return strMiles + " " + strCentenas;
 }
 
-$scope.millones = function(num){
-  divisor = 1000000;
-  cientos = Math.floor(num / divisor);
-  resto = num - (cientos * divisor);
+    $scope.millones = function(num){
+        divisor = 1000000;
+        cientos = Math.floor(num / divisor);
+        resto = num - (cientos * divisor);
 
-  strMillones = $scope.seccion(num, divisor, "UN MILLON DE", "MILLONES DE");
-  strMiles = $scope.miles(resto);
+        strMillones = $scope.seccion(num, divisor, "UN MILLON DE", "MILLONES DE");
+        strMiles = $scope.miles(resto);
 
-  if(strMillones == "")
-      return strMiles;
+        if(strMillones == "")
+            return strMiles;
 
-  return strMillones + " " + strMiles;
-}
+        return strMillones + " " + strMiles;
+    }
 
-$scope.numeroALetras=function(num){
-  var data = {
-    numero: num,
-    enteros: Math.floor(num),
-    //centavos: (((Math.round(num * 100)) - (Math.floor(num) * 100))),
-    //letrasCentavos: "",
-    letrasMonedaPlural: 'PESOS',//“PESOS”, 'Dólares', 'Bolívares', 'etcs'
-    letrasMonedaSingular: 'PESO' //“PESO”, 'Dólar', 'Bolivar', 'etc'
+    $scope.numeroALetras=function(num){
+        var data = {
+            numero: num,
+            enteros: Math.floor(num),
+            letrasMonedaPlural: 'PESOS',//“PESOS”, 'Dólares', 'Bolívares', 'etcs'
+            letrasMonedaSingular: 'PESO' //“PESO”, 'Dólar', 'Bolivar', 'etc'
+        };
+            $scope.centavos = (((Math.round(num * 100)) - (Math.floor(num) * 100)));
+            $scope.centavos = $scope.centavos == 0 ? '00' : $scope.centavos;
+        if (data.centavos > 0) {
+            data.letrasCentavos = "CON " + (function (){
+            
+                if (data.centavos == 1)
+                return $scope.millones(data.centavos) + " " + data.letrasMonedaCentavoSingular;
+            else
+                return $scope.millones(data.centavos) + " " + data.letrasMonedaCentavoPlural;
+            })();
+        };
 
-    //letrasMonedaCentavoPlural: "CENTAVOS",
-    //letrasMonedaCentavoSingular: "CENTAVO"
-};
-  $scope.centavos = (((Math.round(num * 100)) - (Math.floor(num) * 100)));
-  $scope.centavos = $scope.centavos == 0 ? '00' : $scope.centavos;
-if (data.centavos > 0) {
-    data.letrasCentavos = "CON " + (function (){
-        if (data.centavos == 1)
-            return $scope.millones(data.centavos) + " " + data.letrasMonedaCentavoSingular;
+        if(data.enteros == 0)
+            return "CERO " + data.letrasMonedaPlural //+ " " + data.letrasCentavos;
+        if (data.enteros == 1)
+            return $scope.millones(data.enteros) + " " + data.letrasMonedaSingular //+ " " + data.letrasCentavos;
         else
-            return $scope.millones(data.centavos) + " " + data.letrasMonedaCentavoPlural;
-        })();
-};
+            return $scope.millones(data.enteros) + " " + data.letrasMonedaPlural //+ " " + data.letrasCentavos;
+    }
 
-if(data.enteros == 0)
-    return "CERO " + data.letrasMonedaPlural //+ " " + data.letrasCentavos;
-if (data.enteros == 1)
-    return $scope.millones(data.enteros) + " " + data.letrasMonedaSingular //+ " " + data.letrasCentavos;
-else
-    return $scope.millones(data.enteros) + " " + data.letrasMonedaPlural //+ " " + data.letrasCentavos;
-}
+    $scope.actualizarTramite = function() {
+        swal({
+                title: '¿Deseas actualizar tu trámite?',
+                text: 'Se sobreescribiran los datos del trámite',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Actualizar',
+                cancelButtonText: 'Cancelar',
+                closeOnConfirm: true,
+                closeOnCancel: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                        
+                $scope.updateBorradorImages(JSON.parse(localStorage.getItem('borrador')).idPerTra, $scope.documentos, 0);
+                } 
+            });
+    }
 
-$scope.actualizarTramite = function() {
-    swal({
-            title: '¿Deseas actualizar tu trámite?',
-            text: 'Se sobreescribiran los datos del trámite',
-            type: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Actualizar',
-            cancelButtonText: 'Cancelar',
-            closeOnConfirm: true,
-            closeOnCancel: true
-        },
-        function(isConfirm) {
-            if (isConfirm) {
-                      
-            $scope.updateBorradorImages(JSON.parse(localStorage.getItem('borrador')).idPerTra, $scope.documentos, 0);
-            } 
-        });
-}
+    $scope.verImagenModalVale = function(item) {
+        if(item.tipoEvidencia == 'pdf')
+            {$scope.verPdfVale(item)}
+        else
+            {
+                $scope.modalTitle = 'Evidencia';
+                $scope.obervacionesDoc = item.comentario;
+                $scope.verComentarios = item.estatusReembolso == 2 ? true : false;
+                $scope.verImagen = item.evidencia;
+                $("#mostrarImagen").modal("show");
+            }            
+    }
 
-$scope.verImagenModalVale = function(item) {
-    if(item.tipoEvidencia == 'pdf')
-    {$scope.verPdfVale(item)}
-    else
-    {
-    $scope.modalTitle = 'Evidencia';
-    $scope.obervacionesDoc = item.comentario;
-    $scope.verComentarios = item.estatusReembolso == 2 ? true : false;
-    $scope.verImagen = item.evidencia;
-    $("#mostrarImagen").modal("show");
-}
-    
-}
+    $scope.validaDataComprobacion = function( item, opcion ){   
+        $scope.dataComplementoFF();
 
-$scope.validaDataComprobacion = function( item, opcion ){
-    //console.log("idGastoFondoFijo", item.idGastoFondoFijo)
-    $scope.dataComplementoFF();
-    //item.tipoComprobante = null;
-    if( item.idGastoFondoFijo == 2 ){
-        if(
-            item.tipoComprobante === undefined || item.tipoComprobante === null ||
-            item.tipoIVA === undefined || item.tipoIVA === null ||
-            item.areaAfectacion === undefined || item.areaAfectacion === null ||
-            item.conceptoAfectacion === undefined || item.conceptoAfectacion === null
-            ){
-            swal( "Revisión de la comprobación", "No se encontró la información completa, favor de entrar en ‘Editar Comprobación’ y complete el registro.", "warning" );
+        if( item.idGastoFondoFijo == 2 ){
+            if(
+                item.tipoComprobante === undefined || item.tipoComprobante === null ||
+                item.tipoIVA === undefined || item.tipoIVA === null ||
+                item.areaAfectacion === undefined || item.areaAfectacion === null ||
+                item.conceptoAfectacion === undefined || item.conceptoAfectacion === null
+                ){
+                swal( "Revisión de la comprobación", "No se encontró la información completa, favor de entrar en ‘Editar Comprobación’ y complete el registro.", "warning" );
+            }
+            else{
+                console.log("Valida campos", true)
+                if( opcion == 2 ){
+                    $scope.AutorizarRechazarEvidencia(item, 2 );
+                }
+                else if( opcion == 3){
+                    $scope.modalComentarios(item, 3);
+                }
+            }
         }
         else{
-            console.log("Valida campos", true)
+            console.log("Valida campos", false)
             if( opcion == 2 ){
                 $scope.AutorizarRechazarEvidencia(item, 2 );
             }
@@ -2434,48 +2430,37 @@ $scope.validaDataComprobacion = function( item, opcion ){
             }
         }
     }
-    else{
-        console.log("Valida campos", false)
-        if( opcion == 2 ){
-            $scope.AutorizarRechazarEvidencia(item, 2 );
+
+    $scope.editarEvidencia = function(item) { // idtipoComprobante
+        console.log( "item.tipoComprobante", item.tipoComprobante );
+        console.log( "item.tipoIVA", item.tipoIVA );
+        console.log( "item.areaAfectacion", item.areaAfectacion );
+        console.log( "item.conceptoAfectacion", item.conceptoAfectacion );
+        
+
+        $scope.modalTitleEdit = 'Edición Comprobación';
+        $scope.comp_areaAfectacion = item.areaAfectacion;
+        $scope.comp_conceptoAfectacion = item.conceptoAfectacion;
+        $scope.comp_tipoComprobante = item.tipoComprobante;
+        $scope.comp_tipoIVA = item.tipoIVA;
+        $scope.comp_idComprobacionVale = item.idValeEvidencia;
+        $scope.getAreaAfectacion($scope.idEmpresa, $scope.sucursalVale);
+        $scope.getConceptoAfectacion($scope.idEmpresa, $scope.sucursalVale, item);
+        $scope.getTipoComprobante($scope.sucursalVale);
+        $scope.getIVABySucursal($scope.sucursalVale);
+        $scope.idProveedor = 0;
+        $scope.motivoComprobacion = item.motivo;
+        $scope.esFactura = item.esFactura == 'S' ? true : false;
+        if(item.esFactura == 'S')
+        {
+            $scope.idProveedor = item.idProveedor
+            $scope.buscarProveedor($scope.idProveedor);
+            $scope.verProveedor = true;
         }
-        else if( opcion == 3){
-            $scope.modalComentarios(item, 3);
-        }
+        else
+        { $scope.verProveedor = false;}
+        $("#mostrarEditarComprobacion").modal("show");
     }
-}
-
-$scope.editarEvidencia = function(item) { // idtipoComprobante
-    console.log( "item.tipoComprobante", item.tipoComprobante );
-    console.log( "item.tipoIVA", item.tipoIVA );
-    console.log( "item.areaAfectacion", item.areaAfectacion );
-    console.log( "item.conceptoAfectacion", item.conceptoAfectacion );
-    
-
-    $scope.modalTitleEdit = 'Edición Comprobación';
-    $scope.comp_areaAfectacion = item.areaAfectacion;
-    $scope.comp_conceptoAfectacion = item.conceptoAfectacion;
-    $scope.comp_tipoComprobante = item.tipoComprobante;
-    $scope.comp_tipoIVA = item.tipoIVA;
-    $scope.comp_idComprobacionVale = item.idValeEvidencia;
-    $scope.getAreaAfectacion($scope.idEmpresa, $scope.sucursalVale);
-    $scope.getConceptoAfectacion($scope.idEmpresa, $scope.sucursalVale, item);
-    $scope.getTipoComprobante($scope.sucursalVale);
-    $scope.getIVABySucursal($scope.sucursalVale);
-    $scope.idProveedor = 0;
-    $scope.motivoComprobacion = item.motivo;
-    $scope.esFactura = item.esFactura == 'S' ? true : false;
-    if(item.esFactura == 'S')
-    {
-        $scope.idProveedor = item.idProveedor
-        $scope.buscarProveedor($scope.idProveedor);
-        $scope.verProveedor = true;
-    }
-    else
-    { $scope.verProveedor = false;}
-    $("#mostrarEditarComprobacion").modal("show");
-
-}
 
 $scope.buscarProveedor = function (idProveedor) {
     if(idProveedor == 0 || idProveedor == '' || idProveedor == undefined)
