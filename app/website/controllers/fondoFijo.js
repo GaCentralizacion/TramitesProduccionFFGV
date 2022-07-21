@@ -3142,12 +3142,24 @@ fondoFijo.prototype.get_ValidaNotificacion = function(req, res, next) {
 
 fondoFijo.prototype.get_dataComplementoFF = function(req, res, next) {
     var self = this;
-    var id_perTra   =  req.query.id_perTra;
-    var idVale      =  req.query.idVale;
+    var id_perTra           =  req.query.id_perTra;
+    var idVale              =  req.query.idVale;
+    var idUsuario           =  req.query.idUsuario;
+    var idEmpresa           =  req.query.idEmpresa;
+    var IdSucursal          =  req.query.IdSucursal;
+    var ProcesoPol          =  req.query.ProcesoPol;
+    var idValeEvidenciaAPI  =  req.query.idValeEvidenciaAPI;
+    var opcionFF            =  req.query.opcionFF;
 
     var params = [
         { name: 'id_perTra', value: id_perTra, type: self.model.types.INT },
-        { name: 'idVale', value: idVale, type: self.model.types.INT }
+        { name: 'idVale', value: idVale, type: self.model.types.INT },
+        { name: 'idUsuario', value: idUsuario, type: self.model.types.INT },
+        { name: 'idEmpresa', value: idEmpresa, type: self.model.types.INT },
+        { name: 'IdSucursal', value: IdSucursal, type: self.model.types.INT },
+        { name: 'ProcesoPol', value: ProcesoPol, type: self.model.types.STRING.type },
+        { name: 'idValeEvidenciaAPI', value: idValeEvidenciaAPI, type: self.model.types.STRING.type },
+        { name: 'opcionFF', value: opcionFF, type: self.model.types.INT }
     ];
 
     this.model.query('[dbo].[SEL_DATACOMPLEMENTOFF_SP]', params, function(error, result) {
@@ -3165,31 +3177,29 @@ fondoFijo.prototype.get_ActualizaTramitePolizaFF = function(req, res, next) {
     var poliza = req.query.poliza;
     var documentoConcepto = req.query.documentoConcepto;
     var incremental = req.query.incremental;
-
     var ordenCompra = req.query.ordenCompra;
     var consPol = req.query.consPol;
     var mesPol = req.query.mesPol;
     var anioPol = req.query.anioPol;
 
     var params = [
-        { name: 'idValeFF', value: idValeFF, type: self.model.types.INT },
-        { name: 'idUsuario', value: idUsuario, type: self.model.types.INT },
-        { name: 'poliza', value: poliza, type: self.model.types.STRING },
-        { name: 'documentoConcepto', value: documentoConcepto, type: self.model.types.STRING },
-        { name: 'incremental', value: incremental, type: self.model.types.INT },
-        { name: 'ordenCompra', value: ordenCompra, type: self.model.types.STRING },
-        { name: 'consPol', value: consPol, type: self.model.types.INT },
-        { name: 'mesPol', value: mesPol, type: self.model.types.INT },
-        { name: 'anioPol', value: anioPol, type: self.model.types.INT }
-    ];
-    
-    this.model.query('UPD_TRAMITE_FONDO_FIJO', params, function(error, result) {
-        
+         { name: 'idValeFF', value: idValeFF, type: self.model.types.INT }
+        ,{ name: 'idUsuario', value: idUsuario, type: self.model.types.INT }
+        ,{ name: 'poliza', value: poliza, type: self.model.types.STRING }
+        ,{ name: 'documentoConcepto', value: documentoConcepto, type: self.model.types.STRING }
+        ,{ name: 'incremental', value: incremental, type: self.model.types.INT }
+        ,{ name: 'ordenCompra', value: ordenCompra, type: self.model.types.STRING }
+        ,{ name: 'consPol', value: consPol, type: self.model.types.INT }
+        ,{ name: 'mesPol', value: mesPol, type: self.model.types.INT }
+        ,{ name: 'anioPol', value: anioPol, type: self.model.types.INT }
+    ];    
+    this.model.query('UPD_TRAMITE_FONDO_FIJO', params, function(error, result) {        
         self.view.expositor(res, {
             error: error,
             result: result
         });
     });
 };
+
 
 module.exports = fondoFijo;

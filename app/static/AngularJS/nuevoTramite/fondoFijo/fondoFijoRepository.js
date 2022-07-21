@@ -1034,20 +1034,26 @@ registrationModule.factory('fondoFijoRepository', function($http) {
 
             });
         },
-        getDataComplementoFF: (id_perTra, idVale) => {
+        dataComplementoFF: (id_perTra, idVale, idUsuario, idEmpresa, IdSucursal, ProcesoPol, idValeEvidenciaAPI, opcionFF) => {
             return $http({
-                url: fondoFijo + 'get_dataComplementoFF/',
+                url: fondoFijo + 'dataComplementoFF/',
                 method: "GET",
                 params: {
                     id_perTra: id_perTra,
-                    idVale: idVale
+                    idVale: idVale,
+                    idUsuario: idUsuario,
+                    idEmpresa: idEmpresa,
+                    IdSucursal: IdSucursal,
+                    ProcesoPol: ProcesoPol,
+                    idValeEvidenciaAPI: idValeEvidenciaAPI,
+                    opcionFF : opcionFF
                 }
                     ,
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
-        },        
+        },
         ActualizaTramitePolizaFF:(
             idValeFF
             ,idUsuario
@@ -1060,24 +1066,24 @@ registrationModule.factory('fondoFijoRepository', function($http) {
             ,anioPol= 0
             )=>{
             return $http({
-                url: fondoFijo + 'ActualizaTramitePolizaFF',
+                url: fondoFijo + 'ActualizaTramitePolizaFF/',
                 method: "GET",
                 params: {
-                    idValeFF,
-                    idUsuario,
-                    poliza,
-                    documentoConcepto,
-                    incremental
-                    ,ordenCompra
-                    ,consPol 
-                    ,mesPol 
-                    ,anioPol
+                    idValeFF: idValeFF,
+                    idUsuario: idUsuario,
+                    poliza: poliza,
+                    documentoConcepto: documentoConcepto,
+                    incremental: incremental,
+                    ordenCompra: ordenCompra,
+                    consPol: consPol,
+                    mesPol: mesPol,
+                    anioPol : anioPol
                 },
                 headers: {
                     'Content-Type': 'application/json'
                 }
 
             });
-        }       
+        }
     };
 });
