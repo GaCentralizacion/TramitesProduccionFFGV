@@ -575,9 +575,9 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
 
         respRFCE = await AplicaPolizaRFCE()
 
-        if(respRFCE == true){
-            respRFCS = await AplicaPolizaRFCS()
-        }
+        // if(respRFCE == true){
+        //     respRFCS = await AplicaPolizaRFCS()
+        // }
 
         // var tipoProceso = true;
         // tipoProceso = await promiseInsertaDatos($rootScope.user.usu_idusuario, $scope.idSucursal, $scope.tipo == 'FS' ? 1 : 12, $scope.idFondoFijo, $scope.monto, 'FONFIJ', $scope.tipo == 'FS' ? 'FFOP' : $scope.nombreDep, $scope.idPerTra, banco, CCDepto);
@@ -1188,9 +1188,9 @@ function zeroDelete (item)
             apiJson1Detalle.IdSucursal = $scope.idSucursal
             apiJson1Detalle.Tipo = 2
 
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = `RFCE${$scope.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = `RFOP${$scope.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].DocumentoOrigen = FF
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `RFCE${$scope.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `RFOP${$scope.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = FF
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 =  FF
 
@@ -1241,8 +1241,13 @@ function zeroDelete (item)
                 //respUpdate = await promiseActualizaTramite($scope.idPerTra,'GVOP', AG, $scope.consecutivoTramite,'',datalog.consPol,datalog.mesPol,datalog.anioPol)
 
                // $scope.getDataOrdenPagoFF();
-                $scope.nombreTramite ='REEMBOLSO ORDEN PAGO RFCE'
+                $scope.nombreTramite ='REEMBOLSO ORDEN PAGO RFOP'
 
+                html = $scope.html1 + 'Se Proceso el Reembolso al fondo fijo:  ' + $scope.idFondoFijo +' ' + "<br><br> Se realizó reembolso por orden de pago por el monto de:  $"+ formatMoney($scope.monto) + "  " + $scope.html2;
+                $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', $scope.nombreTramite, html);
+                //$scope.sendMail(respUpdate.correo, respUpdate.asunto, html);
+                $('#loading').modal('hide');
+                
                 $('#loading').modal('hide');
 
                 swal({

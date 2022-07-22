@@ -1,4 +1,4 @@
-registrationModule.controller('traspasosFondoFijoController', function ($scope, $rootScope, $location, localStorageService, traspasosFondoFijoRepository, devolucionesRepository, aprobarFondoRepository, fondoFijoRepository, anticipoGastoRepository, rx, ordenDePagoFFAGRepository,ordenDePagoFFAGRepository) {
+registrationModule.controller('traspasosFondoFijoController', function ($scope, $rootScope, $location, localStorageService, traspasosFondoFijoRepository, devolucionesRepository, aprobarFondoRepository, fondoFijoRepository, anticipoGastoRepository, rx, ordenDePagoFFAGRepository,ordenDePagoFFAGRepository,apiBproRepository) {
 
     $scope.dataAprobar = [];
     $scope.empresas = [{
@@ -68,6 +68,9 @@ registrationModule.controller('traspasosFondoFijoController', function ($scope, 
     $scope.idTramiteSolicitud = 0;
     $scope.archivoCargado = true;
     $scope.documentos = []
+    $scope.html1 = "<div style=\"width:310px;height:140px\"><center><img style=\"width: 100% \" src=\"https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png\" alt=\"GrupoAndrade\" />" +
+        "</center></div><div><p><br>";
+    $scope.html2 = ".</p></div>";
 
     $scope.init = () => {
         $scope.id_perTra = localStorage.getItem('id_perTra');
@@ -328,9 +331,22 @@ return x;
 
                 }
                 else if ($scope.polizaCaja.esReembolso == 1 && $scope.polizaCaja.tramite == 'FF') {
-                    tipoProceso = await promiseInsertaDatos($scope.polizaCaja.idUsuario, $scope.polizaCaja.idSucursal, 13, $scope.polizaCaja.idFondoFijo, $scope.polizaCaja.monto, 'FONFIJ', $scope.polizaCaja.dep_nombrecto, $scope.polizaCaja.id_perTraFF, $scope.polizaCaja.bancoE, '');
-                    tipoProceso = await promiseInsertaDatos($scope.polizaCaja.idUsuario, $scope.polizaCaja.idSucursal, 14, $scope.polizaCaja.idFondoFijo, $scope.polizaCaja.monto, 'FONFIJ', $scope.polizaCaja.dep_nombrecto, $scope.polizaCaja.id_perTraFF, $scope.polizaCaja.bancoS, $scope.polizaCaja.CCDepto);
+                    // aplicacion api
+                    // tipoProceso = await promiseInsertaDatos($scope.polizaCaja.idUsuario, $scope.polizaCaja.idSucursal, 13, $scope.polizaCaja.idFondoFijo, $scope.polizaCaja.monto, 'FONFIJ', $scope.polizaCaja.dep_nombrecto, $scope.polizaCaja.id_perTraFF, $scope.polizaCaja.bancoE, '');
+                    // tipoProceso = await promiseInsertaDatos($scope.polizaCaja.idUsuario, $scope.polizaCaja.idSucursal, 14, $scope.polizaCaja.idFondoFijo, $scope.polizaCaja.monto, 'FONFIJ', $scope.polizaCaja.dep_nombrecto, $scope.polizaCaja.id_perTraFF, $scope.polizaCaja.bancoS, $scope.polizaCaja.CCDepto);
+                  
+
+                    let respRFCE
+                    let respRFCS
+            
+                    respRFCE = await AplicaPolizaRFCE()
+            
+                    if(respRFCE == true){
+                        respRFCS = await AplicaPolizaRFCS()
+                    }
+
                     $scope.avanzaReembolso();
+
                 }
                 else if ($scope.polizaCaja.esReembolso == 0 && $scope.polizaCaja.tramite == 'GV') {
                     tipoProceso = await promiseInsertaDatos($scope.polizaCaja.idUsuario, $scope.polizaCaja.idSucursal, 17, 'AG', $scope.polizaCaja.monto, $scope.polizaCaja.dep_nombrecto, $scope.polizaCaja.dep_nombrecto, $scope.polizaCaja.id_perTraGV, $scope.polizaCaja.bancoE, '');
@@ -371,10 +387,11 @@ return x;
             if( $scope.datosTransferencia.EsGDM == 1 ){
                 $scope.sendPoliza();
             }
-
-
-            $('#loading').modal('hide');
-
+            // //tesoreriaHome
+            //             $('#loading').modal('hide');
+            //             $scope.backTramites = function () {
+            //               }
+            $scope.backDashboard();
         }
 
     }
@@ -783,4 +800,341 @@ return x;
             console.log("La poliza se ha creado", res);
         });
     }
+
+
+    async function AplicaPolizaRFCE (){
+        return new Promise( async (resolve, reject) => {
+            // let SubProducto = zeroDelete($scope.cuentaContable);   
+            // let Origen = zeroDelete($scope.cuentaContableSalida);   
+            let AuthToken;
+            let FF =  $scope.idFondoFijo
+            let resPoliza
+            let respUpdate
+
+            $('#loading').modal('show');
+
+            let apiJson1Detalle = structuredClone(apiJsonBPRO1detalle)
+
+            apiJson1Detalle.IdEmpresa = $scope.polizaCaja.id_Empresa
+            apiJson1Detalle.IdSucursal = $scope.polizaCaja.id_Sucursal
+            apiJson1Detalle.Tipo = 2
+
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = `RFCE${$scope.polizaCaja.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.polizaCaja.idFondoFijo
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `RFCE${$scope.polizaCaja.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = $scope.polizaCaja.idFondoFijo
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 =  $scope.polizaCaja.idFondoFijo
+
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.polizaCaja.idFondoFijo
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '0'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto= $scope.polizaCaja.dep_nombrecto
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].SubProducto = ''
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Origen = $scope.polizaCaja.bancoE
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.polizaCaja.monto
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = '0'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = $scope.polizaCaja.idFondoFijo 
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.polizaCaja.idFondoFijo
+
+            console.log(JSON.stringify(apiJson1Detalle))
+
+            let datalog = structuredClone(datalogAPI)
+        
+                datalog.idSucursal = $scope.polizaCaja.id_Sucursal
+                datalog.id_perTra = $scope.polizaCaja.id_perTraReembolso
+                datalog.opcion = 1        
+
+            AuthToken = await promiseAutBPRO();
+            //AuthToken = await AuthApi()
+
+            datalog.tokenGenerado = AuthToken.Token
+            datalog.unniqIdGenerado = AuthToken.UnniqId
+            datalog.jsonEnvio = JSON.stringify(apiJson1Detalle)
+
+            let respLog = await LogApiBpro(datalog)
+
+            datalog.consecutivo = respLog.folio
+            datalog.opcion = 2
+
+            resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify(apiJson1Detalle))
+
+            if(resPoliza.Codigo === '200 OK'){
+                datalog.anioPol = resPoliza.Poliza[0].añoPoliza
+                datalog.consPol = resPoliza.Poliza[0].ConsecutivoPoliza
+                datalog.empresaPol = resPoliza.Poliza[0].EmpresaPoliza
+                datalog.mesPol =  resPoliza.Poliza[0].MesPoliza
+                datalog.tipoPol = resPoliza.Poliza[0].TipoPoliza
+                datalog.jsonRespuesta = JSON.stringify(resPoliza.Poliza[0])
+                datalog.codigo = resPoliza.Codigo
+                datalog.resuelto = 1
+
+                //respUpdate = await promiseActualizaTramite($scope.idPerTra,'RFCE', AG, $scope.consecutivoTramite,'',datalog.consPol,datalog.mesPol,datalog.anioPol)
+
+               // $scope.getDataOrdenPagoFF();
+                $scope.nombreTramite ='REEMBOLSO ORDEN PAGO RFCE'
+
+                $('#loading').modal('hide');
+
+                swal({
+                    title:"Aviso",
+                    type:"success",
+                    width: 1000,
+                    text:`El rembolso por orden de pago genero la siguiente póliza
+                    Año póliza: ${datalog.anioPol}
+                    Mes póliza: ${datalog.mesPol}
+                    Cons póliza: ${datalog.consPol}
+                    Tipo póliza: ${datalog.tipoPol}
+                    
+                    No olvide subir el archivo PDF de la orden de pago al sistema`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    timer:10000
+                })
+
+                resolve(true)
+                
+            }else{
+
+                $('#loading').modal('hide');
+
+
+                datalog.jsonRespuesta = JSON.stringify(resPoliza)
+
+                if(resPoliza.data !== undefined){
+                    datalog.mensajeError = resPoliza.data.Message 
+                    datalog.codigo = resPoliza.status.toString()
+                    datalog.resuelto = 0
+                }else{
+                    datalog.mensajeError = resPoliza.Mensaje
+                    datalog.codigo = resPoliza.Codigo
+                    datalog.resuelto = 0
+                }
+
+                swal({
+                    title:"Aviso",
+                    type:"error",
+                    width: 1000,
+                    text: `Se presento un problema al procesar la póliza en BPRO
+                    El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                    
+                    Codigo: ${datalog.codigo }
+                    Respuesta BPRO:  ${datalog.mensajeError}
+                    
+                    Reitentar cuando se le notifique la solución a la incidencia`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    timer:10000
+                })
+
+                resolve(false)
+            }
+
+            respLog = await LogApiBpro(datalog)
+
+            console.log(respUpdate)
+
+            $scope.backDashboard();
+
+        })
+    }
+
+    $scope.AplicaPolizaRFCE = function async (){        
+    }
+
+    async function AplicaPolizaRFCS (){
+        return new Promise( async (resolve, reject) => {
+            let AuthToken;
+            let FF =  $scope.idFondoFijo
+            let resPoliza
+            let respUpdate
+
+            $('#loading').modal('show');
+
+            let apiJson1Detalle = structuredClone(apiJsonBPRO1detalle)
+
+            apiJson1Detalle.IdEmpresa = $scope.polizaCaja.id_Empresa
+            apiJson1Detalle.IdSucursal = $scope.polizaCaja.id_Sucursal
+            apiJson1Detalle.Tipo = 2
+
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = `RFCS${$scope.polizaCaja.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.polizaCaja.idFondoFijo
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `RFCS${$scope.polizaCaja.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = $scope.polizaCaja.idFondoFijo
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 =  $scope.polizaCaja.idFondoFijo
+
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.polizaCaja.idFondoFijo
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '0'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto= $scope.polizaCaja.dep_nombrecto
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].SubProducto = $scope.polizaCaja.CCDepto
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Origen = $scope.polizaCaja.bancoS
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.polizaCaja.monto
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.polizaCaja.PER_IDPERSONA
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = $scope.polizaCaja.idFondoFijo 
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.polizaCaja.idFondoFijo
+
+            console.log(JSON.stringify(apiJson1Detalle))
+
+            let datalog = structuredClone(datalogAPI)
+        
+            datalog.idSucursal = $scope.polizaCaja.id_Sucursal
+            datalog.id_perTra = $scope.polizaCaja.id_perTraReembolso
+            datalog.opcion = 1       
+
+            AuthToken = await promiseAutBPRO();
+            //AuthToken = await AuthApi()
+
+            datalog.tokenGenerado = AuthToken.Token
+            datalog.unniqIdGenerado = AuthToken.UnniqId
+            datalog.jsonEnvio = JSON.stringify(apiJson1Detalle)
+
+            let respLog = await LogApiBpro(datalog)
+
+            datalog.consecutivo = respLog.folio
+            datalog.opcion = 2
+
+            resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify(apiJson1Detalle))
+
+            if(resPoliza.Codigo === '200 OK'){
+                datalog.anioPol = resPoliza.Poliza[0].añoPoliza
+                datalog.consPol = resPoliza.Poliza[0].ConsecutivoPoliza
+                datalog.empresaPol = resPoliza.Poliza[0].EmpresaPoliza
+                datalog.mesPol =  resPoliza.Poliza[0].MesPoliza
+                datalog.tipoPol = resPoliza.Poliza[0].TipoPoliza
+                datalog.jsonRespuesta = JSON.stringify(resPoliza.Poliza[0])
+                datalog.codigo = resPoliza.Codigo
+                datalog.resuelto = 1
+
+                //respUpdate = await promiseActualizaTramite($scope.idPerTra,'RFCS', AG, $scope.consecutivoTramite,'',datalog.consPol,datalog.mesPol,datalog.anioPol)
+
+                //$scope.getDataOrdenPagoFF();
+                $scope.nombreTramite ='REEMBOLSO POR SALIDA DE CAJA'
+
+                html = $scope.html1 + 'Se proceso el reembolso al fondo fijo:  ' + $scope.polizaCaja.idFondoFijo +'. ' + "<br><br> Se realizó reembolso por Reembolso Caja por el monto de:  $"+ formatMoney($scope.polizaCaja.monto) + "  " + $scope.html2;
+                $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', $scope.nombreTramite, html);
+                //$scope.sendMail(respUpdate.correo, respUpdate.asunto, html);
+                $('#loading').modal('hide');
+
+                swal({
+                    title:"Aviso",
+                    type:"success",
+                    width: 1000,
+                    text:`El rembolso por orden de pago genero la siguiente póliza
+                    Año póliza: ${datalog.anioPol}
+                    Mes póliza: ${datalog.mesPol}
+                    Cons póliza: ${datalog.consPol}
+                    Tipo póliza: ${datalog.tipoPol}
+                    
+                    No olvide subir el archivo PDF de la orden de pago al sistema`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    timer:10000
+                })
+
+                resolve(true)
+                
+            }else{
+
+                $('#loading').modal('hide');
+
+
+                datalog.jsonRespuesta = JSON.stringify(resPoliza)
+
+                if(resPoliza.data !== undefined){
+                    datalog.mensajeError = resPoliza.data.Message 
+                    datalog.codigo = resPoliza.status.toString()
+                    datalog.resuelto = 0
+                }else{
+                    datalog.mensajeError = resPoliza.Mensaje
+                    datalog.codigo = resPoliza.Codigo
+                    datalog.resuelto = 0
+                }
+
+                swal({
+                    title:"Aviso",
+                    type:"error",
+                    width: 1000,
+                    text: `Se presento un problema al procesar la póliza en BPRO
+                    El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                    
+                    Codigo: ${datalog.codigo }
+                    Respuesta BPRO:  ${datalog.mensajeError}
+                    
+                    Reitentar cuando se le notifique la solución a la incidencia`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    timer:10000
+                })
+
+                resolve(false)
+            }
+
+            respLog = await LogApiBpro(datalog)
+
+            console.log(respUpdate)
+            
+          
+
+        })
+    }
+
+    async function GeneraPolizaBPRO(token, data){
+        return new Promise((resolve, reject) => {
+            apiBproRepository.GeneraPolizaBPRO(token, data).then(resp =>{
+                console.log('respuesta: ',resp.data)
+                resolve(resp.data)
+            }).catch(error => {
+                resolve(error)
+            })
+        })
+    }
+
+    async function LogApiBpro(data){
+        return new Promise((resolve, reject) => {
+            apiBproRepository.LogApiBpro(data).then(resp =>{
+                console.log('resp: ',resp)
+                resolve(resp.data[0])
+            })
+        })
+    }
+
+    async function promiseAutBPRO(){
+        return new Promise((resolve, reject) => {
+            apiBproRepository.GetTokenBPRO().then(resp =>{
+                console.log('resp: ',resp)
+                resolve(resp.data)
+            })
+
+        })
+    }
+
+    function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
+        try {
+          decimalCount = Math.abs(decimalCount);
+          decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
+      
+          const negativeSign = amount < 0 ? "-" : "";
+      
+          let i = parseInt(amount = Math.abs(Number(amount) || 0).toFixed(decimalCount)).toString();
+          let j = (i.length > 3) ? i.length % 3 : 0;
+      
+          return negativeSign + (j ? i.substr(0, j) + thousands : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) + (decimalCount ? decimal + Math.abs(amount - i).toFixed(decimalCount).slice(2) : "");
+        } catch (e) {
+          console.log(e)
+        }
+    };
+
+    $scope.sendMail = function(to, subject, html) {
+        devolucionesRepository.sendMailCliente(to, subject, html).then((res) => {
+            if (res.data.response.success == 1) {
+                console.log('Correo enviado con exito ")')
+            } else {
+                console.log('Ocuerrio un error al emviar el correo "( ')
+            }
+        });
+    };
+
+
 });

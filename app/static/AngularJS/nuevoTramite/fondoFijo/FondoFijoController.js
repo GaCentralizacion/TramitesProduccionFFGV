@@ -1047,6 +1047,8 @@ $scope.insertaPolizaFFCVFM = async function () {
     $("#aprobarVale").modal("hide");
 
     $scope.regresarVale();
+
+    $('#loading').modal('hide');
 };
 
 
