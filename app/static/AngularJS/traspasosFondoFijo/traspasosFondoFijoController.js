@@ -343,6 +343,7 @@ return x;
             
                     if(respRFCE == true){
                         respRFCS = await AplicaPolizaRFCS()
+                        $location.path('/tesoreriaHome');
                     }
 
                     $scope.avanzaReembolso();

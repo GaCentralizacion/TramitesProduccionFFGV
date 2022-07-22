@@ -570,14 +570,15 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
     $scope.insertaPolizaFF = async function () {
         let CCDepto = zeroDelete($scope.cuentaContable);
         let banco = zeroDelete($scope.cuentaContableSalida);
-        let respRFCE
+        let respRFOP
         let respRFCS
 
-        respRFCE = await AplicaPolizaRFCE()
+        respRFOP = await AplicaPolizaRFOP()
 
-        // if(respRFCE == true){
-        //     respRFCS = await AplicaPolizaRFCS()
-        // }
+         if(respRFOP == true){
+            $location.path('/tesoreriaHome');
+            //     respRFCS = await AplicaPolizaRFCS()
+         }
 
         // var tipoProceso = true;
         // tipoProceso = await promiseInsertaDatos($rootScope.user.usu_idusuario, $scope.idSucursal, $scope.tipo == 'FS' ? 1 : 12, $scope.idFondoFijo, $scope.monto, 'FONFIJ', $scope.tipo == 'FS' ? 'FFOP' : $scope.nombreDep, $scope.idPerTra, banco, CCDepto);
@@ -1167,11 +1168,11 @@ function zeroDelete (item)
         })
     }
 
-    $scope.AplicaPolizaRFCE = function async (){
+    $scope.AplicaPolizaRFOP = function async (){
         
     }
 
-    async function AplicaPolizaRFCE (){
+    async function AplicaPolizaRFOP (){
         return new Promise( async (resolve, reject) => {
             let SubProducto = zeroDelete($scope.cuentaContable);   
             let Origen = zeroDelete($scope.cuentaContableSalida);   
@@ -1247,7 +1248,7 @@ function zeroDelete (item)
                 $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', $scope.nombreTramite, html);
                 //$scope.sendMail(respUpdate.correo, respUpdate.asunto, html);
                 $('#loading').modal('hide');
-                
+
                 $('#loading').modal('hide');
 
                 swal({
