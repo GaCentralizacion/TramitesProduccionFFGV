@@ -542,7 +542,7 @@ async function LogApiBpro(data){
         $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
         $scope.apiJson.OrdenCompra.Detalle[0].Producto = $scope.idValeEvidenciaAPI
         if( $scope.tasaIVA > 0){ 
-            $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = ( $scope.precioUnitario / $scope.tasaIVA )
+            $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.precioUnitario - ( $scope.precioUnitario / $scope.tasaIVA )
         } else {
             $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.precioUnitario
         }    
@@ -2725,18 +2725,20 @@ $scope.verPdfComprobacion = function(item) {
                                 {
                                     if(estatusVales.JustificoMas == 0)
                                     {
-                                        tipoProceso = await promiseInsertaDatosFront($scope.idUsuario, $scope.sucursalVale , 7,item.idComprobacionVale , item.monto, '', $scope.nombreDepartamentoVale, 0, '','' );
+                                    //tipoProceso = await promiseInsertaDatosFront($scope.idUsuario, $scope.sucursalVale , 7,item.idComprobacionVale , item.monto, '', $scope.nombreDepartamentoVale, 0, '','' );
+                                    $scope.insertaPolizaFrontAPI();
                                     }
                                     else
                                     {
-                                        tipoProceso = await promiseInsertaDatosFront($scope.idUsuario, $scope.sucursalVale , 7,item.idComprobacionVale , item.monto - estatusVales.JustificoMas, '', $scope.nombreDepartamentoVale, 0, '','' );
-                                    
+                                        // tipoProceso = await promiseInsertaDatosFront($scope.idUsuario, $scope.sucursalVale , 7,item.idComprobacionVale , item.monto - estatusVales.JustificoMas, '', $scope.nombreDepartamentoVale, 0, '','' );
+                                        $scope.insertaPolizaFrontAPI();
+                                        
                                         if(item.compNoAutorizado == 0)
                                         {
                                             tipoProceso = await promiseInsertaDatosFront($scope.idUsuario, $scope.sucursalVale , 8,item.idComprobacionVale , estatusVales.JustificoMas, '', $scope.nombreDepartamentoVale, 0, '','' );
 
                                         }
-                                    else
+                                        else
                                         {
                                             tipoProceso = await promiseInsertaDatosFront($scope.idUsuario, $scope.sucursalVale , 9,item.idComprobacionVale , estatusVales.JustificoMas, '', $scope.nombreDepartamentoVale, 0, '','' );
                                         }

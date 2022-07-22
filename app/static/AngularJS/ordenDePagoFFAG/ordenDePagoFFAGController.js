@@ -34,6 +34,9 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
     $scope.documentoConcepto= ''
     $scope.idPersonaRFC = 0
     $scope.cuentaEnvio = ''
+    $scope.html1 = "<div style=\"width:310px;height:140px\"><center><img style=\"width: 100% \" src=\"https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png\" alt=\"GrupoAndrade\" />" +
+        "</center></div><div><p><br>";
+    $scope.html2 = ".</p></div>";
 
     $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
 

@@ -852,7 +852,7 @@
                 $scope.regresarmisVales(1);
             }
             else{
-                console.log("NO hay Notificacion")                
+                console.log("NO hay Notificacion, fue enviada correctamente")                
             }
         });
     }
@@ -1135,6 +1135,7 @@
               $('#loading').modal('show');           
               misTramitesValesRepository.renunciaEvidencia($scope.datosEvidencia.idValeEvidencia).then(function (result) {
                 if (result.data != undefined) {
+                    log.console(result)
                     $('#loading').modal('hide');   
                     $("#actualizaEvidencia").modal("hide");
                     $scope.regresarmisVales(1);
