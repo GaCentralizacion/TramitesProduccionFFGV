@@ -485,7 +485,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                     $scope.getDataOrdenPagoFF();
                     $scope.insertaPolizaFF();
                     $scope.nombreTramite ='FONDO FIJO'
-                    $scope.avanzaReembolso();
+                    // $scope.avanzaReembolso();
                 }
                 if($scope.idTramite == 9)
                 {
@@ -1243,6 +1243,8 @@ function zeroDelete (item)
                 datalog.resuelto = 1
 
                 //respUpdate = await promiseActualizaTramite($scope.idPerTra,'GVOP', AG, $scope.consecutivoTramite,'',datalog.consPol,datalog.mesPol,datalog.anioPol)
+
+                $scope.avanzaReembolso();
 
                // $scope.getDataOrdenPagoFF();
                 $scope.nombreTramite ='REEMBOLSO ORDEN PAGO RFOP'

@@ -346,7 +346,7 @@ return x;
                         $location.path('/tesoreriaHome');
                     }
 
-                    $scope.avanzaReembolso();
+                    //$scope.avanzaReembolso();
 
                 }
                 else if ($scope.polizaCaja.esReembolso == 0 && $scope.polizaCaja.tramite == 'GV') {
@@ -1012,6 +1012,8 @@ return x;
 
                 //$scope.getDataOrdenPagoFF();
                 $scope.nombreTramite ='REEMBOLSO POR SALIDA DE CAJA'
+
+                $scope.avanzaReembolso();
 
                 html = $scope.html1 + 'Se proceso el reembolso al fondo fijo:  ' + $scope.polizaCaja.idFondoFijo +'. ' + "<br><br> Se realizó reembolso por Reembolso Caja por el monto de:  $"+ formatMoney($scope.polizaCaja.monto) + "  " + $scope.html2;
                 $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', $scope.nombreTramite, html);
