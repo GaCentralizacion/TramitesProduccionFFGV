@@ -3201,5 +3201,21 @@ fondoFijo.prototype.get_ActualizaTramitePolizaFF = function(req, res, next) {
     });
 };
 
+fondoFijo.prototype.get_verificaDatosPolizaApi = function(req, res, next) {
+    var self = this; 
+    var idVale =  req.query.idVale;
+    var idValeEvidencia =  req.query.idValeEvidencia;
+    var params = [
+         { name: 'idVale', value: idVale, type: self.model.types.INT }
+        ,{ name: 'idValeEvidencia', value: idValeEvidencia, type: self.model.types.INT }
+    ];
+    this.model.query('SEL_VERIFICARVALES_SP_V2', params, function(error, result) {
+        self.view.expositor(res, {
+            error: error,
+            result: result
+        });
+    });
+};
+
 
 module.exports = fondoFijo;

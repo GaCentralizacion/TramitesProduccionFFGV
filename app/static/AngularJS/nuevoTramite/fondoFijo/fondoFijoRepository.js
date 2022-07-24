@@ -1084,6 +1084,20 @@ registrationModule.factory('fondoFijoRepository', function($http) {
                 }
 
             });
+        },
+        verificaDatosPolizaApi: (idVale, idValeEvidencia) => {
+            return $http({
+                url: fondoFijo + 'verificaDatosPolizaApi/',
+                method: "GET",
+                params: {
+                    idVale: idVale,
+                    idValeEvidencia: idValeEvidencia                   
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+
+            });
         }
     };
 });
