@@ -1942,7 +1942,9 @@ $scope.verPdfComprobacion = function(item) {
                             console.log("tipoGasto = Gastos",item.tipoGasto)
                             
                             if ( $scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoAVFF==0){
-                                $scope.insertaPolizaFrontCVFR();
+                                $scope.banderaOrdenCompra = 1
+                                $scope.generaOCCVFR();
+                                //$scope.insertaPolizaFrontCVFR();
                             }else{
                                 $scope.insertaPolizaFrontAPIGastos(); 
                             }
@@ -3174,6 +3176,29 @@ async function LogApiBpro(data){
     });
 };
 
+/**
+     * 
+     * @param {number} idValeFF 
+     * @param {number} idusuario 
+     * @param {string} poliza 
+     * @param {string} documentoConcepto 
+     * @param {number} incremental 
+     * @param {string} ordenCompra 
+     * @returns 
+     */
+ async function promiseActualizaTramiteFFOrdenCompra(idValeFF,idusuario,poliza,documentoConcepto,incremental,ordenCompra) {
+    return new Promise((resolve, reject) => {
+        fondoFijoRepository.ActualizaTramitePolizaFFOrdenCompra(idValeFF,idusuario,poliza,documentoConcepto,incremental,ordenCompra).then(function (result) {
+            if (result.data.length > 0) {
+                resolve(result.data[0]);
+
+            }
+        }).catch(err => {
+            reject(result.data[0]);
+        });
+
+    });
+};
 
 
     $scope.dataComplementoFF = function () {
@@ -3368,6 +3393,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
 
         $('#loading').modal('show');
         //Encabezado
+        
         $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
         $scope.apiJson.IdSucursal = $scope.datoPoliza.idSucursal
         $scope.apiJson.Tipo = 1
@@ -3734,66 +3760,31 @@ $scope.insertaPolizaFrontCVFR = async function () {
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
     $('#loading').modal('show');
-    //Encabezado
-   
+    //Encabezado 
+        $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
 
-    if ( $scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoAVFF==0){
-
-        $scope.apiJson = structuredClone(apiOC)
         $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
         $scope.apiJson.IdSucursal = $scope.datoPoliza.idSucursal
-        $scope.apiJson.Tipo = 3
+        $scope.apiJson.Tipo = 2
 
-        $scope.apiJson.OrdenCompra.IdProveedor = $scope.datoPoliza.PER_IDPERSONA
-        $scope.apiJson.OrdenCompra.ArePed = $scope.areaAfectacion
-        $scope.apiJson.OrdenCompra.TipoComprobante = '1'
-        $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
-        $scope.apiJson.OrdenCompra.FechaAplicacion = `${anio}-${mes}-${dia}`
-
-        $scope.apiJson.OrdenCompra.Detalle[0].ConceptoContable = $scope.conceptoContable
-        $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
-        $scope.apiJson.OrdenCompra.Detalle[0].Producto = $scope.datoPoliza.idComprobacionVale
-        $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.datoPoliza.montoCVFR
-        $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.datoPoliza.IVAmontoCVFR
-
-    }else{
-
-        if($scope.datoPoliza.montoAVFF>0){
-            $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
-            $scope.apiJson.IdSucursal = $scope.datoPoliza.idSucursal
-            $scope.apiJson.Tipo = 2
+        if($scope.datoPoliza.OcAPI != 'NA')
+        {
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = $scope.datoPoliza.OcAPI //OC
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 = $scope.datoPoliza.OcAPI //OC
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado =  $scope.datoPoliza.OcAPI
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 =  $scope.datoPoliza.OcAPI
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado =  FF //OC
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = $scope.datoPoliza.OcAPI
+        }else{
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = $scope.ordenCompraAVFF //OC
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 = $scope.ordenCompraAVFF //OC
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado =  $scope.ordenCompraAVFF 
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 =  $scope.ordenCompraAVFF
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado =  FF //OC
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = $scope.ordenCompraAVFF
-            
         }
-        if($scope.datoPoliza.montoAVFF==0){      
-            $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
-            $scope.apiJson.IdSucursal = $scope.datoPoliza.idSucursal  
-            $scope.apiJson.Tipo = 1
-             //DatosOrdenesCompra
-            $scope.apiJson.OrdenCompra.IdProveedor = $scope.datoPoliza.persona12
-            $scope.apiJson.OrdenCompra.ArePed = $scope.areaAfectacion
-            $scope.apiJson.OrdenCompra.TipoComprobante = '1'
-            $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
-            $scope.apiJson.OrdenCompra.FechaAplicacion = `${anio}-${mes}-${dia}`
-    
-            //DatosOrdenesCompra DETALLE
-            $scope.apiJson.OrdenCompra.Detalle[0].ConceptoContable = $scope.conceptoContable
-            $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
-            $scope.apiJson.OrdenCompra.Detalle[0].Producto = $scope.datoPoliza.idComprobacionVale
-            $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.datoPoliza.montoCVFR
-            $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.datoPoliza.IVAmontoCVFR
-    
-            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado =  $scope.datoPoliza.idVale 
-            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 =  $scope.datoPoliza.idComprobacionVale
-            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 =  $scope.datoPoliza.idComprobacionVale
-        }
-         
-    
+        
+           
         //ContabilidadMasiva
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = $scope.ProcesoPol+$scope.complementoPolizas
         $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.datoPoliza.idComprobacionVale
@@ -3822,11 +3813,6 @@ $scope.insertaPolizaFrontCVFR = async function () {
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].IVA = $scope.datoPoliza.IVAmontoCVFR
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.datoPoliza.PER_IDPERSONA
         
-
-    }   
-
-  
-    
 
     console.log(JSON.stringify($scope.apiJson))
 
@@ -3940,6 +3926,112 @@ $scope.insertaPolizaFrontCVFR = async function () {
     $scope.regresarVale();
     $location.path('/misTramites');
 };
+
+$scope.generaOCCVFR = async function () {
+    let AuthToken;
+    let resPoliza
+
+    let fecha = new Date()
+    let anio = fecha.getFullYear().toString()
+    let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
+    let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
+
+    $('#loading').modal('show');
+    //Encabezado
+
+    if ( $scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoAVFF==0){
+        $scope.apiJson = structuredClone(apiOC)
+        $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
+        $scope.apiJson.IdSucursal = $scope.datoPoliza.idSucursal
+        $scope.apiJson.Tipo = 3
+
+        $scope.apiJson.OrdenCompra.IdProveedor = $scope.datoPoliza.PER_IDPERSONA
+        $scope.apiJson.OrdenCompra.ArePed = $scope.areaAfectacion
+        $scope.apiJson.OrdenCompra.TipoComprobante = '1'
+        $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
+        $scope.apiJson.OrdenCompra.FechaAplicacion = `${anio}-${mes}-${dia}`
+
+        $scope.apiJson.OrdenCompra.Detalle[0].ConceptoContable = $scope.conceptoContable
+        $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
+        $scope.apiJson.OrdenCompra.Detalle[0].Producto = $scope.datoPoliza.idComprobacionVale
+        $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.datoPoliza.montoCVFR
+        $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.datoPoliza.IVAmontoCVFR
+    }
+
+    console.log(JSON.stringify($scope.apiJson))
+
+    let datalog = structuredClone(datalogAPI)
+        datalog.idSucursal = $scope.idSucursal
+        datalog.idVale = $scope.idVale
+        datalog.opcion = 1        
+
+        AuthToken = await promiseAutBPRO();
+        datalog.tokenGenerado = AuthToken.Token
+        datalog.unniqIdGenerado = AuthToken.UnniqId
+        datalog.jsonEnvio = JSON.stringify($scope.apiJson)
+
+    let respLog = await LogApiBpro(datalog)
+        datalog.consecutivo = respLog.folio
+        datalog.opcion = 2
+    
+    resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify($scope.apiJson))
+
+    if(resPoliza.Codigo === '200 OK'){
+        datalog.ordenCompra = resPoliza.Folio
+      
+    respUpdate = await promiseActualizaTramiteFFOrdenCompra($scope.idVale,$scope.idUsuario ,'OC', $scope.datoPoliza.idComprobacionVale, $scope.incremental,datalog.ordenCompra)
+    console.log(respUpdate)
+
+    var datoPoliza = await verificaDatosPolizaApi($scope.idVale,$scope.idValeEvidenciaAPI);
+    $scope.datoPoliza = datoPoliza
+
+    if($scope.datoPoliza.OcAPI != 'NA')
+    {
+        $scope.ordenCompraAVFF = $scope.datoPoliza.OcAPI
+        $scope.insertaPolizaFrontCVFR()
+    }
+        
+    }else{
+        $('#loading').modal('hide');
+        datalog.jsonRespuesta = JSON.stringify(resPoliza)
+
+        if(resPoliza.data !== undefined){
+            datalog.mensajeError = resPoliza.data.Message 
+            datalog.codigo = resPoliza.status.toString()
+            datalog.resuelto = 0
+        }else{
+            datalog.mensajeError = resPoliza.Mensaje
+            datalog.codigo = resPoliza.Codigo
+            datalog.resuelto = 0
+        }
+
+        swal({
+            title:"Aviso",
+            type:"error",
+            width: 1000,
+            text: `Se presento un problema al procesar la Orden de Compra, 
+            favor de notificar al área de sistemas 
+            
+            Codigo: ${datalog.codigo }
+            Respuesta BPRO:  ${datalog.mensajeError}
+            
+            Reitentar cuando se le notifique la solución a la incidencia`,
+            showConfirmButton: true,
+            showCloseButton:  false,
+            timer:10000
+        })
+      
+    }
+
+    respLog = await LogApiBpro(datalog)
+
+    $('#loading').modal('hide');
+    $("#aprobarVale").modal("hide");
+
+    $scope.regresarVale();
+    $location.path('/misTramites'); 
+};
+
 
 // Se Genera Poliza CVFR/POLIZA - Comprobacion de mas! Inventario
 $scope.insertaPolizaFrontCVFRInventario = async function () {
