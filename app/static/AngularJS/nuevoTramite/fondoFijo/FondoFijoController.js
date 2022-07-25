@@ -3735,12 +3735,13 @@ $scope.insertaPolizaFrontCVFR = async function () {
 
     $('#loading').modal('show');
     //Encabezado
-    $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
-    $scope.apiJson.IdSucursal = $scope.datoPoliza.idSucursal
+   
 
     if ( $scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoAVFF==0){
 
         $scope.apiJson = structuredClone(apiOC)
+        $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
+        $scope.apiJson.IdSucursal = $scope.datoPoliza.idSucursal
         $scope.apiJson.Tipo = 3
 
         $scope.apiJson.OrdenCompra.IdProveedor = $scope.datoPoliza.PER_IDPERSONA
@@ -3758,6 +3759,8 @@ $scope.insertaPolizaFrontCVFR = async function () {
     }else{
 
         if($scope.datoPoliza.montoAVFF>0){
+            $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
+            $scope.apiJson.IdSucursal = $scope.datoPoliza.idSucursal
             $scope.apiJson.Tipo = 2
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = $scope.ordenCompraAVFF //OC
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 = $scope.ordenCompraAVFF //OC
@@ -3767,7 +3770,9 @@ $scope.insertaPolizaFrontCVFR = async function () {
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = $scope.ordenCompraAVFF
             
         }
-        if($scope.datoPoliza.montoAVFF==0){        
+        if($scope.datoPoliza.montoAVFF==0){      
+            $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
+            $scope.apiJson.IdSucursal = $scope.datoPoliza.idSucursal  
             $scope.apiJson.Tipo = 1
              //DatosOrdenesCompra
             $scope.apiJson.OrdenCompra.IdProveedor = $scope.datoPoliza.persona12
