@@ -3212,7 +3212,8 @@ async function LogApiBpro(data){
         if (tipoProcesoAPI = 7 ) {$scope.nombreValeAPI = $scope.idValeEvidenciaAPI}
         if (tipoProcesoAPI = 7 ) {$scope.ProcesoPol = 'AVFF'}    
 
-        fondoFijoRepository.dataComplementoFF($scope.id_perTra,$scope.idVale,$scope.idUsuario,$scope.idEmpresa,$scope.idSucursal,$scope.ProcesoPol,$scope.nombreValeAPI,$scope.opcionFF).then(resp => {
+        fondoFijoRepository.dataComplementoFF($scope.id_perTra,$scope.idValeFF,$scope.idUsuario,$scope.idEmpresa,$scope.idSucursal,$scope.ProcesoPol,$scope.nombreValeAPI,$scope.opcionFF).then(resp => {
+            $scope.complementoAPi = resp.data[0]
             $scope.iPersonaDevFF            = resp.data[0].PER_IDPERSONA;
             $scope.areaAfectacion           = resp.data[0].areaAfectacion;
             $scope.precioUnitario           = resp.data[0].precioUnitario;
@@ -3227,6 +3228,9 @@ async function LogApiBpro(data){
             $scope.montoCVFRo               = resp.data[0].montoCVFRo; 
             $scope.cuentaEnvio              = resp.data[0].cuentaEnvio;
             $scope.montoSaldo               = resp.data[0].montoSaldo
+            $scope.persona1pvff             = resp.data[0].persona1pvff
+            $scope.persona2pvff             = resp.data[0].persona2pvff
+
         });    
     }
 
@@ -3260,7 +3264,7 @@ $scope.insertaPolizaFFPVFF = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.importeValeFF
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.idPersona    
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.persona1pvff    
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = FFVale 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = FFVale
 
@@ -3272,8 +3276,7 @@ $scope.insertaPolizaFFPVFF = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Moneda = 'PE'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoCambio = '1'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.importeValeFF
-    // $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.idPersona
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.iPersonaDevFF    
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.persona2pvff    
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado = FF 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = FFVale     
 
@@ -3399,7 +3402,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
         $scope.apiJson.Tipo = 1
 
         //DatosOrdenesCompra
-        $scope.apiJson.OrdenCompra.IdProveedor = $scope.datoPoliza.PER_IDPERSONA
+        $scope.apiJson.OrdenCompra.IdProveedor = $scope.complementoAPi.idProveedor
         $scope.apiJson.OrdenCompra.ArePed = $scope.areaAfectacion
         $scope.apiJson.OrdenCompra.TipoComprobante = '1'
         $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
@@ -3417,9 +3420,9 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
          }    
 
         //ContabilidadMasiva
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = $scope.datoPoliza.proceso
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `AVFF${$scope.complementoPolizas}`
         $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.datoPoliza.idComprobacionVale
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = $scope.datoPoliza.proceso
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `AVFF${$scope.complementoPolizas}`
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = '' //OC
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 = '' //OC        
 
@@ -3432,7 +3435,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.datoPoliza.montoAVFF
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].IVA = $scope.datoPoliza.IVAmontoAVFF
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.datoPoliza.persona12    
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.datoPoliza.PER_IDPERSONA    
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = FFVale 
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.datoPoliza.idComprobacionVale
 
@@ -3446,7 +3449,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoCambio = '1'
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.datoPoliza.montoAVFF
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].IVA = $scope.datoPoliza.IVAmontoAVFF
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 =  $scope.datoPoliza.PER_IDPERSONA
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 =  $scope.complementoAPi.idProveedor
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado = ''
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = $scope.datoPoliza.idComprobacionVale
 
@@ -3594,9 +3597,9 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
 
     //ContabilidadMasiva
 
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = $scope.datoPoliza.proceso
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = $`AVFF${$scope.complementoPolizas}`
     $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.datoPoliza.idComprobacionVale
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = $scope.datoPoliza.proceso  
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `AVFF${$scope.complementoPolizas}`
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = $scope.datoPoliza.InventarioOC //OC
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  $scope.datoPoliza.InventarioOC //OC
 
@@ -3610,7 +3613,7 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.datoPoliza.montoAVFF
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].IVA = $scope.datoPoliza.IVAmontoAVFF
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.datoPoliza.persona12    
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.complementoAPi.persona1pvff    
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = FFVale 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.datoPoliza.idComprobacionVale
 
@@ -3624,7 +3627,7 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoCambio = '1'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.datoPoliza.montoAVFF
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].IVA = $scope.datoPoliza.IVAmontoAVFF
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 =  $scope.datoPoliza.PER_IDPERSONA
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 =  $scope.complementoAPi.idProveedor
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado = $scope.datoPoliza.InventarioOC 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = $scope.datoPoliza.idComprobacionVale
 
@@ -3786,9 +3789,9 @@ $scope.insertaPolizaFrontCVFR = async function () {
         
            
         //ContabilidadMasiva
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = $scope.ProcesoPol+$scope.complementoPolizas
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `CVFR${$scope.complementoPolizas}`
         $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.datoPoliza.idComprobacionVale
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = $scope.ProcesoPol+$scope.complementoPolizas
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `CVFR${$scope.complementoPolizas}`
     
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.datoPoliza.idComprobacionVale
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
@@ -3799,7 +3802,7 @@ $scope.insertaPolizaFrontCVFR = async function () {
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.datoPoliza.montoCVFR
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].IVA = $scope.datoPoliza.IVAmontoCVFR
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.datoPoliza.persona12 
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.complementoAPi.idProveedor 
         
     
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoOrigen= $scope.datoPoliza.idComprobacionVale
@@ -3811,7 +3814,7 @@ $scope.insertaPolizaFrontCVFR = async function () {
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoCambio = '1'
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.datoPoliza.montoCVFR
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].IVA = $scope.datoPoliza.IVAmontoCVFR
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.datoPoliza.PER_IDPERSONA
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.complementoAPi.personaff
         
 
     console.log(JSON.stringify($scope.apiJson))
@@ -3945,7 +3948,7 @@ $scope.generaOCCVFR = async function () {
         $scope.apiJson.IdSucursal = $scope.datoPoliza.idSucursal
         $scope.apiJson.Tipo = 3
 
-        $scope.apiJson.OrdenCompra.IdProveedor = $scope.datoPoliza.PER_IDPERSONA
+        $scope.apiJson.OrdenCompra.IdProveedor = $scope.complementoAPi.idProveedor
         $scope.apiJson.OrdenCompra.ArePed = $scope.areaAfectacion
         $scope.apiJson.OrdenCompra.TipoComprobante = '1'
         $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
@@ -4062,9 +4065,9 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
      
 
     //ContabilidadMasiva
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = $scope.ProcesoPol+$scope.complementoPolizas
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `CVFR${$scope.complementoPolizas}`
     $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.datoPoliza.idComprobacionVale
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = $scope.ProcesoPol+$scope.complementoPolizas
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `CVFR${$scope.complementoPolizas}`
     // $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = 'OC' //OC
     // $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  'OC' //OC
 
@@ -4077,7 +4080,7 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.datoPoliza.montoCVFR
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].IVA = $scope.datoPoliza.IVAmontoCVFR
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.datoPoliza.persona12 
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.complementoAPi.idProveedor
     
 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoOrigen= $scope.idValeEvidenciaAPI
@@ -4089,7 +4092,7 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoCambio = '1'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.montoValeCVFR
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].IVA = $scope.datoPoliza.IVAmontoCVFR
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.datoPoliza.PER_IDPERSONA
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.complementoAPi.personaff
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado =  FF //OC
     
 
@@ -4237,7 +4240,7 @@ $scope.insertaPolizaFFCVFM = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.montoCVFM
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.idPersona    
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.complementoAPi.persona1pvff 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = FFVale 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = FFVale
 
@@ -4250,7 +4253,7 @@ $scope.insertaPolizaFFCVFM = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoCambio = '1'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.montoCVFM
     // $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.idPersona
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.idPersona    
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.complementoAPi.personaff
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado = FF 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = FFVale     
 
