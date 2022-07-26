@@ -3276,7 +3276,6 @@ $scope.insertaPolizaFFPVFF = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Moneda = 'PE'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoCambio = '1'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.importeValeFF
-    // $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.idPersona
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.persona2pvff    
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado = FF 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = FFVale     
