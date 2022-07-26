@@ -329,7 +329,8 @@ registrationModule.controller('gastosDeMasController', function ($scope, $rootSc
 
     $scope.aprobacionSalidaEfectivo = function () {
         $scope.traeBancos();
-        $scope.tipoSalida = [{ id:3, text:'Transferencia'},{ id:1, text:'Orden de Pago'}]
+        // $scope.tipoSalida = [{ id:3, text:'Transferencia'},{ id:1, text:'Orden de Pago'}]
+        $scope.tipoSalida = [{ id:1, text:'Orden de Pago'}]
         // if($scope.tramite.cuentaClabeSolicitante === ''){
         //     $scope.tipoSalida = [{ id:1, text:'Orden de Pago'},{ id:2, text:'Caja'}]
         // }else{
