@@ -3201,7 +3201,7 @@ fondoFijo.prototype.get_ActualizaTramitePolizaFF = function(req, res, next) {
     });
 };
 
-fondoFijo.prototype.get_ActualizaTramiteFFOrdenCompra = function(req, res, next) {
+fondoFijo.prototype.get_ActualizaTramitePolizaFFOrdenCompra = function(req, res, next) {
     var self = this;
     var idValeFF = req.query.idValeFF;
     var idUsuario = req.query.idUsuario;
