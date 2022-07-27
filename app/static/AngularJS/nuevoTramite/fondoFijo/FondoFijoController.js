@@ -1933,22 +1933,32 @@ $scope.verPdfComprobacion = function(item) {
 
                         $scope.datoPoliza = datoPoliza
 
-                        if(item.tipoGasto == 1){
-                            console.log("tipoGasto = Inventario",item.tipoGasto)
-                            $scope.insertaPolizaFrontAPIGastosInventario();
+                        if($scope.datoPoliza.avanza == 0 ){
+
+                            if(item.tipoGasto == 1){
+                                console.log("tipoGasto = Inventario",item.tipoGasto)
+                                $scope.insertaPolizaFrontAPIGastosInventario();
+                            }
+    
+                            if(item.tipoGasto == 2){
+                                console.log("tipoGasto = Gastos",item.tipoGasto)
+                                
+                                if ( $scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoAVFF==0){
+                                    $scope.banderaOrdenCompra = 1
+                                    $scope.generaOCCVFR();
+                                    //$scope.insertaPolizaFrontCVFR();
+                                }else{
+                                    $scope.insertaPolizaFrontAPIGastos(); 
+                                }
+                            }
+
+                        }else{
+
+                            $("#loading").modal("hide");
+                            swal('Alto', $scope.datoPoliza.mensaje, 'warning');
                         }
 
-                        if(item.tipoGasto == 2){
-                            console.log("tipoGasto = Gastos",item.tipoGasto)
-                            
-                            if ( $scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoAVFF==0){
-                                $scope.banderaOrdenCompra = 1
-                                $scope.generaOCCVFR();
-                                //$scope.insertaPolizaFrontCVFR();
-                            }else{
-                                $scope.insertaPolizaFrontAPIGastos(); 
-                            }
-                        }
+                        
                     }
                 });
 
