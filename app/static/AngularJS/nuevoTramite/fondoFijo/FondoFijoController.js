@@ -3597,7 +3597,7 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
 
     //ContabilidadMasiva
 
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = $`AVFF${$scope.complementoPolizas}`
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `AVFF${$scope.complementoPolizas}`
     $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.datoPoliza.idComprobacionVale
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `AVFF${$scope.complementoPolizas}`
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = $scope.datoPoliza.InventarioOC //OC
