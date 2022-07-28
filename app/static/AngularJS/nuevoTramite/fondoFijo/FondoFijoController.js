@@ -1933,7 +1933,7 @@ $scope.verPdfComprobacion = function(item) {
 
                         $scope.datoPoliza = datoPoliza
 
-                        if($scope.datoPoliza.avanza == 0 ){
+                        if($scope.datoPoliza.avanza != 0 ){
 
                             if(item.tipoGasto == 1){
                                 console.log("tipoGasto = Inventario",item.tipoGasto)
@@ -1954,8 +1954,18 @@ $scope.verPdfComprobacion = function(item) {
 
                         }else{
 
+                            swal({
+                                title:"Aviso",
+                                type:"error",
+                                width: 1000,
+                                text: `Validación de comprobaciones                                
+                                Mensaje:  ${$scope.datoPoliza.mensajeAvanza}`,
+                                showConfirmButton: true,
+                                showCloseButton:  false,
+                                timer:5000
+                            })
+
                             $("#loading").modal("hide");
-                            swal('Alto', $scope.datoPoliza.mensaje, 'warning');
                         }
 
                         
