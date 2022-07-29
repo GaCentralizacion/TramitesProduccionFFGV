@@ -3610,6 +3610,24 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
     $('#loading').modal('show');
+
+      //Tipo 2 Limpiamos Variables
+      //DatosOrdenesCompra
+      $scope.apiJson.OrdenCompra.IdProveedor = ""
+      $scope.apiJson.OrdenCompra.ArePed = ""
+      $scope.apiJson.OrdenCompra.TipoComprobante = '1'
+      $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
+      $scope.apiJson.OrdenCompra.FechaAplicacion = `${anio}-${mes}-${dia}`
+
+      //DatosOrdenesCompra DETALLE
+      $scope.apiJson.OrdenCompra.Detalle[0].ConceptoContable = ""
+      $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
+      $scope.apiJson.OrdenCompra.Detalle[0].Producto = ""
+      $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = o
+      $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = 0
+
+
+
     //Encabezado
     $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
     $scope.apiJson.IdSucursal = $scope.datoPoliza.idSucursal
@@ -3633,11 +3651,10 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.datoPoliza.montoAVFF
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].IVA = $scope.datoPoliza.IVAmontoAVFF
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.complementoAPi.persona1pvff    
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.complementoAPi.persona1pvff == null ? $scope.complementoAPi.persona1 : $scope.complementoAPi.persona1pvff;     
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = FFVale 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.datoPoliza.idComprobacionVale
-
-
+    
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoOrigen= $scope.datoPoliza.idComprobacionVale
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Partida = '2'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoProducto = $scope.nombreDepartamentoVale
