@@ -3651,7 +3651,7 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.datoPoliza.montoAVFF
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].IVA = $scope.datoPoliza.IVAmontoAVFF
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.complementoAPi.personaff
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.datoPoliza.PER_IDPERSONA
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = FFVale 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.datoPoliza.idComprobacionVale
     
