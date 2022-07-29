@@ -1933,22 +1933,42 @@ $scope.verPdfComprobacion = function(item) {
 
                         $scope.datoPoliza = datoPoliza
 
-                        if(item.tipoGasto == 1){
-                            console.log("tipoGasto = Inventario",item.tipoGasto)
-                            $scope.insertaPolizaFrontAPIGastosInventario();
+                        if($scope.datoPoliza.avanza != 0 ){
+
+                            if(item.tipoGasto == 1){
+                                console.log("tipoGasto = Inventario",item.tipoGasto)
+                                $scope.insertaPolizaFrontAPIGastosInventario();
+                            }
+    
+                            if(item.tipoGasto == 2){
+                                console.log("tipoGasto = Gastos",item.tipoGasto)
+                                
+                                if ( $scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoAVFF==0){
+                                    $scope.banderaOrdenCompra = 1
+                                    $scope.generaOCCVFR();
+                                    //$scope.insertaPolizaFrontCVFR();
+                                }else{
+                                    $scope.insertaPolizaFrontAPIGastos(); 
+                                }
+                            }
+
+                        }else{
+
+                            swal({
+                                title:"Aviso",
+                                type:"error",
+                                width: 1000,
+                                text: `Validación de comprobaciones                                
+                                Mensaje:  ${$scope.datoPoliza.mensajeAvanza}`,
+                                showConfirmButton: true,
+                                showCloseButton:  false,
+                                timer:5000
+                            })
+
+                            $("#loading").modal("hide");
                         }
 
-                        if(item.tipoGasto == 2){
-                            console.log("tipoGasto = Gastos",item.tipoGasto)
-                            
-                            if ( $scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoAVFF==0){
-                                $scope.banderaOrdenCompra = 1
-                                $scope.generaOCCVFR();
-                                //$scope.insertaPolizaFrontCVFR();
-                            }else{
-                                $scope.insertaPolizaFrontAPIGastos(); 
-                            }
-                        }
+                        
                     }
                 });
 
@@ -3590,6 +3610,24 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
     $('#loading').modal('show');
+
+      //Tipo 2 Limpiamos Variables
+      //DatosOrdenesCompra
+      $scope.apiJson.OrdenCompra.IdProveedor = ""
+      $scope.apiJson.OrdenCompra.ArePed = ""
+      $scope.apiJson.OrdenCompra.TipoComprobante = '1'
+      $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
+      $scope.apiJson.OrdenCompra.FechaAplicacion = `${anio}-${mes}-${dia}`
+
+      //DatosOrdenesCompra DETALLE
+      $scope.apiJson.OrdenCompra.Detalle[0].ConceptoContable = ""
+      $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
+      $scope.apiJson.OrdenCompra.Detalle[0].Producto = ""
+      $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = 0
+      $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = 0
+
+
+
     //Encabezado
     $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
     $scope.apiJson.IdSucursal = $scope.datoPoliza.idSucursal
@@ -3613,11 +3651,10 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.datoPoliza.montoAVFF
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].IVA = $scope.datoPoliza.IVAmontoAVFF
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.complementoAPi.persona1pvff    
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.complementoAPi.personaff
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = FFVale 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.datoPoliza.idComprobacionVale
-
-
+    
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoOrigen= $scope.datoPoliza.idComprobacionVale
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Partida = '2'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoProducto = $scope.nombreDepartamentoVale
