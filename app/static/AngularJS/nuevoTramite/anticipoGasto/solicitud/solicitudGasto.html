@@ -123,15 +123,7 @@
 
                     </select>
                 </div>
-                <!-- <div class="col-sm-4 form-inline">
-                    <label class="labelIdCliente"><small>Departamento:<label class="text-danger">*</label></small></label>
-                    <select style="width: 100% !important;" class="form-control"
-                        ng-class="{ErrorControl: selDepartamento === 0 }" ng-model="selDepartamento"
-                        ng-options="departamento.idDepartamento as departamento.nombre for departamento in departamentos"
-                        ng-change="asignarDepartamento(selDepartamento)" ng-disabled="disabledDepto">
-                        <option value="">Seleccione Departamento</option>
-                    </select>
-                </div> -->
+
                 <div class="col-sm-4 form-inline">
                     <label class="labelIdCliente"><small>Departamento:<label class="text-danger">*</label></small></label>
                     <select style="width: 100% !important;" class="form-control"
@@ -185,19 +177,6 @@
                     <label class="labelIdCliente" style="padding-top: 30px; padding-left: 25px;">
                         <input type="checkbox" id="cbox1" ng-model="checkAll" class="checkmark" style="margin-top: 30px;" ng-change="validaDistancia(this)"><span>¿El viaje supera los 50Km?</span> 
                     </label>
-                    <!-- <label class="labelIdCliente"><small>Kilometros:(origen - destino)<label class="text-danger">*</label></small></label>
-                    <input 
-                        type="number"
-                        min="50"
-                        class="form-control"
-                        required
-                        style="width: 50% !important;"
-                        placeholder=""
-                        ng-model="tramite.kilometro"
-                        minlength="2"
-                        maxlength="10"
-                        ng-change="GeneraCambio()"
-                        ng-blur="validaKilometros()"> -->
                 </div>
                
             </div>
@@ -227,6 +206,12 @@
                     <br>
                     <input type="hidden" disabled  ng-model="tramite.idPersona" class="form-control" style="width: 100%">
                     <input disabled  ng-model="nombrePersona" class="form-control"  style="width: 100%">
+                </div>
+
+                <div class="col-sm-3 form-inline" ng-show="muestraAutorizador">
+                    <label class="labelIdCliente"><small>Autorizador:</small></label>
+                    <br>
+                    <input disabled  ng-model="nombreAutorizador" class="form-control"  style="width: 100%">
                 </div>
             </div>
 
