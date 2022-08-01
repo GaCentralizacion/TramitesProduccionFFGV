@@ -132,7 +132,6 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
         $rootScope.usuario = JSON.parse(localStorage.getItem('usuario'));
         console.log('usuarioActivo: ', $scope.usuarioActivo)
         $scope.ValidaEstatusActivo();
-
     }
 
     $scope.ValidaEstatusActivo = function (){
@@ -155,23 +154,17 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
                     $scope.controlCuentas = 0;
                     $scope.accionFormulario = 0;
                     $scope.recuperaCuentaAnterior(0);
-                    /*anticipoGastoRepository.CuentaByPersona( $rootScope.usuario.usu_idusuario ).then( res => {
-                        if( res.data.length  != 0 ){
-                            $scope.tramite.cuenta = res.data[0];
-                            $scope.controlCuentas = 1
-                        }
-                    });*/
                     $scope.checkAll = false
                     $scope.validaDistancia()
                 } else {
                     $scope.idTramite = JSON.parse(localStorage.getItem('borrador')).idTramite;
                     $scope.idSolicitud = JSON.parse(localStorage.getItem('borrador')).idPerTra;
-                    //$scope.subTitulo = 'Numero de solicitud: ' + $scope.idSolicitud;
                     $scope.traeEmpleado();
                     $scope.getAnticipoGastoItem();
                     $scope.accionTramite = 1; 
                     $scope.aplicaUpdate = false;
                     $scope.controlCuentas = 1; 
+
                     anticipoGastoRepository.imageComprobanteOrdenPagoGV($scope.idSolicitud, $scope.idTramite , 'GV' ).then(res => {
                         if(res.data[0].url === undefined || res.data[0].url === null){
                             $scope.hiddenOrdenCompra = true
@@ -352,7 +345,10 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
                 $scope.accionFormulario = 0;
                 $scope.idTipoProceso = 1
                 $scope.titulo = 'Solicitud Anticipo de Gasto N° ' + res.data[0].idSolicitud;
-                $scope.registro = true;;
+                $scope.registro = true;
+
+                ObtieneAutorizador()
+
             } else {
                 swal('Anticipo de Gasto', 'No se encontró el registro', 'success');
                 $location.path('/misTramites');
@@ -826,12 +822,14 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
         else{
             //Buscar al autorizador al que se le va a enviar la notificación
             var error = $scope.validarTramite($scope.tramite);
-            if( $scope.documentoINE.id_perTra !== null && $scope.documentoINE.id_perTra !== undefined){
+            // if( $scope.documentoINE.id_perTra !== null && $scope.documentoINE.id_perTra !== undefined){
+            if(error == ''){
                 $scope.accionEnviar = true;
                 $scope.buscarAutorizador($scope.selEmpresa);
             }
-            else
-            swal('Anticipo de Gastos','El documento INE es obligatorio ')
+            // }
+            // else
+            // swal('Anticipo de Gastos','El documento INE es obligatorio ')
 
         }
     };
@@ -1976,47 +1974,60 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
         });
     }
 
+    /**Se comenta este metodo y se crea uno que no guarde la informacion de la cuenta bancaria por el momento no se usara */
+    // $scope.validaCuenta = function(){
+    //     $scope.aplicaUpdate = false;
+    //     var error = $scope.validarTramite($scope.tramite);
+    //     if (error == '') {
+    //         var parapetros = {
+    //             IdUsuario: $rootScope.usuario.usu_idusuario,
+    //             IdPersona: $scope.tramite.idPersona,
+    //             IdBanco: $scope.tramite.cuenta.idBanco,
+    //             Plaza: $scope.tramite.cuenta.plaza,
+    //             Sucursal: $scope.tramite.cuenta.sucursal,
+    //             Cuenta: $scope.tramite.cuenta.cuenta,
+    //             CLABE: $scope.tramite.cuenta.clabe,
+    //             IdEmpresa: $scope.selEmpresa,
+    //             bancoNombre: $scope.tramite.cuenta.banco,
+    //             cvebanxico: $scope.tramite.cuenta.cveBanxico,
+    //             solicitante: $rootScope.usuario.usu_idusuario
+    //         }
+            
+    //         anticipoGastoRepository.GuardaBanco(parapetros).then((res) => {
+    //             console.log( "Guardado de Banco", res.data[0].perTra );
+
+    //             if( res.data[0].success == 1){
+    //                 html = $scope.bodyTramitesCuenta( res.data[0].perTra, $scope.tramite.cuenta, $scope.nombrePersona );
+    //                 //$scope.sendMail("alex9abril@gmail.com", "PRUEBAS - Solicitud de validación de cuenta para Gastos de Viaje", html);
+    //                 $scope.sendMail($scope.dataCorreosTesoreria, "Solicitud de validación de cuenta para Gastos de Viaje", html);
+    //             }
+
+    //             if(Number.isInteger(res.data[0].perTra) && (res.data[0].success == 1 || res.data[0].success == 0)){
+    //                 $scope.guardarTramite( res.data[0].perTra );
+    //             }
+    //             else if(res.data[0].success == 1 || res.data[0].success == 0){
+    //                 $scope.guardarTramite(0);
+    //             }
+    //             else{
+    //                 swal('Alerta','Se presento un error al guardar la información bancaria, los datos capturados no serán almacenados', 'warning');
+    //             }
+                
+    //         });
+    //         //$scope.guardarTramite();
+    //     }
+    //     else{
+    //         swal('Anticipo de Gasto', error, 'warning');
+    //     }
+    // }
+
     $scope.validaCuenta = function(){
         $scope.aplicaUpdate = false;
+
         var error = $scope.validarTramite($scope.tramite);
         if (error == '') {
-            var parapetros = {
-                IdUsuario: $rootScope.usuario.usu_idusuario,
-                IdPersona: $scope.tramite.idPersona,
-                IdBanco: $scope.tramite.cuenta.idBanco,
-                Plaza: $scope.tramite.cuenta.plaza,
-                Sucursal: $scope.tramite.cuenta.sucursal,
-                Cuenta: $scope.tramite.cuenta.cuenta,
-                CLABE: $scope.tramite.cuenta.clabe,
-                IdEmpresa: $scope.selEmpresa,
-                bancoNombre: $scope.tramite.cuenta.banco,
-                cvebanxico: $scope.tramite.cuenta.cveBanxico,
-                solicitante: $rootScope.usuario.usu_idusuario
-            }
-            
-            anticipoGastoRepository.GuardaBanco(parapetros).then((res) => {
-                console.log( "Guardado de Banco", res.data[0].perTra );
-
-                if( res.data[0].success == 1){
-                    html = $scope.bodyTramitesCuenta( res.data[0].perTra, $scope.tramite.cuenta, $scope.nombrePersona );
-                    //$scope.sendMail("alex9abril@gmail.com", "PRUEBAS - Solicitud de validación de cuenta para Gastos de Viaje", html);
-                    $scope.sendMail($scope.dataCorreosTesoreria, "Solicitud de validación de cuenta para Gastos de Viaje", html);
-                }
-
-                if(Number.isInteger(res.data[0].perTra) && (res.data[0].success == 1 || res.data[0].success == 0)){
-                    $scope.guardarTramite( res.data[0].perTra );
-                }
-                else if(res.data[0].success == 1 || res.data[0].success == 0){
-                    $scope.guardarTramite(0);
-                }
-                else{
-                    swal('Alerta','Se presento un error al guardar la información bancaria, los datos capturados no serán almacenados', 'warning');
-                }
-                
-            });
-            //$scope.guardarTramite();
-        }
-        else{
+            $scope.guardarTramite(0);
+            ObtieneAutorizador()
+        }else{
             swal('Anticipo de Gasto', error, 'warning');
         }
     }
@@ -2577,6 +2588,15 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
             $scope.dominiosValidos = res.data;
         });
 
+    }
+
+    function ObtieneAutorizador(){
+        $scope.muestraAutorizador = true;
+        anticipoGastoRepository.getBuscarAutorizador($scope.selEmpresa, $scope.selSucursal, $scope.selDepartamento, $scope.selUsuario, 1).then(res =>{
+            $scope.idAutorizador = res.data[0].idAutorizador;
+            $scope.correoAutorizador = res.data[0].usu_correo;
+            $scope.nombreAutorizador = res.data[0].nombreUsuario;
+        })
     }
     
 });                                                                                                                    

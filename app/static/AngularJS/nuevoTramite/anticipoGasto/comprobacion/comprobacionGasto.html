@@ -168,24 +168,21 @@
                     
                 </div>
             </div>
-            <div class="col-sm-4 form-inline" style="text-align: right;">
+            <div class="col-sm-4 form-inline" style="text-align: right;" hidden>
                 <button class="btn btnNuevos" ng-click="frmModalEmpleado()" style="width: auto;" title="Ver Empleados">
                     <i class="fa fa-users" aria-hidden="true"></i> Empleados
                 </button>
             </div>
-            <!--<div class="col-sm-2 form-inline" style="text-align: left;">
-                <button class="btn btnNuevos" ng-click="frmModalDevolucionRecibo()" style="width: auto;"
-                    title="Devolver por cancelación">
-                    <i class="fa fa-times-circle" aria-hidden="true"></i> Devolver
-                </button>
-            </div>-->
+
+            <div class="col-sm-4 form-inline">
+                <label class="labelIdCliente">Autorizador:</label>
+                <label class="labelDataCliente">{{autorizador}}</label>
+            </div>
+
             <div class="col-sm-2 form-inline" style="text-align: left;">
-                <!--<button class="btn btnNuevos" ng-click="frmModalDevolucionRecibo()" style="width: auto;" title="Devolver por cancelación"
-                    ng-if="tramite.idEstatus === 7 || tramite.idEstatus === 8">
-                    <i class="fa fa-times-circle" aria-hidden="true"></i> Devolver
-                </button>-->
             </div>
         </div>
+
         <div class="row" style="margin-top: 1%;">.
             <div class="col-sm-2 form-inline">
                 <label class="labelIdCliente">Conceptos:</label>
