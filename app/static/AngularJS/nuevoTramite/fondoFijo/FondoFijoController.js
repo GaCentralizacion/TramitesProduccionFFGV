@@ -3786,6 +3786,8 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
 };
 // Se Genera Poliza CVFR/POLIZA - Comprobacion de mas!
 $scope.insertaPolizaFrontCVFR = async function () {
+    $('#loading').modal('show');
+
     let banco = zeroDelete($scope.cuentaContable);
     let AuthToken;
     let FFVale = $scope.nombreVale 
@@ -3799,7 +3801,6 @@ $scope.insertaPolizaFrontCVFR = async function () {
     let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
-    $('#loading').modal('show');
     //Encabezado 
         $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
 
@@ -3960,14 +3961,13 @@ $scope.insertaPolizaFrontCVFR = async function () {
 
     respLog = await LogApiBpro(datalog)
 
-    $('#loading').modal('hide');
-    $("#aprobarVale").modal("hide");
-
     $scope.regresarVale();
     $location.path('/misTramites');
 };
 
 $scope.generaOCCVFR = async function () {
+    $('#loading').modal('show');
+    
     let AuthToken;
     let resPoliza
 
@@ -3976,9 +3976,7 @@ $scope.generaOCCVFR = async function () {
     let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
-    $('#loading').modal('show');
     //Encabezado
-
     if ( $scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoAVFF==0){
         $scope.apiJson = structuredClone(apiOC)
         $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
@@ -4019,20 +4017,20 @@ $scope.generaOCCVFR = async function () {
     if(resPoliza.Codigo === '200 OK'){
         datalog.ordenCompra = resPoliza.Folio
       
-    respUpdate = await promiseActualizaTramiteFFOrdenCompra($scope.idVale,$scope.idUsuario ,'OC', $scope.datoPoliza.idComprobacionVale, $scope.incremental,datalog.ordenCompra)
-    console.log(respUpdate)
+        respUpdate = await promiseActualizaTramiteFFOrdenCompra($scope.idVale,$scope.idUsuario ,'OC', $scope.datoPoliza.idComprobacionVale, $scope.incremental,datalog.ordenCompra)
+        console.log(respUpdate)
 
-    var datoPoliza = await verificaDatosPolizaApi($scope.idVale,$scope.idValeEvidenciaAPI);
-    $scope.datoPoliza = datoPoliza
+        var datoPoliza = await verificaDatosPolizaApi($scope.idVale,$scope.idValeEvidenciaAPI);
+        $scope.datoPoliza = datoPoliza
 
-    if($scope.datoPoliza.OcAPI != 'NA')
-    {
-        $scope.ordenCompraAVFF = $scope.datoPoliza.OcAPI
-        $scope.insertaPolizaFrontCVFR()
-    }
+        if($scope.datoPoliza.OcAPI != 'NA')
+        {
+            $scope.ordenCompraAVFF = $scope.datoPoliza.OcAPI
+            $scope.insertaPolizaFrontCVFR()
+        }
         
     }else{
-        $('#loading').modal('hide');
+        
         datalog.jsonRespuesta = JSON.stringify(resPoliza)
 
         if(resPoliza.data !== undefined){
@@ -4045,6 +4043,7 @@ $scope.generaOCCVFR = async function () {
             datalog.resuelto = 0
         }
 
+        $('#loading').modal('hide');
         swal({
             title:"Aviso",
             type:"error",
@@ -4064,12 +4063,8 @@ $scope.generaOCCVFR = async function () {
     }
 
     respLog = await LogApiBpro(datalog)
-
-    $('#loading').modal('hide');
-    $("#aprobarVale").modal("hide");
-
+   
     $scope.regresarVale();
-    $location.path('/misTramites'); 
 };
 
 
