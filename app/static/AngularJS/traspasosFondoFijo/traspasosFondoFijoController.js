@@ -890,7 +890,7 @@ return x;
                     No olvide subir el archivo PDF de la orden de pago al sistema`,
                     showConfirmButton: true,
                     showCloseButton:  false,
-                    timer:10000
+                    //timer:10000
                 })
 
                 resolve(true)
@@ -925,7 +925,7 @@ return x;
                     Reitentar cuando se le notifique la solución a la incidencia`,
                     showConfirmButton: true,
                     showCloseButton:  false,
-                    timer:10000
+                    //timer:10000
                 })
 
                 resolve(false)
@@ -1033,7 +1033,7 @@ return x;
                     No olvide subir el archivo PDF de la orden de pago al sistema`,
                     showConfirmButton: true,
                     showCloseButton:  false,
-                    timer:10000
+                    //timer:10000
                 })
 
                 resolve(true)
@@ -1068,7 +1068,7 @@ return x;
                     Reitentar cuando se le notifique la solución a la incidencia`,
                     showConfirmButton: true,
                     showCloseButton:  false,
-                    timer:10000
+                    //timer:10000
                 })
 
                 resolve(false)
