@@ -1943,7 +1943,8 @@ $scope.verPdfComprobacion = function(item) {
                             if(item.tipoGasto == 2){
                                 console.log("tipoGasto = Gastos",item.tipoGasto)
                                 
-                                if ( $scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoAVFF==0){
+                                if ( $scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoAVFF==0)
+                                {
                                     $scope.banderaOrdenCompra = 1
                                     $scope.generaOCCVFR();
                                     //$scope.insertaPolizaFrontCVFR();
@@ -1961,8 +1962,8 @@ $scope.verPdfComprobacion = function(item) {
                                 text: `Validación de comprobaciones                                
                                 Mensaje:  ${$scope.datoPoliza.mensajeAvanza}`,
                                 showConfirmButton: true,
-                                showCloseButton:  false,
-                                timer:5000
+                                showCloseButton:  false
+                                //timer:5000
                             })
 
                             $("#loading").modal("hide");
@@ -3357,8 +3358,8 @@ $scope.insertaPolizaFFPVFF = async function () {
             
             No olvide dar seguimiento.`,
             showConfirmButton: true,
-            showCloseButton:  false,
-            timer:10000         
+            showCloseButton:  false
+            //timer:10000         
 
         })
         
@@ -3388,8 +3389,8 @@ $scope.insertaPolizaFFPVFF = async function () {
             
             Reitentar cuando se le notifique la solución a la incidencia`,
             showConfirmButton: true,
-            showCloseButton:  false,
-            timer:10000
+            showCloseButton:  false
+            //timer:10000
         })
     }
 
@@ -3545,8 +3546,8 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
                 
                 No olvide dar seguimiento.`,
                 showConfirmButton: true,
-                showCloseButton:  false,
-                timer:10000         
+                showCloseButton:  false
+                //timer:10000         
 
             })
             
@@ -3576,8 +3577,8 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
                 
                 Reitentar cuando se le notifique la solución a la incidencia`,
                 showConfirmButton: true,
-                showCloseButton:  false,
-                timer:10000
+                showCloseButton:  false
+                //timer:10000
             })
         }
 
@@ -3736,8 +3737,8 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
             
             No olvide dar seguimiento.`,
             showConfirmButton: true,
-            showCloseButton:  false,
-            timer:10000         
+            showCloseButton:  false
+            //timer:10000         
 
         })
         
@@ -3767,8 +3768,8 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
             
             Reitentar cuando se le notifique la solución a la incidencia`,
             showConfirmButton: true,
-            showCloseButton:  false,
-            timer:10000
+            showCloseButton:  false
+            //timer:10000
         })
     }
 
@@ -3777,15 +3778,20 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
     $('#loading').modal('hide');
     $("#aprobarVale").modal("hide");
 
-    $scope.regresarVale();
+
 
     if($scope.datoPoliza.justificoMas == 1)
         {
             $scope.insertaPolizaFrontCVFRInventario()
         }
+    else{
+        $scope.regresarVale();
+    }
 };
 // Se Genera Poliza CVFR/POLIZA - Comprobacion de mas!
 $scope.insertaPolizaFrontCVFR = async function () {
+    $('#loading').modal('show');
+
     let banco = zeroDelete($scope.cuentaContable);
     let AuthToken;
     let FFVale = $scope.nombreVale 
@@ -3799,7 +3805,6 @@ $scope.insertaPolizaFrontCVFR = async function () {
     let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
-    $('#loading').modal('show');
     //Encabezado 
         $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
 
@@ -3922,8 +3927,8 @@ $scope.insertaPolizaFrontCVFR = async function () {
             
             No olvide dar seguimiento.`,
             showConfirmButton: true,
-            showCloseButton:  false,
-            timer:10000         
+            showCloseButton:  false
+            //timer:10000         
 
         })
         
@@ -3953,21 +3958,20 @@ $scope.insertaPolizaFrontCVFR = async function () {
             
             Reitentar cuando se le notifique la solución a la incidencia`,
             showConfirmButton: true,
-            showCloseButton:  false,
-            timer:10000
+            showCloseButton:  false
+            //timer:10000
         })
     }
 
     respLog = await LogApiBpro(datalog)
 
-    $('#loading').modal('hide');
-    $("#aprobarVale").modal("hide");
-
     $scope.regresarVale();
-    $location.path('/misTramites');
+    //$location.path('/misTramites');
 };
 
 $scope.generaOCCVFR = async function () {
+    $('#loading').modal('show');
+    
     let AuthToken;
     let resPoliza
 
@@ -3976,9 +3980,7 @@ $scope.generaOCCVFR = async function () {
     let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
-    $('#loading').modal('show');
     //Encabezado
-
     if ( $scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoAVFF==0){
         $scope.apiJson = structuredClone(apiOC)
         $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
@@ -4019,20 +4021,20 @@ $scope.generaOCCVFR = async function () {
     if(resPoliza.Codigo === '200 OK'){
         datalog.ordenCompra = resPoliza.Folio
       
-    respUpdate = await promiseActualizaTramiteFFOrdenCompra($scope.idVale,$scope.idUsuario ,'OC', $scope.datoPoliza.idComprobacionVale, $scope.incremental,datalog.ordenCompra)
-    console.log(respUpdate)
+        respUpdate = await promiseActualizaTramiteFFOrdenCompra($scope.idVale,$scope.idUsuario ,'OC', $scope.datoPoliza.idComprobacionVale, $scope.incremental,datalog.ordenCompra)
+        console.log(respUpdate)
 
-    var datoPoliza = await verificaDatosPolizaApi($scope.idVale,$scope.idValeEvidenciaAPI);
-    $scope.datoPoliza = datoPoliza
+        var datoPoliza = await verificaDatosPolizaApi($scope.idVale,$scope.idValeEvidenciaAPI);
+        $scope.datoPoliza = datoPoliza
 
-    if($scope.datoPoliza.OcAPI != 'NA')
-    {
-        $scope.ordenCompraAVFF = $scope.datoPoliza.OcAPI
-        $scope.insertaPolizaFrontCVFR()
-    }
+        if($scope.datoPoliza.OcAPI != 'NA')
+        {
+            $scope.ordenCompraAVFF = $scope.datoPoliza.OcAPI
+            $scope.insertaPolizaFrontCVFR()
+        }
         
     }else{
-        $('#loading').modal('hide');
+        
         datalog.jsonRespuesta = JSON.stringify(resPoliza)
 
         if(resPoliza.data !== undefined){
@@ -4045,6 +4047,7 @@ $scope.generaOCCVFR = async function () {
             datalog.resuelto = 0
         }
 
+        $('#loading').modal('hide');
         swal({
             title:"Aviso",
             type:"error",
@@ -4057,19 +4060,15 @@ $scope.generaOCCVFR = async function () {
             
             Reitentar cuando se le notifique la solución a la incidencia`,
             showConfirmButton: true,
-            showCloseButton:  false,
-            timer:10000
+            showCloseButton:  false
+            //timer:10000
         })
       
     }
 
     respLog = await LogApiBpro(datalog)
-
-    $('#loading').modal('hide');
-    $("#aprobarVale").modal("hide");
-
+   
     $scope.regresarVale();
-    $location.path('/misTramites'); 
 };
 
 
@@ -4199,8 +4198,8 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
             
             No olvide dar seguimiento.`,
             showConfirmButton: true,
-            showCloseButton:  false,
-            timer:10000         
+            showCloseButton:  false
+            //timer:10000         
 
         })
         
@@ -4230,8 +4229,8 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
             
             Reitentar cuando se le notifique la solución a la incidencia`,
             showConfirmButton: true,
-            showCloseButton:  false,
-            timer:10000
+            showCloseButton:  false
+            //timer:10000
         })
     }
 
@@ -4241,7 +4240,7 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
     $("#aprobarVale").modal("hide");
 
     $scope.regresarVale();
-    $location.path('/misTramites');
+    //$location.path('/misTramites');
 };
 
 
@@ -4354,8 +4353,8 @@ $scope.insertaPolizaFFCVFM = async function () {
             
             Recuerde solicitar el reembolso correspondiente.`,
             showConfirmButton: true,
-            showCloseButton:  false,
-            timer:10000         
+            showCloseButton:  false
+            //timer:10000         
 
         })           
         
@@ -4385,8 +4384,8 @@ $scope.insertaPolizaFFCVFM = async function () {
             
             Reitentar cuando se le notifique la solución a la incidencia`,
             showConfirmButton: true,
-            showCloseButton:  false,
-            timer:10000
+            showCloseButton:  false
+            //timer:10000
         })
     }
 
@@ -4396,8 +4395,6 @@ $scope.insertaPolizaFFCVFM = async function () {
     $("#aprobarVale").modal("hide");
 
     $scope.regresarVale();
-
-    $('#loading').modal('hide');
 };
 
 

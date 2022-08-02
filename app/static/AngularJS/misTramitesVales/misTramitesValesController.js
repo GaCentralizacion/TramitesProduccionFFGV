@@ -2798,13 +2798,16 @@ $scope.buscarOrdenesProveedor=function(idProveedor){
       function(isConfirm) {
         if (isConfirm) {
             $('#loading').modal('show');           
-           $scope.sendNotificacionComp(dataSave);    
+           $scope.sendNotificacionComp(dataSave);   
+           $scope.listaValesFF($scope.id_perTra, $scope.idVale); 
           
         } else {
             swal('Cancelado', 'No se aplicaron los cambios', 'error');
             $('#loading').modal('hide');
         }
     });
+
+    $scope.listaValesFF($scope.id_perTra, $scope.idVale);
 }
 
     /////////Se agrega para notificar la aprobar de mas una comprobacion
