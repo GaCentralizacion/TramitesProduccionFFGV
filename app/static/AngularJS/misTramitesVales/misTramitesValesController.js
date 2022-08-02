@@ -2805,6 +2805,8 @@ $scope.buscarOrdenesProveedor=function(idProveedor){
             $('#loading').modal('hide');
         }
     });
+
+    $scope.listaValesFF($scope.id_perTra, $scope.idVale);
 }
 
     /////////Se agrega para notificar la aprobar de mas una comprobacion
