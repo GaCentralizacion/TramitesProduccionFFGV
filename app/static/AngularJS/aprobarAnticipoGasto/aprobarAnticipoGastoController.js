@@ -1147,8 +1147,8 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                                 `,
                                 showConfirmButton: true,
                                 showCloseButton:  false,
-                                timer:10000,
-                                timerProgressBar: true
+                                // timer:10000,
+                                // timerProgressBar: true
                             })
                         }else{
                             swal({
@@ -1165,8 +1165,8 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                                 `,
                                 showConfirmButton: true,
                                 showCloseButton:  false,
-                                timer:10000,
-                                timerProgressBar: true
+                                // timer:10000,
+                                // timerProgressBar: true
                             })
                         }
 
@@ -1200,7 +1200,7 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                             Reitentar cuando se le notifique la solución a la incidencia`,
                             showConfirmButton: true,
                             showCloseButton:  false,
-                            timer:10000
+                            // timer:10000
                         })
                     }
 
@@ -2520,8 +2520,8 @@ return x;
                 `,
                 showConfirmButton: true,
                 showCloseButton:  false,
-                timer:10000,
-                timerProgressBar: true
+                // timer:10000,
+                // timerProgressBar: true
             })
 
             $scope.getConceptosPorSolicitud();
@@ -2555,7 +2555,7 @@ return x;
                 Reitentar cuando se le notifique la solución a la incidencia`,
                 showConfirmButton: true,
                 showCloseButton:  false,
-                timer:10000
+                //timer:10000
             })
         }
 

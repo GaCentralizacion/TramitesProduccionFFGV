@@ -808,7 +808,7 @@ function zeroDelete (item)
                 No olvide subir el archivo PDF de la orden de pago al sistema`,
                 showConfirmButton: true,
                 showCloseButton:  false,
-                timer:10000
+                //timer:10000
             })
             
         }else{
@@ -840,7 +840,7 @@ function zeroDelete (item)
                 Reitentar cuando se le notifique la solución a la incidencia`,
                 showConfirmButton: true,
                 showCloseButton:  false,
-                timer:10000
+               // timer:10000
             })
         }
 
@@ -983,7 +983,7 @@ function zeroDelete (item)
                     No olvide subir el archivo PDF de la orden de pago al sistema`,
                     showConfirmButton: true,
                     showCloseButton:  false,
-                    timer:10000
+                    //timer:10000
                 })
 
                 resolve(true)
@@ -1018,7 +1018,7 @@ function zeroDelete (item)
                     Reitentar cuando se le notifique la solución a la incidencia`,
                     showConfirmButton: true,
                     showCloseButton:  false,
-                    timer:10000
+                    //timer:10000
                 })
 
                 resolve(false)
@@ -1123,7 +1123,7 @@ function zeroDelete (item)
                     No olvide subir el archivo PDF de la orden de pago al sistema`,
                     showConfirmButton: true,
                     showCloseButton:  false,
-                    timer:10000
+                    //timer:10000
                 })
 
                 resolve(true)
@@ -1158,7 +1158,7 @@ function zeroDelete (item)
                     Reitentar cuando se le notifique la solución a la incidencia`,
                     showConfirmButton: true,
                     showCloseButton:  false,
-                    timer:10000
+                    //timer:10000
                 })
 
                 resolve(false)
@@ -1269,7 +1269,7 @@ function zeroDelete (item)
                     No olvide subir el archivo PDF de la orden de pago al sistema`,
                     showConfirmButton: true,
                     showCloseButton:  false,
-                    timer:10000
+                    //timer:10000
                 })
 
                 resolve(true)
@@ -1304,7 +1304,7 @@ function zeroDelete (item)
                     Reitentar cuando se le notifique la solución a la incidencia`,
                     showConfirmButton: true,
                     showCloseButton:  false,
-                    timer:10000
+                    //timer:10000
                 })
 
                 resolve(false)
@@ -1407,7 +1407,7 @@ function zeroDelete (item)
                     No olvide subir el archivo PDF de la orden de pago al sistema`,
                     showConfirmButton: true,
                     showCloseButton:  false,
-                    timer:10000
+                    //timer:10000
                 })
 
                 resolve(true)
@@ -1442,7 +1442,7 @@ function zeroDelete (item)
                     Reitentar cuando se le notifique la solución a la incidencia`,
                     showConfirmButton: true,
                     showCloseButton:  false,
-                    timer:10000
+                    //timer:10000
                 })
 
                 resolve(false)

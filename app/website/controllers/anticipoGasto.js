@@ -508,6 +508,7 @@ anticipoGasto.prototype.post_guardarImporteConcepto = function (req, res, next) 
     var mescorriente = req.body.mesCorriente === undefined || req.body.mesCorriente === null ? 0 : req.body.mesCorriente;
     var tipoNotificacion = req.body.tipoNotificacion === undefined || req.body.tipoNotificacion === null ? 0 : req.body.tipoNotificacion;
     var estatusNotificacion = req.body.estatusNotificacion === undefined || req.body.estatusNotificacion === null ? 0 : req.body.estatusNotificacion;
+    var UUID = req.body.UUID
 
     var params = [
         { name: 'importe', value: req.body.importe, type: self.model.types.DECIMAL },
@@ -532,9 +533,16 @@ anticipoGasto.prototype.post_guardarImporteConcepto = function (req, res, next) 
             idRegistro: 0
         }
         if (result != null && result != 'undefined') {
-            resultado.respuesta = 1;
-            resultado.mensaje = 'Solicitud procesada correctamente';
-            resultado.idRegistro = result[0].resultado;
+            if(result[0].resultado<0){
+                resultado.respuesta = -1;
+                resultado.mensaje = `El UUID: ${UUID} ya fue utilizaso como comprobante en el tramite ${result[0].idPerTra}`;
+                resultado.idRegistro = result[0].resultado;
+            }else{
+                resultado.respuesta = 1;
+                resultado.mensaje = 'Solicitud procesada correctamente';
+                resultado.idRegistro = result[0].resultado;            
+            }
+
         }
         self.view.expositor(res, {
             error: error,
@@ -742,12 +750,21 @@ anticipoGasto.prototype.post_saveInfoDocumentos = function (req, res, next) {
         var resultado = {
             respuesta: 0,
             mensaje: 'Se genero un error al procesar la solicitud',
-            idRegistro: 0
+            idRegistro: 0,
+            idPerTra:0
         }
         if (result != null && result != 'undefined') {
-            resultado.idRegistro = result[0].resultado;
-            resultado.mensaje = 'La información se guardo de manera correcta';
-            resultado.consecutivo = result[0].consecutivo;
+
+            if(result[0].resultado > 0){
+                resultado.idRegistro = result[0].resultado;
+                resultado.mensaje = 'La información se guardo de manera correcta';
+                resultado.consecutivo = result[0].consecutivo;
+            }else{
+                resultado.idRegistro = result[0].resultado;
+                resultado.mensaje = `El archivo ${nombreArchivo}, ya fue utilizado como comprobante en el tramite: ${result[0].numTramite}`;
+                resultado.consecutivo = result[0].consecutivo;
+            }
+
         }
         self.view.expositor(res, {
             error: error,
