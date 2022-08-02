@@ -684,7 +684,11 @@
                             sendDataXML.consecutivo =  res.data.consecutivo;
                             $scope.guardarArchivo(sendDataXML, concepto.id);
                             $('#spinner-loading').modal('hide');
-                        } else {
+                        } else if(res.data.idRegistro < 0){
+                            $('#spinner-loading').modal('hide');
+                            swal('Comprobante', res.data.mensaje, 'error');
+                        }
+                        else {
                             $('#spinner-loading').modal('hide');
                             swal('Comprobante', 'Ocurrio un error al guardar el archivo.', 'error');
                         }
@@ -750,7 +754,11 @@
                             sendData.consecutivo = res.data.consecutivo;
                             $scope.guardarArchivo(sendData, concepto.id);
                             $('#spinner-loading').modal('hide');
-                        } else {
+                        }else if(res.data.idRegistro < 0){
+                            $('#spinner-loading').modal('hide');
+                            swal('Comprobante', res.data.mensaje, 'error');
+                        } 
+                        else {
                             $('#spinner-loading').modal('hide');
                             //$scope.conceptosGastoPorSolicitud();
                             swal('Comprobante', 'Ocurrio un error al guardar el archivo.', 'error');
@@ -970,17 +978,25 @@
         //$('#spinner-loading').modal('show');
         anticipoGastoRepository.guardarImporteConcepto(importe, idUsuario, idTipoProceso, idTramiteConcepto, importeiVA, folio, fecha, idConceptoArchivo, mesCorriente, tipoNotificacion, estatusNotificacion).then((res) => {
             if (res != null && res.data != null && res.data.respuesta != 0) {
-                $scope.conceptosGastoPorSolicitud();
-                /*anticipoGastoRepository.conceptosGastoPorSolicitud($scope.concepto.idTramiteEmpleado, $scope.idTipoProceso).then((response) => {
-                    if (response.data != null && response.data.length > 0) {
-                        $scope.conceptosSolicitud = response.data;
-                        for (var i = 0; i < $scope.conceptosSolicitud.length; i++) {
-                            $scope.conceptosSolicitud[i].expanded = false;
+
+                if(res.data.respuesta != -1){
+                    $scope.conceptosGastoPorSolicitud();
+                    /*anticipoGastoRepository.conceptosGastoPorSolicitud($scope.concepto.idTramiteEmpleado, $scope.idTipoProceso).then((response) => {
+                        if (response.data != null && response.data.length > 0) {
+                            $scope.conceptosSolicitud = response.data;
+                            for (var i = 0; i < $scope.conceptosSolicitud.length; i++) {
+                                $scope.conceptosSolicitud[i].expanded = false;
+                            }
                         }
-                    }
-                });*/
-                $('#spinner-loading').modal('hide');
-                swal('Anticipo de Saldo', 'Se proceso correctamente la solicitud.', 'success');
+                    });*/
+                    $('#spinner-loading').modal('hide');
+                    swal('Anticipo de Saldo', 'Se proceso correctamente la solicitud.', 'success');
+                }
+                else{
+                    $('#spinner-loading').modal('hide');
+                    swal('Anticipo de Saldo', res.data.mensaje, 'success');
+                }
+
             } else {
                 $('#spinner-loading').modal('hide');
                 swal('Anticipo de Saldo', 'Ocurrio un error al guardar el comentario', 'success');
