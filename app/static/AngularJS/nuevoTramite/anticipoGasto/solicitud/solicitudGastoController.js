@@ -2289,33 +2289,52 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
     } 
 
 
-    $scope.guardarArchivoVale = function(){
-        anticipoGastoRepository.saveDocReportePresupuestoGV($scope.idSolicitud, $scope.documento.archivo.archivo ).then(resp => {
-            console.log(resp)
-            swal('Información','El reporte se ha guardado correctamente', 'success')
-            $scope.documento = {url:'',archivo:'', ext_nombre:'pdf'};
+    $scope.guardarArchivoVale = function () {
+      anticipoGastoRepository
+        .saveDocReportePresupuestoGV(
+          $scope.idSolicitud,
+          $scope.documento.archivo.archivo
+        )
+        .then((resp) => {
+          console.log(resp);
+          swal(
+            "Información",
+            "El presupuesto autorizado se ha guardado correctamente y se encuentra en revisión por Finanzas 1",
+            "success"
+          );
+
+          setTimeout(() => {
+            $scope.documento = { url: "", archivo: "", ext_nombre: "pdf" };
             document.getElementById("picturePresupuesto").value = null;
-            $location.path('/misTramites');
+            $location.path("/misTramites");
             //$("#viewCargaReporte").modal("hide");
-            var numTramite = $scope.tramite.idSolicitud
-            var html = `
+            var numTramite = $scope.tramite.idSolicitud;
+            var html =
+              `
             <div style="width: 310px; height: 140px;"><center><img style="width: 80%;" src="https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png" alt="GrupoAndrade" /></center></div>
-            <div>Favor de generar la salida de efectivo para el tramite de gastos de viaje </div>
+            <div>Favor de generar la salida de efectivo para el tramite de gasto de viaje </div>
             <div>
                 <table>
                     <tbody>
                         <tr>
                             <td style="text-align: right;"><span style="color: #ff0000;">Tramite:</span></td>
-                            <td>` + numTramite + `</td>
+                            <td>` +
+              numTramite +
+              `</td>
                         </tr>
                     </tbody>
                 </table>
-            </div>`
-            
+            </div>`;
+
             //$scope.sendMail( 'adriana.olivares@grupoandrade.com,roberto.almanza@coalmx.com', `Solicitud Salida de efectivo gastos de viaje ${$scope.tramite.idSolicitud}`, html )
-            $scope.sendMail( resp.data[0].correoSalidaEfectivo, `Solicitud Salida de efectivo gastos de viaje ${$scope.tramite.idSolicitud}`, html )
-        })
-    }
+            $scope.sendMail(
+              resp.data[0].correoSalidaEfectivo,
+              `Solicitud Salida de efectivo gastos de viaje ${$scope.tramite.idSolicitud}`,
+              html
+            );
+          }, 3000);
+        });
+    };
 
     $scope.cancelarArchivoVale = function(){
         $scope.documento = {url:'',archivo:'', ext_nombre:'pdf'};
