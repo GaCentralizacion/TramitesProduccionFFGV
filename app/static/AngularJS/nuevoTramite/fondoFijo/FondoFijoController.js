@@ -3966,7 +3966,7 @@ $scope.insertaPolizaFrontCVFR = async function () {
     respLog = await LogApiBpro(datalog)
 
     $scope.regresarVale();
-    //$location.path('/misTramites');
+    $location.path('/misTramites');
 };
 
 $scope.generaOCCVFR = async function () {
@@ -3997,7 +3997,7 @@ $scope.generaOCCVFR = async function () {
         $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
         $scope.apiJson.OrdenCompra.Detalle[0].Producto = $scope.datoPoliza.idComprobacionVale
         $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.datoPoliza.montoCVFR
-        $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.datoPoliza.IVAmontoCVFR
+        $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.datoPoliza.tasaIVACal
     }
 
     console.log(JSON.stringify($scope.apiJson))
