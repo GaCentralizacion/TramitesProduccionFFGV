@@ -1937,7 +1937,12 @@ $scope.verPdfComprobacion = function(item) {
 
                             if(item.tipoGasto == 1){
                                 console.log("tipoGasto = Inventario",item.tipoGasto)
-                                $scope.insertaPolizaFrontAPIGastosInventario();
+                                if ( $scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoAVFF==0)
+                                {
+                                    $scope.insertaPolizaFrontCVFRInventario()
+                                }else{
+                                    $scope.insertaPolizaFrontAPIGastosInventario();
+                                }                                
                             }
     
                             if(item.tipoGasto == 2){
@@ -4131,7 +4136,7 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Origen = 'FAC'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Moneda = 'PE'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoCambio = '1'
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.montoValeCVFR
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.datoPoliza.montoCVFR
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].IVA = $scope.datoPoliza.IVAmontoCVFR
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.complementoAPi.personaff
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado =  FF //OC
@@ -4176,7 +4181,7 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
        // respUpdate = await promiseActualizaTramiteFF($scope.idValeFF,$scope.idUsuario ,'PVFF', FFVale, $scope.incremental)
        // console.log(respUpdate)
 
-       respUpdate = await promiseActualizaTramiteFF($scope.idVale,$scope.idUsuario ,'AVFF', $scope.datoPoliza.idComprobacionVale, $scope.incremental)
+       respUpdate = await promiseActualizaTramiteFF($scope.idVale,$scope.idUsuario ,'CVFR', $scope.datoPoliza.idComprobacionVale, $scope.incremental)
         // console.log(respUpdate)
 
         //$scope.getDataOrdenPagoGV();
