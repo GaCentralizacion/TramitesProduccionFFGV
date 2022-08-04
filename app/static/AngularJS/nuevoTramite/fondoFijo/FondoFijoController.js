@@ -3996,8 +3996,15 @@ $scope.generaOCCVFR = async function () {
         $scope.apiJson.OrdenCompra.Detalle[0].ConceptoContable = $scope.conceptoContable
         $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
         $scope.apiJson.OrdenCompra.Detalle[0].Producto = $scope.datoPoliza.idComprobacionVale
-        $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.datoPoliza.montoCVFR
-        $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.datoPoliza.tasaIVACal
+        // $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.datoPoliza.montoCVFR
+        // $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.datoPoliza.tasaIVACal
+        if( $scope.datoPoliza.esFactura > 0){ 
+            $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.datoPoliza.subTotal
+            $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.datoPoliza.TasaIva
+         } else {
+             $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.datoPoliza.monto
+         }    
+         
     }
 
     console.log(JSON.stringify($scope.apiJson))
