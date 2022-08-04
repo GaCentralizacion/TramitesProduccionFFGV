@@ -3587,13 +3587,11 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
         $('#loading').modal('hide');
         $("#aprobarVale").modal("hide");
 
-        $scope.regresarVale();
-
-        //
-
         if($scope.datoPoliza.justificoMas == 1)
             {
                 $scope.insertaPolizaFrontCVFR()
+            }else{
+                $scope.regresarVale();
             }
 };
 
@@ -3966,7 +3964,7 @@ $scope.insertaPolizaFrontCVFR = async function () {
     respLog = await LogApiBpro(datalog)
 
     $scope.regresarVale();
-    $location.path('/misTramites');
+    //$location.path('/misTramites');
 };
 
 $scope.generaOCCVFR = async function () {
@@ -4247,7 +4245,6 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
     $("#aprobarVale").modal("hide");
 
     $scope.regresarVale();
-    //$location.path('/misTramites');
 };
 
 
