@@ -1942,7 +1942,7 @@ $scope.verPdfComprobacion = function(item) {
                                     $scope.insertaPolizaFrontCVFRInventario()
                                 }else{
                                     $scope.insertaPolizaFrontAPIGastosInventario();
-                                }                                
+                                }
                             }
     
                             if(item.tipoGasto == 2){
@@ -4181,7 +4181,7 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
        // respUpdate = await promiseActualizaTramiteFF($scope.idValeFF,$scope.idUsuario ,'PVFF', FFVale, $scope.incremental)
        // console.log(respUpdate)
 
-       respUpdate = await promiseActualizaTramiteFF($scope.idVale,$scope.idUsuario ,'CVFR', $scope.datoPoliza.idComprobacionVale, $scope.incremental)
+       respUpdate = await promiseActualizaTramiteFF($scope.idVale,$scope.idUsuario ,'AVFF', $scope.datoPoliza.idComprobacionVale, $scope.incremental)
         // console.log(respUpdate)
 
         //$scope.getDataOrdenPagoGV();
