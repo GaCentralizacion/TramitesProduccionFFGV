@@ -121,7 +121,7 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                 $scope.concepto.idEstatus = $scope.tramite.idEstatus;
                 $scope.correoTesoreria = res.data[0].correoTesoreria;
                 $scope.Comprobar =  res.data[0].Comprobar;
-                $scope.estatusAnticipo = res.data[0].idEstatus;
+                $scope.estatusAnticipo = res.data[0].estatusAnticipo;
                 $scope.selEmpresa = $scope.tramite.idCompania;
                 $scope.selSucursal = $scope.tramite.idSucursal;
                 $scope.selDepartamento = $scope.tramite.idDepartamento;
@@ -346,7 +346,8 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
             $scope.tipoSalida = [{ id:1, text:'Orden de Pago'}] // se elimina la opcion de caja por lo tratado en la junta del dia 17/11/2021 revisar video
         }else{
            // $scope.tipoSalida = [{ id:3, text:'Transferencia'},{ id:1, text:'Orden de Pago'},{ id:2, text:'Caja'}]    
-            $scope.tipoSalida = [{ id:3, text:'Transferencia'},{ id:1, text:'Orden de Pago'}] // se elimina la opcion de caja por lo tratado en la junta del dia 17/11/2021 revisar video
+            //$scope.tipoSalida = [{ id:3, text:'Transferencia'},{ id:1, text:'Orden de Pago'}] // se elimina la opcion de caja por lo tratado en la junta del dia 17/11/2021 revisar video
+            $scope.tipoSalida = [{ id:1, text:'Orden de Pago'}]
         }
         $scope.salidaSelected = '';
         $scope.BancoSalidaFFS = '';
