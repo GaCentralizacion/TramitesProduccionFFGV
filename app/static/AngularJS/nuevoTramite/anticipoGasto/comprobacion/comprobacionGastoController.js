@@ -169,7 +169,7 @@
                 if ($scope.tramite.idEstatus == 2) {
                     $scope.actualizaEstatusTramiteComprobar();
                 }
-                $scope.estatusAnticipo = res.data[0].idEstatus;
+                $scope.estatusAnticipo = res.data[0].estatusAnticipo;
                 $scope.openWizard();
                 $scope.titulo = 'Comprobación de Gasto N° ' +  res.data[0].idSolicitud;
                 $scope.tramite.fechaInicio = $scope.tramite.fechaInicio.toISOString().substring(0, 10);

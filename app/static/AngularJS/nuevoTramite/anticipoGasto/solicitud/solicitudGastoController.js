@@ -331,7 +331,7 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
                 $scope.selEmpresa = $scope.tramite.idCompania;
                 $scope.selSucursal = $scope.tramite.idSucursal;
                 $scope.selDepartamento = $scope.tramite.idDepartamento;
-                $scope.estatusAnticipo = res.data[0].idEstatus;
+                $scope.estatusAnticipo = res.data[0].estatusAnticipo;
                 $scope.salidaEfectivo = $scope.tramite.salidaEfectivo;
                 $scope.openWizard();
                 $scope.getAllEmpresas();
