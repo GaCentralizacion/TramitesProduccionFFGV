@@ -3443,6 +3443,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
             $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.datoPoliza.TasaIva
          } else {
              $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.datoPoliza.monto
+             $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = 0
          }    
 
         //ContabilidadMasiva
@@ -4006,8 +4007,8 @@ $scope.generaOCCVFR = async function () {
             $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.datoPoliza.TasaIva
          } else {
              $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.datoPoliza.monto
-         }    
-         
+             $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = 0
+         }             
     }
 
     console.log(JSON.stringify($scope.apiJson))
