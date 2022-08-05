@@ -1937,7 +1937,12 @@ $scope.verPdfComprobacion = function(item) {
 
                             if(item.tipoGasto == 1){
                                 console.log("tipoGasto = Inventario",item.tipoGasto)
-                                $scope.insertaPolizaFrontAPIGastosInventario();
+                                if ( $scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoAVFF==0)
+                                {
+                                    $scope.insertaPolizaFrontCVFRInventario()
+                                }else{
+                                    $scope.insertaPolizaFrontAPIGastosInventario();
+                                }
                             }
     
                             if(item.tipoGasto == 2){
@@ -3417,6 +3422,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
 
         $('#loading').modal('show');
         //Encabezado
+        $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
         
         $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
         $scope.apiJson.IdSucursal = $scope.datoPoliza.idSucursal
@@ -3438,6 +3444,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
             $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.datoPoliza.TasaIva
          } else {
              $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.datoPoliza.monto
+             $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = 0
          }    
 
         //ContabilidadMasiva
@@ -3520,7 +3527,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
             }          
 
             html = $scope.html1 + 'Comprobación de vale evidencia :  ' + $scope.datoPoliza.idComprobacionVale +' del vale '  + $scope.datoPoliza.idVale  + "<br><br> Estimado " + $scope.nombreSolicitanteAPI + " se realizó la comprobacion del vale por el monto de:  $"+ formatMoney(($scope.datoPoliza.montoAVFF)) + $scope.html2;
-            $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de vales evidencias  ' + $scope.datoPoliza.idVale, html);
+            //$scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de vales evidencias  ' + $scope.datoPoliza.idVale, html);
 
             //$scope.getDataOrdenPagoGV();
             $scope.nombreTramite ='APROBAR EVIDENCIA FF'
@@ -3587,13 +3594,11 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
         $('#loading').modal('hide');
         $("#aprobarVale").modal("hide");
 
-        $scope.regresarVale();
-
-        //
-
         if($scope.datoPoliza.justificoMas == 1)
             {
                 $scope.insertaPolizaFrontCVFR()
+            }else{
+                $scope.regresarVale();
             }
 };
 
@@ -3611,6 +3616,7 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
     $('#loading').modal('show');
+    $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
 
       //Tipo 2 Limpiamos Variables
       //DatosOrdenesCompra
@@ -3718,7 +3724,7 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
         console.log($scope.nombreTramite)
         
         html = $scope.html1 + 'Comprobación de vale evidencia por inventario :  ' + $scope.datoPoliza.idComprobacionVale +' del vale '  + $scope.datoPoliza.idVale  + "<br><br> Estimado " + $scope.nombreSolicitanteAPI + " se realizó la comprobacion del vale por el monto de:  $"+ formatMoney(($scope.datoPoliza.montoCVFR)) + " con la orden de compra por inventario : " + $scope.datoPoliza.InventarioOC + $scope.html2;
-        $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de vales evidencias  ' + $scope.datoPoliza.idComprobacionVale, html);
+        //$scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de vales evidencias  ' + $scope.datoPoliza.idComprobacionVale, html);
 
         $('#loading').modal('hide');
 
@@ -3908,7 +3914,7 @@ $scope.insertaPolizaFrontCVFR = async function () {
         console.log($scope.nombreTramite)
 
         html = $scope.html1 + 'Comprobación de más [CVFR] en vale evidencia :  ' + $scope.datoPoliza.idComprobacionVale + "<br><br> Estimado " + $scope.nombreSolicitanteAPI + " se realizó la comprobacion [CVFR] del vale por el monto de:  $"+ formatMoney($scope.datoPoliza.montoCVFR) + $scope.html2;
-        $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de Mas vales evidencias  ' + $scope.datoPoliza.idComprobacionVale, html);
+        //$scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de Mas vales evidencias  ' + $scope.datoPoliza.idComprobacionVale, html);
 
         $('#loading').modal('hide');
 
@@ -3966,7 +3972,7 @@ $scope.insertaPolizaFrontCVFR = async function () {
     respLog = await LogApiBpro(datalog)
 
     $scope.regresarVale();
-    $location.path('/misTramites');
+    //$location.path('/misTramites');
 };
 
 $scope.generaOCCVFR = async function () {
@@ -4003,8 +4009,8 @@ $scope.generaOCCVFR = async function () {
             $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = $scope.datoPoliza.TasaIva
          } else {
              $scope.apiJson.OrdenCompra.Detalle[0].PrecioUnitario = $scope.datoPoliza.monto
-         }    
-         
+             $scope.apiJson.OrdenCompra.Detalle[0].TasaIva = 0
+         }             
     }
 
     console.log(JSON.stringify($scope.apiJson))
@@ -4096,6 +4102,8 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
 
     $('#loading').modal('show');
     //Encabezado
+    $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
+
     $scope.apiJson.IdEmpresa = $scope.idEmpresa
     $scope.apiJson.IdSucursal = $scope.idSucursal
 
@@ -4133,7 +4141,7 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Origen = 'FAC'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Moneda = 'PE'
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoCambio = '1'
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.montoValeCVFR
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.datoPoliza.montoCVFR
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].IVA = $scope.datoPoliza.IVAmontoCVFR
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 = $scope.complementoAPi.personaff
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado =  FF //OC
@@ -4186,7 +4194,7 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
         console.log($scope.nombreTramite)
 
         html = $scope.html1 + 'Comprobación de más [CVFR] en vale evidencia por inventario :  ' + $scope.datoPoliza.idComprobacionVale + "<br><br> Estimado " + $scope.nombreSolicitanteAPI + " con la orden de compra por inventario : " + $scope.datoPoliza.InventarioOC + ", se realizó la comprobacion [CVFR] del vale por el monto de:  $"+ formatMoney($scope.datoPoliza.montoCVFR) + $scope.html2;
-        $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de vales evidencias  ' + $scope.datoPoliza.idComprobacionVale, html);
+        //$scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de vales evidencias  ' + $scope.datoPoliza.idComprobacionVale, html);
 
         $('#loading').modal('hide');
 
@@ -4195,7 +4203,7 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
             type:"success",
             icon: "success",
             width: 1000,
-            text:`Se proceso con éxito el importe de más de la de evidencia; ` + $scope.datoPoliza.idComprobacionVale + `por la cantidad de: $`+ formatMoney($scope.montoValeCVFR)  +`
+            text:`Se proceso con éxito el importe de más de la de evidencia; ` + $scope.datoPoliza.idComprobacionVale + `por la cantidad de: $`+ formatMoney($scope.datoPoliza.montoCVFR)  +`
             
             Orden Compra por inventario: ${$scope.datoPoliza.InventarioOC}
             Año póliza: ${datalog.anioPol}
@@ -4247,7 +4255,6 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
     $("#aprobarVale").modal("hide");
 
     $scope.regresarVale();
-    //$location.path('/misTramites');
 };
 
 
@@ -4264,6 +4271,8 @@ $scope.insertaPolizaFFCVFM = async function () {
 
     $('#loading').modal('show');
     //Encabezado
+    $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
+    
     $scope.apiJson.IdEmpresa = $scope.idEmpresa
     $scope.apiJson.IdSucursal = $scope.idSucursal
     $scope.apiJson.Tipo = 2
@@ -4344,7 +4353,7 @@ $scope.insertaPolizaFFCVFM = async function () {
         $scope.nombreTramite ='REGRESA DINERO FF'
 
         html = $scope.html1 + 'Regreso de efectivo del vale:  ' + FFVale +'  de  Fondo Fijo' + "<br><br> Se realizó el regreso de efectivo por el monto de:  $"+ formatMoney($scope.montoCVFM) + "  " + $scope.html2;
-        $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Regreso de efectivo ', html);
+        //$scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Regreso de efectivo ', html);
         //$scope.sendMail(respUpdate.correo, respUpdate.asunto, html);
         $('#loading').modal('hide');
 
