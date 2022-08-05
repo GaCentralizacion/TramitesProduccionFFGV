@@ -3422,6 +3422,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
 
         $('#loading').modal('show');
         //Encabezado
+        $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
         
         $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
         $scope.apiJson.IdSucursal = $scope.datoPoliza.idSucursal
@@ -3526,7 +3527,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
             }          
 
             html = $scope.html1 + 'Comprobación de vale evidencia :  ' + $scope.datoPoliza.idComprobacionVale +' del vale '  + $scope.datoPoliza.idVale  + "<br><br> Estimado " + $scope.nombreSolicitanteAPI + " se realizó la comprobacion del vale por el monto de:  $"+ formatMoney(($scope.datoPoliza.montoAVFF)) + $scope.html2;
-            $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de vales evidencias  ' + $scope.datoPoliza.idVale, html);
+            //$scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de vales evidencias  ' + $scope.datoPoliza.idVale, html);
 
             //$scope.getDataOrdenPagoGV();
             $scope.nombreTramite ='APROBAR EVIDENCIA FF'
@@ -3615,6 +3616,7 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
     $('#loading').modal('show');
+    $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
 
       //Tipo 2 Limpiamos Variables
       //DatosOrdenesCompra
@@ -3722,7 +3724,7 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
         console.log($scope.nombreTramite)
         
         html = $scope.html1 + 'Comprobación de vale evidencia por inventario :  ' + $scope.datoPoliza.idComprobacionVale +' del vale '  + $scope.datoPoliza.idVale  + "<br><br> Estimado " + $scope.nombreSolicitanteAPI + " se realizó la comprobacion del vale por el monto de:  $"+ formatMoney(($scope.datoPoliza.montoCVFR)) + " con la orden de compra por inventario : " + $scope.datoPoliza.InventarioOC + $scope.html2;
-        $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de vales evidencias  ' + $scope.datoPoliza.idComprobacionVale, html);
+        //$scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de vales evidencias  ' + $scope.datoPoliza.idComprobacionVale, html);
 
         $('#loading').modal('hide');
 
@@ -3912,7 +3914,7 @@ $scope.insertaPolizaFrontCVFR = async function () {
         console.log($scope.nombreTramite)
 
         html = $scope.html1 + 'Comprobación de más [CVFR] en vale evidencia :  ' + $scope.datoPoliza.idComprobacionVale + "<br><br> Estimado " + $scope.nombreSolicitanteAPI + " se realizó la comprobacion [CVFR] del vale por el monto de:  $"+ formatMoney($scope.datoPoliza.montoCVFR) + $scope.html2;
-        $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de Mas vales evidencias  ' + $scope.datoPoliza.idComprobacionVale, html);
+        //$scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de Mas vales evidencias  ' + $scope.datoPoliza.idComprobacionVale, html);
 
         $('#loading').modal('hide');
 
@@ -4100,6 +4102,8 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
 
     $('#loading').modal('show');
     //Encabezado
+    $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
+
     $scope.apiJson.IdEmpresa = $scope.idEmpresa
     $scope.apiJson.IdSucursal = $scope.idSucursal
 
@@ -4190,7 +4194,7 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
         console.log($scope.nombreTramite)
 
         html = $scope.html1 + 'Comprobación de más [CVFR] en vale evidencia por inventario :  ' + $scope.datoPoliza.idComprobacionVale + "<br><br> Estimado " + $scope.nombreSolicitanteAPI + " con la orden de compra por inventario : " + $scope.datoPoliza.InventarioOC + ", se realizó la comprobacion [CVFR] del vale por el monto de:  $"+ formatMoney($scope.datoPoliza.montoCVFR) + $scope.html2;
-        $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de vales evidencias  ' + $scope.datoPoliza.idComprobacionVale, html);
+        //$scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Aprobación de vales evidencias  ' + $scope.datoPoliza.idComprobacionVale, html);
 
         $('#loading').modal('hide');
 
@@ -4199,7 +4203,7 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
             type:"success",
             icon: "success",
             width: 1000,
-            text:`Se proceso con éxito el importe de más de la de evidencia; ` + $scope.datoPoliza.idComprobacionVale + `por la cantidad de: $`+ formatMoney($scope.montoValeCVFR)  +`
+            text:`Se proceso con éxito el importe de más de la de evidencia; ` + $scope.datoPoliza.idComprobacionVale + `por la cantidad de: $`+ formatMoney($scope.datoPoliza.montoCVFR)  +`
             
             Orden Compra por inventario: ${$scope.datoPoliza.InventarioOC}
             Año póliza: ${datalog.anioPol}
@@ -4267,6 +4271,8 @@ $scope.insertaPolizaFFCVFM = async function () {
 
     $('#loading').modal('show');
     //Encabezado
+    $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
+    
     $scope.apiJson.IdEmpresa = $scope.idEmpresa
     $scope.apiJson.IdSucursal = $scope.idSucursal
     $scope.apiJson.Tipo = 2
@@ -4347,7 +4353,7 @@ $scope.insertaPolizaFFCVFM = async function () {
         $scope.nombreTramite ='REGRESA DINERO FF'
 
         html = $scope.html1 + 'Regreso de efectivo del vale:  ' + FFVale +'  de  Fondo Fijo' + "<br><br> Se realizó el regreso de efectivo por el monto de:  $"+ formatMoney($scope.montoCVFM) + "  " + $scope.html2;
-        $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Regreso de efectivo ', html);
+        //$scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', 'Regreso de efectivo ', html);
         //$scope.sendMail(respUpdate.correo, respUpdate.asunto, html);
         $('#loading').modal('hide');
 
