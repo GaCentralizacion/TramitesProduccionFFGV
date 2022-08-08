@@ -68,6 +68,7 @@ registrationModule.controller('traspasosFondoFijoController', function ($scope, 
     $scope.idTramiteSolicitud = 0;
     $scope.archivoCargado = true;
     $scope.documentos = []
+    $scope.complementoPolizas = '';
     $scope.html1 = "<div style=\"width:310px;height:140px\"><center><img style=\"width: 100% \" src=\"https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png\" alt=\"GrupoAndrade\" />" +
         "</center></div><div><p><br>";
     $scope.html2 = ".</p></div>";
@@ -180,6 +181,7 @@ registrationModule.controller('traspasosFondoFijoController', function ($scope, 
                 $scope.polizaCaja.bancoS = zeroDelete($scope.polizaCaja.cuentaContableSalida);
                 //$scope.obtieneEvidenciasReembolso();
                 $scope.id_perTraReembolso = res.data[0].id_perTraReembolso
+                $scope.complementoPolizas = res.data[0].complementoPoliza;
                 $scope.obtieneEvidenciasReembolsoTramite();
             } 
         });

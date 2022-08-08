@@ -3256,7 +3256,7 @@ async function LogApiBpro(data){
             $scope.montoSaldo               = resp.data[0].montoSaldo
             $scope.persona1pvff             = resp.data[0].persona1pvff
             $scope.persona2pvff             = resp.data[0].persona2pvff
-
+            $scope.complementoPolizas       = resp.data[0].complementoPolizas
         });    
     }
 
@@ -3391,6 +3391,7 @@ $scope.insertaPolizaFFPVFF = async function () {
             
             Codigo: ${datalog.codigo }
             Respuesta BPRO:  ${datalog.mensajeError}
+            vale: ${ $scope.datoPoliza.idComprobacionVale }
             
             Reitentar cuando se le notifique la solución a la incidencia`,
             showConfirmButton: true,
@@ -3581,6 +3582,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
                 
                 Codigo: ${datalog.codigo }
                 Respuesta BPRO:  ${datalog.mensajeError}
+                vale: ${ $scope.datoPoliza.idComprobacionVale }
                 
                 Reitentar cuando se le notifique la solución a la incidencia`,
                 showConfirmButton: true,
@@ -3594,7 +3596,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
         $('#loading').modal('hide');
         $("#aprobarVale").modal("hide");
 
-        if($scope.datoPoliza.justificoMas == 1)
+        if($scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoCVFR > 0 )
             {
                 $scope.insertaPolizaFrontCVFR()
             }else{
@@ -3771,6 +3773,7 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
             
             Codigo: ${datalog.codigo }
             Respuesta BPRO:  ${datalog.mensajeError}
+            vale: ${ $scope.datoPoliza.idComprobacionVale }
             
             Reitentar cuando se le notifique la solución a la incidencia`,
             showConfirmButton: true,
@@ -3961,6 +3964,7 @@ $scope.insertaPolizaFrontCVFR = async function () {
             
             Codigo: ${datalog.codigo }
             Respuesta BPRO:  ${datalog.mensajeError}
+            vale: ${ $scope.datoPoliza.idComprobacionVale }
             
             Reitentar cuando se le notifique la solución a la incidencia`,
             showConfirmButton: true,
@@ -4241,7 +4245,8 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
             
             Codigo: ${datalog.codigo }
             Respuesta BPRO:  ${datalog.mensajeError}
-            
+            vale: ${ $scope.datoPoliza.idComprobacionVale }
+
             Reitentar cuando se le notifique la solución a la incidencia`,
             showConfirmButton: true,
             showCloseButton:  false
@@ -4397,6 +4402,7 @@ $scope.insertaPolizaFFCVFM = async function () {
             
             Codigo: ${datalog.codigo }
             Respuesta BPRO:  ${datalog.mensajeError}
+            vale: ${ $scope.datoPoliza.idComprobacionVale }
             
             Reitentar cuando se le notifique la solución a la incidencia`,
             showConfirmButton: true,

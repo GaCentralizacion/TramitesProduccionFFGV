@@ -100,6 +100,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             $scope.cuentaContableSalida  = res.data[0].cuentaContableSalida;
             $scope.idFondoFijo = res.data[0].idFondoFijo;
             $scope.nombreDep = res.data[0].dep_nombrecto;
+            $scope.complementoPolizas = res.data[0].complementoPoliza;
             $scope.nombreTramite = $scope.tipo == 'FS' ? 'SALIDA FONDO FIJO' : 'REEMBOLSO FONDO FIJO'
             $scope.docsReembolso = $scope.tipo == 'FS' ? false : true;
             $scope.getNombreBanco();
@@ -148,6 +149,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             $scope.docsReembolso = $scope.tipo == 'FS' ? false : true;
             $scope.cajero =  res.data[0].cajero,
             $scope.correoCajero = res.data[0].correo,
+            $scope.complementoPolizas = res.data[0].complementoPoliza;
             $scope.getNombreBanco();
             $scope.getDataClienteFA();
             $scope.getDocumentosAprobarFFTramite($scope.id_perTraFF);
