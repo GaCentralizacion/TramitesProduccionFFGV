@@ -1081,6 +1081,9 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                             datalog.codigo = resPoliza.Codigo
                             datalog.resuelto = 1
                             datalog.ordenCompra = resPoliza.Folio  
+                            datalog.anioPol = 0
+                            datalog.consPol = 0
+                            datalog.tipoPol = 'AGVV'
                         }else{
                             datalog.anioPol = resPoliza.Poliza[0].añoPoliza
                             datalog.consPol = resPoliza.Poliza[0].ConsecutivoPoliza
