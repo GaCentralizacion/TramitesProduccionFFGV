@@ -957,40 +957,6 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
         $('#spinner-loading').modal('show');
         let respAprobarRechazar
 
-        try{
-            if( $scope.archivo.estatusNotificacionDeMas === undefined  || 
-                $scope.archivo.estatusNotificacionDeMas === null || 
-                $scope.archivo.estatusNotificacionDeMas == 0 ||
-                $scope.archivo.estatusNotificacionDeMas == '' ){
-                $scope.compNoAutorizada = 0;
-            }
-            else if( $scope.archivo.estatusNotificacionDeMas == 4 ){
-                $scope.compNoAutorizada = 1;
-            }
-            else if( $scope.archivo.estatusNotificacionDeMas == 3 ){
-                $scope.compNoAutorizada = 0;
-                // Aqui se crea el tramite para salida de efectivo para comprobación de más
-
-                var parametros = {
-                    perTraPadre: $scope.idSolicitud,
-                    idConceptoArhivo: $scope.archivo.idConceptoArchivo,
-                    importe: $scope.archivo.ExcedeMonto,
-                    idTramiteConcepto: $scope.archivo.idReferencia
-                }
-
-                console.log( $scope.archivo );
-
-                //return true;
-
-                console.log( "creacionTramiteEntregaEfectivo", parametros );
-
-                $scope.creacionTramiteEntregaEfectivo( parametros );
-            }
-        }
-        catch( e ){
-            $scope.compNoAutorizada = 0;
-        }
-
         //return true;
         var data = {
             idConceptoArchivo: $scope.archivo.idConceptoArchivo,
@@ -1130,11 +1096,6 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                         respAprobarRechazar = await aprobarRechazarArchivo(data)
             
                         respUpdate = await promiseActualizaTramite($scope.tramite.idSolicitud,'AGVV', $scope.archivo.idComprobacionConcepto , 0,datalog.ordenCompra,datalog.consPol,datalog.mesPol,datalog.anioPol)
-
-                        $scope.archivo.idEstatus = $scope.idEstatusConcepto;
-                        $scope.getConceptosPorSolicitud();
-            
-                        $('#spinner-loading').modal('hide');
             
                         if($scope.archivo.totalPoliza == 0){
                             swal({
@@ -1171,6 +1132,43 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                             })
                         }
 
+                        try{
+                            if( $scope.archivo.estatusNotificacionDeMas === undefined  || 
+                                $scope.archivo.estatusNotificacionDeMas === null || 
+                                $scope.archivo.estatusNotificacionDeMas == 0 ||
+                                $scope.archivo.estatusNotificacionDeMas == '' ){
+                                $scope.compNoAutorizada = 0;
+                            }
+                            else if( $scope.archivo.estatusNotificacionDeMas == 4 ){
+                                $scope.compNoAutorizada = 1;
+                            }
+                            else if( $scope.archivo.estatusNotificacionDeMas == 3 ){
+                                $scope.compNoAutorizada = 0;
+                                // Aqui se crea el tramite para salida de efectivo para comprobación de más
+                
+                                var parametros = {
+                                    perTraPadre: $scope.idSolicitud,
+                                    idConceptoArhivo: $scope.archivo.idConceptoArchivo,
+                                    importe: $scope.archivo.montoDeMas,
+                                    idTramiteConcepto: $scope.archivo.idReferencia
+                                }
+                
+                                console.log( $scope.archivo );
+                
+                                //return true;
+                
+                                console.log( "creacionTramiteEntregaEfectivo", parametros );
+                
+                                $scope.creacionTramiteEntregaEfectivo( parametros );
+                            }
+                        }
+                        catch( e ){
+                            $scope.compNoAutorizada = 0;
+                        }
+
+                        $scope.archivo.idEstatus = $scope.idEstatusConcepto;
+                        $scope.getConceptosPorSolicitud();
+                        $('#spinner-loading').modal('hide');
                         
                     }else{
 
