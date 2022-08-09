@@ -3522,7 +3522,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
 
             $scope.ordenCompraAVFF =  resPoliza.Folio
 
-            if($scope.datoPoliza.justificoMas == 0){
+            if($scope.datoPoliza.justificoMas == 0 || $scope.datoPoliza.montoCVFR == 0){
 
                 respUpdate = await promiseActualizaTramiteFF($scope.idVale,$scope.idUsuario ,'AVFF', $scope.datoPoliza.idComprobacionVale, $scope.incremental)
                 // console.log(respUpdate)              
@@ -3718,7 +3718,7 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
         // respUpdate = await promiseActualizaTramiteFF($scope.idValeFF,$scope.idUsuario ,'PVFF', FFVale, $scope.incremental)
     // console.log(respUpdate)
 
-        if($scope.datoPoliza.justificoMas == 0){
+        if($scope.datoPoliza.justificoMas == 0 || $scope.datoPoliza.montoCVFR == 0 ){
             respUpdate = await promiseActualizaTramiteFF($scope.idVale,$scope.idUsuario ,'AVFF', $scope.datoPoliza.idComprobacionVale, $scope.incremental)
             // console.log(respUpdate)
         }      
