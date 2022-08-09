@@ -1083,6 +1083,8 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                             datalog.ordenCompra = resPoliza.Folio  
                             datalog.anioPol = 0
                             datalog.consPol = 0
+                            datalog.empresaPol = 1
+                            datalog.mesPol =  0
                             datalog.tipoPol = 'AGVV'
                         }else{
                             datalog.anioPol = resPoliza.Poliza[0].añoPoliza
