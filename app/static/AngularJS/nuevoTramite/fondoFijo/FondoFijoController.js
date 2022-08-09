@@ -1873,17 +1873,19 @@ $scope.verPdfComprobacion = function(item) {
 
                         // POLIZA COMPROBACION DE MENOS REGRESA EFECTIVO
                         // tipoProceso = await promiseInsertaDatos($scope.idUsuario, $scope.sucursalVale , 10,$scope.nombreVale , monto, '', $scope.nombreDepartamentoVale, JSON.parse(localStorage.getItem('borrador')).idPerTra, '', CCDepto);
-                        //$scope.dataComplementoFF();                       
-                        $scope.montoCVFM = monto
-                        $scope.insertaPolizaFFCVFM();
-
-                        fondoFijoRepository.valeSinComprobar($scope.idVale,monto).then(function (result) {
-                            if (result.data.length > 0) {
-                                $scope.listaValesFF(JSON.parse(localStorage.getItem('borrador')).idPerTra, $scope.idVale);
-                                $scope.regresarVale();
-                                $('#loading').modal('hide');
-                            }
-                        }); 
+                        //$scope.dataComplementoFF();   
+                        if (estatusVales.monto > 0) {
+                            $scope.montoCVFM = estatusVales.monto 
+                            $scope.personaCVFM = estatusVales.personaCVFM
+                            $scope.insertaPolizaFFCVFM();
+                        }    
+                        // fondoFijoRepository.valeSinComprobar($scope.idVale,monto).then(function (result) {
+                        //     if (result.data.length > 0) {
+                        //         $scope.listaValesFF(JSON.parse(localStorage.getItem('borrador')).idPerTra, $scope.idVale);
+                        //         $scope.regresarVale();
+                        //         $('#loading').modal('hide');
+                        //     }
+                        // }); 
             
                 
                     $('#loading').modal('hide');
@@ -3391,7 +3393,7 @@ $scope.insertaPolizaFFPVFF = async function () {
             
             Codigo: ${datalog.codigo }
             Respuesta BPRO:  ${datalog.mensajeError}
-            vale: ${ $scope.datoPoliza.idComprobacionVale }
+            vale: ${ $scope.nombreVale  }
             
             Reitentar cuando se le notifique la solución a la incidencia`,
             showConfirmButton: true,
@@ -3789,7 +3791,7 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
 
 
 
-    if($scope.datoPoliza.justificoMas == 1)
+    if($scope.datoPoliza.justificoMas == 1 && $scope.datoPoliza.montoCVFR > 0)
         {
             $scope.insertaPolizaFrontCVFRInventario()
         }

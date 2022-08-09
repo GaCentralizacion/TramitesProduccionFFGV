@@ -1248,6 +1248,12 @@ function zeroDelete (item)
 
                 $scope.avanzaReembolso();
 
+                ordenDePagoFFAGRepository.changeEstatusFA($scope.idPerTra,$scope.tipoTramite, $scope.consecutivoTramite).then((res)=>{
+                    if( res.data[0].success == 1 ){
+
+                    }
+                });
+
                // $scope.getDataOrdenPagoFF();
                 $scope.nombreTramite ='REEMBOLSO ORDEN PAGO RFOP'
 
