@@ -3393,7 +3393,7 @@ $scope.insertaPolizaFFPVFF = async function () {
             
             Codigo: ${datalog.codigo }
             Respuesta BPRO:  ${datalog.mensajeError}
-            vale: ${ $scope.datoPoliza.idComprobacionVale }
+            vale: ${ $scope.nombreVale  }
             
             Reitentar cuando se le notifique la solución a la incidencia`,
             showConfirmButton: true,
