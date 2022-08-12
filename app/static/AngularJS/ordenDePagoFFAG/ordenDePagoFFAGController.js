@@ -1288,8 +1288,6 @@ function zeroDelete (item)
                 //$scope.sendMail(respUpdate.correo, respUpdate.asunto, html);
                 $('#loading').modal('hide');
 
-                $('#loading').modal('hide');
-
                 swal({
                     title:"Aviso",
                     type:"success",
@@ -1311,7 +1309,6 @@ function zeroDelete (item)
             }else{
 
                 $('#loading').modal('hide');
-
 
                 datalog.jsonRespuesta = JSON.stringify(resPoliza)
 

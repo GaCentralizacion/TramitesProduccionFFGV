@@ -1928,12 +1928,24 @@ $scope.verPdfComprobacion = function(item) {
 
                         var estatusVale = await verificaValesEvidencia(item.idVale);
                         var datoPoliza = await verificaDatosPolizaApi(item.idVale,item.idValeEvidencia);
+                        var estatusVales = await verificaVale(item.idEmpresa, item.idSucursal, item.nombreVale, item.monto);
 
-                        let montoestatusVale = estatusVale.justificoMas;                        
+                        let montoestatusVale = estatusVale.justificoMas; 
+                        let montoestatusVales = estatusVales.JustificoMas;
+
                         console.log("tipoGasto",montoestatusVale)
                         console.log("datoPoliza",datoPoliza)
 
-                        $scope.datoPoliza = datoPoliza
+                        $scope.datoPoliza = datoPoliza                        
+                        
+
+                        if((estatusVales.justificado == 1 || estatusVale.justifico == 1) && item.compNoAutorizado == 0)
+                            {
+
+                                if( montoestatusVales > 0 ||  montoestatusVale > 0){
+                                    $scope.obtenerVale(montoestatusVales > 0 ? montoestatusVales : montoestatusVale, item.nombreSolicitante)
+                                    }
+                            }
 
                         if($scope.datoPoliza.avanza != 0 ){
 

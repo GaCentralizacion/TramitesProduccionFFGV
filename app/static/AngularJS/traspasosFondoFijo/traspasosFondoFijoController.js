@@ -181,7 +181,7 @@ registrationModule.controller('traspasosFondoFijoController', function ($scope, 
                 $scope.polizaCaja.bancoS = zeroDelete($scope.polizaCaja.cuentaContableSalida);
                 //$scope.obtieneEvidenciasReembolso();
                 $scope.id_perTraReembolso = res.data[0].id_perTraReembolso
-                $scope.complementoPolizas = res.data[0].complementoPoliza;
+                $scope.complementoPolizas = res.data[0].complementoPolizas;
                 $scope.obtieneEvidenciasReembolsoTramite();
             } 
         });
@@ -336,18 +336,16 @@ return x;
                     // aplicacion api
                     // tipoProceso = await promiseInsertaDatos($scope.polizaCaja.idUsuario, $scope.polizaCaja.idSucursal, 13, $scope.polizaCaja.idFondoFijo, $scope.polizaCaja.monto, 'FONFIJ', $scope.polizaCaja.dep_nombrecto, $scope.polizaCaja.id_perTraFF, $scope.polizaCaja.bancoE, '');
                     // tipoProceso = await promiseInsertaDatos($scope.polizaCaja.idUsuario, $scope.polizaCaja.idSucursal, 14, $scope.polizaCaja.idFondoFijo, $scope.polizaCaja.monto, 'FONFIJ', $scope.polizaCaja.dep_nombrecto, $scope.polizaCaja.id_perTraFF, $scope.polizaCaja.bancoS, $scope.polizaCaja.CCDepto);
-                  
-
+                                      
                     let respRFCE
                     let respRFCS
             
                     respRFCE = await AplicaPolizaRFCE()
-            
                     if(respRFCE == true){
                         respRFCS = await AplicaPolizaRFCS()
-                        $location.path('/tesoreriaHome');
+                        //$location.path('/tesoreriaHome');
                     }
-
+                   
                     //$scope.avanzaReembolso();
 
                 }
@@ -382,7 +380,7 @@ return x;
                        
                         $scope.saveDocumentosTramiteAG($scope.idPerTraSolicitante,0,documentoToSave[0])
                     }
-                    $scope.sendMailNotificacion(2);
+                    //$scope.sendMailNotificacion(2);
                     $scope.backDashboard();
                 })
             }
@@ -394,7 +392,9 @@ return x;
             //             $('#loading').modal('hide');
             //             $scope.backTramites = function () {
             //               }
-            $scope.backDashboard();
+           $scope.backDashboard();
+         //$('#loading').modal('hide');
+         //$location.path('/tesoreriaHome');
         }
 
     }
@@ -877,7 +877,7 @@ return x;
                // $scope.getDataOrdenPagoFF();
                 $scope.nombreTramite ='REEMBOLSO ORDEN PAGO RFCE'
 
-                $('#loading').modal('hide');
+               // $('#loading').modal('hide');
 
                 swal({
                     title:"Aviso",
@@ -899,7 +899,7 @@ return x;
                 
             }else{
 
-                $('#loading').modal('hide');
+               // $('#loading').modal('hide');
 
 
                 datalog.jsonRespuesta = JSON.stringify(resPoliza)
@@ -937,7 +937,8 @@ return x;
 
             console.log(respUpdate)
 
-            $scope.backDashboard();
+           // $('#loading').modal('hide');
+            //$scope.backDashboard();
 
         })
     }
@@ -1017,8 +1018,8 @@ return x;
 
                 $scope.avanzaReembolso();
 
-                html = $scope.html1 + 'Se proceso el reembolso al fondo fijo:  ' + $scope.polizaCaja.idFondoFijo +'. ' + "<br><br> Se realizó reembolso por Reembolso Caja por el monto de:  $"+ formatMoney($scope.polizaCaja.monto) + "  " + $scope.html2;
-                $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', $scope.nombreTramite, html);
+                //html = $scope.html1 + 'Se proceso el reembolso al fondo fijo:  ' + $scope.polizaCaja.idFondoFijo +'. ' + "<br><br> Se realizó reembolso por Reembolso Caja por el monto de:  $"+ formatMoney($scope.polizaCaja.monto) + "  " + $scope.html2;
+                //$scope.sendMail('eduardo.yebra@coalmx.com', $scope.nombreTramite, html);
                 //$scope.sendMail(respUpdate.correo, respUpdate.asunto, html);
                 $('#loading').modal('hide');
 
@@ -1042,7 +1043,7 @@ return x;
                 
             }else{
 
-                $('#loading').modal('hide');
+               $('#loading').modal('hide');
 
 
                 datalog.jsonRespuesta = JSON.stringify(resPoliza)
@@ -1080,7 +1081,7 @@ return x;
 
             console.log(respUpdate)
             
-          
+            $('#loading').modal('hide');
 
         })
     }
