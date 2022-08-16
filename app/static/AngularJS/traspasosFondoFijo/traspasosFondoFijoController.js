@@ -877,7 +877,7 @@ return x;
                // $scope.getDataOrdenPagoFF();
                 $scope.nombreTramite ='REEMBOLSO ORDEN PAGO RFCE'
 
-                $('#loading').modal('hide');
+                //$('#loading').modal('hide');
 
                 swal({
                     title:"Aviso",
@@ -937,7 +937,7 @@ return x;
 
             console.log(respUpdate)
 
-            $scope.backDashboard();
+            //$scope.backDashboard();
 
         })
     }
@@ -1081,7 +1081,7 @@ return x;
             console.log(respUpdate)
             
           
-
+            $('#loading').modal('hide');
         })
     }
 
