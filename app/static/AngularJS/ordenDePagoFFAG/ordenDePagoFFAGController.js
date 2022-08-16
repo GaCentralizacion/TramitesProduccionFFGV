@@ -639,6 +639,14 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             apiBproRepository.GetTokenBPRO().then(resp =>{
                 console.log('resp: ',resp)
                 resolve(resp.data)
+            }).catch(err =>{
+                console.log('Error api: ',err)
+                resolve(
+                    {
+                        Token:'Error al generar el token de api',
+                        UnniqId:''
+                    }
+                )
             })
 
         })
@@ -1083,6 +1091,24 @@ function zeroDelete (item)
 
             AuthToken = await promiseAutBPRO();
             //AuthToken = await AuthApi()
+
+            if(AuthToken.Token.includes('Error al generar el token de api')){
+
+                swal({
+                    title:"Aviso",
+                    type:"error",
+                    width: 1000,
+                    text: `Se presento un problema al generar el token del api de BPRO
+                    El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                    
+                    Codigo: Error al generar el token de api
+                    
+                    Reitentar cuando se le notifique la solución a la incidencia`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    //timer:10000
+                })
+            }
 
             datalog.tokenGenerado = AuthToken.Token
             datalog.unniqIdGenerado = AuthToken.UnniqId

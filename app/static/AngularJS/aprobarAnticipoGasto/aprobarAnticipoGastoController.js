@@ -77,6 +77,23 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
            //$scope.tipoDescuento = [{ id:2, text:'Deposito'},{ id:1, text:'Caja'}]
            $scope.tipoDescuento = [{ id:2, text:'Deposito'}]
         }
+
+        var btn = document.querySelector('#confirmaComprobacion');
+        var btnlbl = btn.textContent;
+
+        btn.addEventListener('click', function(e) {
+
+            e.preventDefault();
+            
+            // deshabilita el botón y previene un doble clic
+            this.disabled = true;
+            this.textContent = 'Espere unos segundos...';
+            
+            // activamos el boton despues de 3 seg
+            setTimeout(function(){ btn.disabled=false; btn.textContent = btnlbl; }, 3000);
+
+            });
+
     };
 
     $scope.getAnticipoGastoItem = function () {
@@ -1083,6 +1100,8 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                             datalog.ordenCompra = resPoliza.Folio  
                             datalog.anioPol = 0
                             datalog.consPol = 0
+                            datalog.empresaPol = 1
+                            datalog.mesPol =  0
                             datalog.tipoPol = 'AGVV'
                         }else{
                             datalog.anioPol = resPoliza.Poliza[0].añoPoliza
@@ -1099,7 +1118,7 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                         respAprobarRechazar = await aprobarRechazarArchivo(data)
             
                         respUpdate = await promiseActualizaTramite($scope.tramite.idSolicitud,'AGVV', $scope.archivo.idComprobacionConcepto , 0,datalog.ordenCompra,datalog.consPol,datalog.mesPol,datalog.anioPol)
-            
+
                         if($scope.archivo.totalPoliza == 0){
                             swal({
                                 title:"Aviso",
@@ -1158,17 +1177,17 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                 
                                 console.log( $scope.archivo );
                 
-                                //return true;
-                
                                 console.log( "creacionTramiteEntregaEfectivo", parametros );
                 
-                                $scope.creacionTramiteEntregaEfectivo( parametros );
+                                //$scope.creacionTramiteEntregaEfectivo( parametros );
+                               let gdm = await creacionTramiteEntregaEfectivo(parametros)
                             }
                         }
                         catch( e ){
                             $scope.compNoAutorizada = 0;
                         }
 
+                        $scope.archivo.estatus = 'Aprobado'
                         $scope.archivo.idEstatus = $scope.idEstatusConcepto;
                         $scope.getConceptosPorSolicitud();
                         $('#spinner-loading').modal('hide');
@@ -1281,28 +1300,57 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
             });
         }
 
-    $scope.creacionTramiteEntregaEfectivo = function( parameros ){
-        anticipoGastoRepository.creacionTramiteEntregaEfectivo( parameros ).then( response =>{
-            console.log( "Respuesta de la creacion del tramite", response.data[0].id_perTra );
+    // $scope.creacionTramiteEntregaEfectivo = function( parameros ){
+    //     anticipoGastoRepository.creacionTramiteEntregaEfectivo( parameros ).then( response =>{
+    //         console.log( "Respuesta de la creacion del tramite", response.data[0].id_perTra );
 
-            var parametrosEmail = {
-                empresa: $scope.tramite.empresa,
-                sucursal: $scope.tramite.sucursal,
-                departamento: $scope.tramite.departamento,
-                viaje: $scope.tramite.concepto,
-                motivo: $scope.tramite.motivo,
-                fecha: $scope.tramite.fechaInicio + ' al ' + $scope.tramite.fechaFin,
-                concepto: $scope.conceptosSolicitud[0].concepto,
-                aprobacion: $scope.tramite.importe,
-                comp_aprobado: $scope.archivos[0].total,
-                importe: $scope.archivo.ExcedeMonto,
-                solicitante: $scope.empleados !== undefined && $scope.empleados.length > 0 ? $scope.empleados[0].nombreEmpleado : $scope.tramite.usuario
-            }
+    //         var parametrosEmail = {
+    //             empresa: $scope.tramite.empresa,
+    //             sucursal: $scope.tramite.sucursal,
+    //             departamento: $scope.tramite.departamento,
+    //             viaje: $scope.tramite.concepto,
+    //             motivo: $scope.tramite.motivo,
+    //             fecha: $scope.tramite.fechaInicio + ' al ' + $scope.tramite.fechaFin,
+    //             concepto: $scope.conceptosSolicitud[0].concepto,
+    //             aprobacion: $scope.tramite.importe,
+    //             comp_aprobado: $scope.archivos[0].total,
+    //             importe: $scope.archivo.ExcedeMonto,
+    //             solicitante: $scope.empleados !== undefined && $scope.empleados.length > 0 ? $scope.empleados[0].nombreEmpleado : $scope.tramite.usuario
+    //         }
             
-            html = $scope.bodyTramitesCuenta( response.data[0].id_perTra, parametrosEmail );
-            $scope.sendMail($scope.tramite.correosFinanzas, "Gastos de Viaje - Entrega de efectivo de gastos de más aprobados", html);
-        });
+    //         html = $scope.bodyTramitesCuenta( response.data[0].id_perTra, parametrosEmail );
+    //         $scope.sendMail($scope.tramite.correosFinanzas, "Gastos de Viaje - Entrega de efectivo de gastos de más aprobados", html);
+    //     });
+    // }
+
+    function creacionTramiteEntregaEfectivo(parameros){
+
+        return new Promise((resolve) => {
+            anticipoGastoRepository.creacionTramiteEntregaEfectivo( parameros ).then( response =>{
+                console.log( "Respuesta de la creacion del tramite", response.data[0].id_perTra );
+    
+                var parametrosEmail = {
+                    empresa: $scope.tramite.empresa,
+                    sucursal: $scope.tramite.sucursal,
+                    departamento: $scope.tramite.departamento,
+                    viaje: $scope.tramite.concepto,
+                    motivo: $scope.tramite.motivo,
+                    fecha: $scope.tramite.fechaInicio + ' al ' + $scope.tramite.fechaFin,
+                    concepto: $scope.conceptosSolicitud[0].concepto,
+                    aprobacion: $scope.tramite.importe,
+                    comp_aprobado: $scope.archivos[0].total,
+                    importe: $scope.archivo.ExcedeMonto,
+                    solicitante: $scope.empleados !== undefined && $scope.empleados.length > 0 ? $scope.empleados[0].nombreEmpleado : $scope.tramite.usuario
+                }
+                
+                html = $scope.bodyTramitesCuenta( response.data[0].id_perTra, parametrosEmail );
+                $scope.sendMail($scope.tramite.correosFinanzas, "Gastos de Viaje - Entrega de efectivo de gastos de más aprobados", html);
+                resolve(true)
+            });
+        })
+
     }
+
 
     $scope.cuentasContablesFF = function () {
         $('#modalArchivoEdicion').modal('hide');
