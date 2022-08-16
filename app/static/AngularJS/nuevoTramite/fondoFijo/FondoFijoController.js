@@ -3457,26 +3457,43 @@ $scope.insertaPolizaFFPVFF = async function (sendData) {
             datalog.resuelto = 0
         }else{
             datalog.mensajeError = resPoliza.Mensaje
+            //datalog.mensajeError ="La transacción (id. de proceso 2065) quedó en interbloqueo en bloqueo recursos con otro proceso y fue elegida como sujeto del interbloqueo. Ejecute de nuevo la transacción."
             datalog.codigo = resPoliza.Codigo
             datalog.resuelto = 0
         }
-
-        swal({
-            title:"Aviso",
-            type:"error",
-            width: 1000,
-            text: `Se presento un problema al procesar la póliza en BPRO
-            No ha sido procesado, favor de notificar al área de sistemas 
-            
-            Codigo: ${datalog.codigo }
-            Respuesta BPRO:  ${datalog.mensajeError}
-            vale: ${ $scope.nombreVale  }
-            
-            Reitentar cuando se le notifique la solución a la incidencia`,
-            showConfirmButton: true,
-            showCloseButton:  false
-            //timer:10000
-        })
+        
+        if(datalog.mensajeError.includes('interbloqueo'))
+        {
+            swal({
+                title:"Aviso",
+                type:"error",
+                width: 1000,
+                text: `Se presento un problema al procesar la póliza en BPRO
+                No ha sido procesado. Por favor intente nuevamente`,
+                showConfirmButton: true,
+                showCloseButton:  false
+                //timer:10000
+            })
+        }
+        else{
+            swal({
+                title:"Aviso",
+                type:"error",
+                width: 1000,
+                text: `Se presento un problema al procesar la póliza en BPRO
+                No ha sido procesado, favor de notificar al área de sistemas 
+                
+                Codigo: ${datalog.codigo }
+                Respuesta BPRO:  ${datalog.mensajeError}
+                vale: ${ $scope.nombreVale  }
+                
+                Reitentar cuando se le notifique la solución a la incidencia`,
+                showConfirmButton: true,
+                showCloseButton:  false
+                //timer:10000
+            })
+        }
+       
     }
 
     respLog = await LogApiBpro(datalog)
