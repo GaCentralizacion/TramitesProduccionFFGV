@@ -127,6 +127,7 @@ registrationModule.controller('FondoFijoController', function ($scope, $rootScop
         $scope.listaVales = [];
         $scope.id_perTra = vale.id_perTra;
         $scope.idVale = vale.idVale;
+        $scope.idValeFF = vale.idVale;
         $scope.saveUrl = vale.saveUrl;
         $scope.descripcionVale = vale.razon;
         $scope.tipoGasto = vale.tipoTramite;
@@ -144,6 +145,8 @@ registrationModule.controller('FondoFijoController', function ($scope, $rootScop
         $scope.nombreVale = vale.nombreVale;
         $scope.sucursalVale = vale.idSucursal;
         $scope.idValeEstatus = vale.idestatus
+        $scope.JustificadoReal = vale.montoSolicitado - vale.JustificadoReal;
+        $scope.muestraRegreso = vale.muestraRegreso;
     }
   
     $scope.regresarVale = function (vale) {
@@ -247,7 +250,7 @@ $scope.actualizarVale = function (accion) {
 
             console.log("INICIO API Bpro Poliza PVFF")          
             $scope.tipoProcesoAPI = 6
-            $scope.insertaPolizaFFPVFF();            
+            $scope.insertaPolizaFFPVFF(sendData);              
 
             // if($scope.idTramite == 10)
             // {           
@@ -1853,7 +1856,8 @@ $scope.verPdfComprobacion = function(item) {
     };
 
     $scope.enviarDescuento = async function () {
-        $scope.dataComplementoFF();
+        var traeInfo = await verificaValesRegreso();
+        //$scope.dataComplementoFF();
 
         if ($scope.descuentoSelected == undefined) {
             swal('Alto', 'Debes seleccionar el tipo de descuento', 'warning');
@@ -1897,9 +1901,9 @@ $scope.verPdfComprobacion = function(item) {
         $("#modalDescuento").modal("hide");
     }
 
-    $scope.dataComplementoFF = function async (){
+    // $scope.dataComplementoFF = function async (){
         
-    }
+    // }
 
     $scope.AutorizarRechazarEvidencia = function (item,tipo) {
         swal({
@@ -1926,14 +1930,34 @@ $scope.verPdfComprobacion = function(item) {
                 misTramitesValesRepository.updateTramiteValeEvidencia(item.idValeEvidencia,tipo,'',0, $rootScope.user.usu_idusuario).then(async function (result) {
                     if (result.data.length > 0) {
 
+                        // var estatusVale = await verificaValesEvidencia(item.idVale);
+                        // var datoPoliza = await verificaDatosPolizaApi(item.idVale,item.idValeEvidencia);
+
+                        // let montoestatusVale = estatusVale.justificoMas;                        
+                        // console.log("tipoGasto",montoestatusVale)
+                        //console.log("datoPoliza",datoPoliza)
+
+                        //$scope.datoPoliza = datoPoliza
+
                         var estatusVale = await verificaValesEvidencia(item.idVale);
                         var datoPoliza = await verificaDatosPolizaApi(item.idVale,item.idValeEvidencia);
+                        var estatusVales = await verificaVale(item.idEmpresa, item.idSucursal, item.nombreVale, item.monto);
 
-                        let montoestatusVale = estatusVale.justificoMas;                        
+                        let montoestatusVale = estatusVale.justificoMas; 
+                        let montoestatusVales = estatusVales.JustificoMas;
+
                         console.log("tipoGasto",montoestatusVale)
                         console.log("datoPoliza",datoPoliza)
 
-                        $scope.datoPoliza = datoPoliza
+                        $scope.datoPoliza = datoPoliza                        
+                        
+                        if((estatusVales.justificado == 1 || estatusVale.justifico == 1) && item.compNoAutorizado == 0)
+                            {
+
+                                if( montoestatusVales > 0 ||  montoestatusVale > 0){
+                                    $scope.obtenerVale(montoestatusVales > 0 ? montoestatusVales : montoestatusVale, item.nombreSolicitante)
+                                    }
+                            }
 
                         if($scope.datoPoliza.avanza != 0 ){
 
@@ -2928,6 +2952,44 @@ async function promiseInsertaDatosOrden(idempresa,idsucursal,proceso,foliofondo,
     });
 }
 
+async function verificaValesRegreso() {
+    return new Promise((resolve, reject) => {
+            if($scope.opcionFF == undefined ){$scope.opcionFF = 0}
+            if($scope.idVale == undefined ){$scope.idVale = 0}
+            if($scope.opcionFF == undefined ){$scope.opcionFF = 0}
+            if($scope.ProcesoPol == undefined ){$scope.ProcesoPol = "0"}
+            
+            $scope.nombreValeAPI = $scope.nombreVale
+    
+            if (tipoProcesoAPI = 7 ) {$scope.nombreValeAPI = $scope.idValeEvidenciaAPI}
+            if (tipoProcesoAPI = 7 ) {$scope.ProcesoPol = 'AVFF'}    
+    
+            fondoFijoRepository.dataComplementoFF($scope.id_perTra,$scope.idValeFF,$scope.idUsuario,$scope.idEmpresa,$scope.idSucursal,$scope.ProcesoPol,$scope.nombreValeAPI,$scope.opcionFF).then(resp => {
+                $scope.complementoAPi = resp.data[0]
+                $scope.iPersonaDevFF            = resp.data[0].PER_IDPERSONA;
+                $scope.areaAfectacion           = resp.data[0].areaAfectacion;
+                $scope.precioUnitario           = resp.data[0].precioUnitario;
+                $scope.tasaIVA                  = resp.data[0].tasaIVA;
+                $scope.conceptoContable         = resp.data[0].conceptoContable;
+                $scope.banderaComprobacionMas   = resp.data[0].banderaComprobacionMas;        
+                $scope.montoValeAVFF            = resp.data[0].montoValeAVFF;
+                $scope.montoValeCVFR            = resp.data[0].montoValeCVFR;
+                $scope.ivaAVFF                  = resp.data[0].ivaAVFF;
+                $scope.ivaCVFR                  = resp.data[0].ivaCVFR;
+                $scope.montoAVFFo               = resp.data[0].montoAVFFo;
+                $scope.montoCVFRo               = resp.data[0].montoCVFRo; 
+                $scope.cuentaEnvio              = resp.data[0].cuentaEnvio;
+                $scope.montoSaldo               = resp.data[0].montoSaldo
+                $scope.persona1pvff             = resp.data[0].persona1pvff
+                $scope.persona2pvff             = resp.data[0].persona2pvff
+                $scope.complementoPolizas       = resp.data[0].complementoPolizas
+                resolve(true);
+            }).catch(err => {
+                reject(false);
+            });
+    });
+}
+
 async function verificaValesEvidencia(idVale) {
     return new Promise((resolve, reject) => {
         fondoFijoRepository.verificaValesEvidencia(idVale).then(function (result) {
@@ -3263,7 +3325,7 @@ async function LogApiBpro(data){
     }
 
 
-$scope.insertaPolizaFFPVFF = async function () {
+$scope.insertaPolizaFFPVFF = async function (sendData) {
     let banco = zeroDelete($scope.cuentaContable);
     let AuthToken;
     let FFVale = $scope.nombreVale 
@@ -3342,6 +3404,21 @@ $scope.insertaPolizaFFPVFF = async function () {
         datalog.codigo = resPoliza.Codigo
         datalog.resuelto = 1
 
+        aprobarValeRepository.updateTramiteVale(sendData).then((resf) => {
+            if (resf.data[0].success == 1) {
+            $scope.guardarBitacoraProceso($rootScope.user.usu_idusuario, JSON.parse(localStorage.getItem('borrador')).idPerTra, 0, 'Se entrego Efectivo vale '+ resf.data[0].vale, 1, 0);
+             $scope.listaValeFondoFijo(JSON.parse(localStorage.getItem('borrador')).idPerTra);
+             $('#loading').modal('hide');
+             $("#aprobarVale").modal("hide");
+             //$scope.regresarVale();
+            }
+            else{
+             $('#loading').modal('hide');
+             swal('Error', 'No se aplicaron los cambios', 'error');
+            }
+        });
+
+        
         respUpdate = await promiseActualizaTramiteFF($scope.idValeFF,$scope.idUsuario ,'PVFF', FFVale, $scope.incremental)
         console.log(respUpdate)
 
