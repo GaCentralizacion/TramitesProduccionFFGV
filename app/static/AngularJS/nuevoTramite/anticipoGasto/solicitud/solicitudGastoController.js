@@ -584,35 +584,36 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
             return 'El ID Persona no puede ser vació o cero';
         } else if (tramiteItem.motivo === undefined || tramiteItem.motivo.length < 15){
             return 'El motivo del viaje debe ser mas detallado máximo 150 caracteres mínimo 15 caracteres'
-        } else if( 
-            (tramiteItem.cuenta.clabe == '' || tramiteItem.cuenta.clabe == undefined) 
-            && (tramiteItem.cuenta.cuenta == '' || tramiteItem.cuenta.cuenta == undefined)
-            && (tramiteItem.cuenta.plaza == '' || tramiteItem.cuenta.plaza == undefined)
-            && (tramiteItem.cuenta.sucursal == '' || tramiteItem.cuenta.sucursal == undefined)
-        ){
-            return 'Los datos de la cuenta son obligatorios'
-        }
-        else if ((tramiteItem.cuenta.clabe == '' || tramiteItem.cuenta.clabe == undefined)) {
-            return 'La cuenta CLABE es obligatoria';
         } 
-        else if ((tramiteItem.cuenta.clabe.length  != 18 )) {
-            return 'La cuenta CLABE debe ser de 18 dígitos';
-        } 
-        else if ((tramiteItem.cuenta.cuenta == '' || tramiteItem.cuenta.cuenta == undefined)) {
-            return 'El número de cuenta es obligatoria';
-        } 
-        else if ((tramiteItem.cuenta.plaza == '' || tramiteItem.cuenta.plaza == undefined)) {
-            return 'El campo Plaza es obligatorio';
-        } 
-        else if ((tramiteItem.cuenta.sucursal == '' || tramiteItem.cuenta.sucursal == undefined)) {
-            return 'El campo Sucursal es obligatorio';
-        } 
-        else if ((tramiteItem.cuenta.idBanco == '' || tramiteItem.cuenta.idBanco == undefined)) {
-            return 'El Banco es obligatorio, verifique su cuenta CLABE';
-        } 
-        else if( ( tramiteItem.cuenta.estatus == 2 || tramiteItem.cuenta.estatus == 4 ) && ( $scope.documento.archivo === '' || $scope.documento.archivo === undefined )) {
-            return 'El estado de cuenta es obligatorio';
-        }
+        // else if( 
+        //     (tramiteItem.cuenta.clabe == '' || tramiteItem.cuenta.clabe == undefined) 
+        //     && (tramiteItem.cuenta.cuenta == '' || tramiteItem.cuenta.cuenta == undefined)
+        //     && (tramiteItem.cuenta.plaza == '' || tramiteItem.cuenta.plaza == undefined)
+        //     && (tramiteItem.cuenta.sucursal == '' || tramiteItem.cuenta.sucursal == undefined)
+        // ){
+        //     return 'Los datos de la cuenta son obligatorios'
+        // }
+        // else if ((tramiteItem.cuenta.clabe == '' || tramiteItem.cuenta.clabe == undefined)) {
+        //     return 'La cuenta CLABE es obligatoria';
+        // } 
+        // else if ((tramiteItem.cuenta.clabe.length  != 18 )) {
+        //     return 'La cuenta CLABE debe ser de 18 dígitos';
+        // } 
+        // else if ((tramiteItem.cuenta.cuenta == '' || tramiteItem.cuenta.cuenta == undefined)) {
+        //     return 'El número de cuenta es obligatoria';
+        // } 
+        // else if ((tramiteItem.cuenta.plaza == '' || tramiteItem.cuenta.plaza == undefined)) {
+        //     return 'El campo Plaza es obligatorio';
+        // } 
+        // else if ((tramiteItem.cuenta.sucursal == '' || tramiteItem.cuenta.sucursal == undefined)) {
+        //     return 'El campo Sucursal es obligatorio';
+        // } 
+        // else if ((tramiteItem.cuenta.idBanco == '' || tramiteItem.cuenta.idBanco == undefined)) {
+        //     return 'El Banco es obligatorio, verifique su cuenta CLABE';
+        // } 
+        // else if( ( tramiteItem.cuenta.estatus == 2 || tramiteItem.cuenta.estatus == 4 ) && ( $scope.documento.archivo === '' || $scope.documento.archivo === undefined )) {
+        //     return 'El estado de cuenta es obligatorio';
+        // }
         else{
             return ''
         }

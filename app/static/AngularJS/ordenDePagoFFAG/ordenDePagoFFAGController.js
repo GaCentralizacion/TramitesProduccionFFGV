@@ -639,16 +639,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             apiBproRepository.GetTokenBPRO().then(resp =>{
                 console.log('resp: ',resp)
                 resolve(resp.data)
-            }).catch(err =>{
-                console.log('Error api: ',err)
-                resolve(
-                    {
-                        Token:'Error al generar el token de api',
-                        UnniqId:''
-                    }
-                )
             })
-
         })
     }
 
@@ -777,6 +768,34 @@ function zeroDelete (item)
             datalog.opcion = 1        
 
         AuthToken = await promiseAutBPRO();
+
+        if(AuthToken.Token.includes('Error al generar el token de api')){
+
+            datalog.tokenGenerado = AuthToken.Token
+            datalog.unniqIdGenerado = ''
+            datalog.jsonEnvio = JSON.stringify($scope.apiJson)
+            datalog.mensajeError = JSON.stringify(AuthToken.Error) 
+
+            let respLog = await LogApiBpro(datalog)
+
+            swal({
+                title:"Aviso",
+                type:"error",
+                width: 1000,
+                text: `Se presento un problema al generar el token del api de BPRO
+                El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                
+                Codigo: Error al generar el token de api \n folio bitácora: ${respLog.folio}
+                
+                Reitentar cuando se le notifique la solución a la incidencia`,
+                showConfirmButton: true,
+                showCloseButton:  false,
+                //timer:10000
+            })
+            
+            resolve(false)
+            return
+        }
 
         datalog.tokenGenerado = AuthToken.Token
         datalog.unniqIdGenerado = AuthToken.UnniqId
@@ -909,10 +928,6 @@ function zeroDelete (item)
         })
     }
 
-    $scope.AplicaPolizaGVOP = function async (){
-        
-    }
-
     async function AplicaPolizaGVTE (){
         return new Promise( async (resolve, reject) => {
             let banco = zeroDelete($scope.cuentaContableSalida);
@@ -954,6 +969,34 @@ function zeroDelete (item)
                 datalog.opcion = 1        
 
             AuthToken = await promiseAutBPRO();
+
+            if(AuthToken.Token.includes('Error al generar el token de api')){
+
+                datalog.tokenGenerado = AuthToken.Token
+                datalog.unniqIdGenerado = ''
+                datalog.jsonEnvio = JSON.stringify($scope.apiJson)
+                datalog.mensajeError = JSON.stringify(AuthToken.Error) 
+    
+                let respLog = await LogApiBpro(datalog)
+
+                swal({
+                    title:"Aviso",
+                    type:"error",
+                    width: 1000,
+                    text: `Se presento un problema al generar el token del api de BPRO
+                    El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                    
+                    Codigo: Error al generar el token de api \n folio bitácora: ${respLog.folio}
+                    
+                    Reitentar cuando se le notifique la solución a la incidencia`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    //timer:10000
+                })
+                
+                resolve(false)
+                return
+            }
 
             datalog.tokenGenerado = AuthToken.Token
             datalog.unniqIdGenerado = AuthToken.UnniqId
@@ -1094,6 +1137,13 @@ function zeroDelete (item)
 
             if(AuthToken.Token.includes('Error al generar el token de api')){
 
+                datalog.tokenGenerado = AuthToken.Token
+                datalog.unniqIdGenerado = ''
+                datalog.jsonEnvio = JSON.stringify($scope.apiJson)
+                datalog.mensajeError = JSON.stringify(AuthToken.Error) 
+    
+                let respLog = await LogApiBpro(datalog)
+
                 swal({
                     title:"Aviso",
                     type:"error",
@@ -1101,13 +1151,16 @@ function zeroDelete (item)
                     text: `Se presento un problema al generar el token del api de BPRO
                     El trámite no ha sido procesado, favor de notificar al área de sistemas 
                     
-                    Codigo: Error al generar el token de api
+                    Codigo: Error al generar el token de api \n folio bitácora: ${respLog.folio}
                     
                     Reitentar cuando se le notifique la solución a la incidencia`,
                     showConfirmButton: true,
                     showCloseButton:  false,
                     //timer:10000
                 })
+                
+                resolve(false)
+                return
             }
 
             datalog.tokenGenerado = AuthToken.Token
@@ -1247,7 +1300,34 @@ function zeroDelete (item)
                 datalog.opcion = 1        
 
             AuthToken = await promiseAutBPRO();
-            //AuthToken = await AuthApi()
+            
+            if(AuthToken.Token.includes('Error al generar el token de api')){
+
+                datalog.tokenGenerado = AuthToken.Token
+                datalog.unniqIdGenerado = ''
+                datalog.jsonEnvio = JSON.stringify($scope.apiJson)
+                datalog.mensajeError = JSON.stringify(AuthToken.Error) 
+    
+                let respLog = await LogApiBpro(datalog)
+
+                swal({
+                    title:"Aviso",
+                    type:"error",
+                    width: 1000,
+                    text: `Se presento un problema al generar el token del api de BPRO
+                    El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                    
+                    Codigo: Error al generar el token de api \n folio bitácora: ${respLog.folio}
+                    
+                    Reitentar cuando se le notifique la solución a la incidencia`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    //timer:10000
+                })
+                
+                resolve(false)
+                return
+            }
 
             datalog.tokenGenerado = AuthToken.Token
             datalog.unniqIdGenerado = AuthToken.UnniqId
@@ -1395,7 +1475,34 @@ function zeroDelete (item)
                 datalog.opcion = 1        
 
             AuthToken = await promiseAutBPRO();
-            //AuthToken = await AuthApi()
+            
+            if(AuthToken.Token.includes('Error al generar el token de api')){
+
+                datalog.tokenGenerado = AuthToken.Token
+                datalog.unniqIdGenerado = ''
+                datalog.jsonEnvio = JSON.stringify($scope.apiJson)
+                datalog.mensajeError = JSON.stringify(AuthToken.Error) 
+    
+                let respLog = await LogApiBpro(datalog)
+
+                swal({
+                    title:"Aviso",
+                    type:"error",
+                    width: 1000,
+                    text: `Se presento un problema al generar el token del api de BPRO
+                    El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                    
+                    Codigo: Error al generar el token de api \n folio bitácora: ${respLog.folio}
+                    
+                    Reitentar cuando se le notifique la solución a la incidencia`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    //timer:10000
+                })
+                
+                resolve(false)
+                return
+            }
 
             datalog.tokenGenerado = AuthToken.Token
             datalog.unniqIdGenerado = AuthToken.UnniqId
