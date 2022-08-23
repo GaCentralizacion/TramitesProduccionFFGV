@@ -1928,8 +1928,8 @@ $scope.verPdfComprobacion = function(item) {
 
                 // NEW COMPROBACIONES 
                 misTramitesValesRepository.updateTramiteValeEvidencia(item.idValeEvidencia,tipo,'',0, $rootScope.user.usu_idusuario).then(async function (result) {
-                    if (result.data.length > 0) {
-
+                   // if (result.data.length > 0) {
+                      if(result.data[0].success == 1) {
                         // var estatusVale = await verificaValesEvidencia(item.idVale);
                         // var datoPoliza = await verificaDatosPolizaApi(item.idVale,item.idValeEvidencia);
 
@@ -2001,6 +2001,20 @@ $scope.verPdfComprobacion = function(item) {
                         }
 
                         
+                    }
+                    else
+                    {
+                        $('#loading').modal('hide');
+                        $scope.regresarVale();
+                        swal({
+                            title:"Aviso",
+                            type:"success",
+                            width: 1000,
+                            text: `Mensaje:  ${result.data[0].msg}`,
+                            showConfirmButton: true,
+                            showCloseButton:  false
+                            //timer:5000
+                        })  
                     }
                 });
 
@@ -3668,7 +3682,20 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
                 datalog.codigo = resPoliza.Codigo
                 datalog.resuelto = 0
             }
-
+            if(datalog.mensajeError.includes('interbloqueo'))
+            {
+                swal({
+                    title:"Aviso",
+                    type:"error",
+                    width: 1000,
+                    text: `Se presento un problema al procesar la póliza en BPRO
+                    No ha sido procesado. Por favor intente nuevamente`,
+                    showConfirmButton: true,
+                    showCloseButton:  false
+                    //timer:10000
+                })
+            }
+            else{
             swal({
                 title:"Aviso",
                 type:"error",
@@ -3685,6 +3712,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
                 showCloseButton:  false
                 //timer:10000
             })
+        }
         }
 
         respLog = await LogApiBpro(datalog)
@@ -3860,6 +3888,20 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
             datalog.resuelto = 0
         }
 
+        if(datalog.mensajeError.includes('interbloqueo'))
+        {
+            swal({
+                title:"Aviso",
+                type:"error",
+                width: 1000,
+                text: `Se presento un problema al procesar la póliza en BPRO
+                No ha sido procesado. Por favor intente nuevamente`,
+                showConfirmButton: true,
+                showCloseButton:  false
+                //timer:10000
+            })
+        }
+        else{
         swal({
             title:"Aviso",
             type:"error",
@@ -3876,6 +3918,7 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
             showCloseButton:  false
             //timer:10000
         })
+    }
     }
 
     respLog = await LogApiBpro(datalog)
@@ -4051,6 +4094,20 @@ $scope.insertaPolizaFrontCVFR = async function () {
             datalog.resuelto = 0
         }
 
+        if(datalog.mensajeError.includes('interbloqueo'))
+        {
+            swal({
+                title:"Aviso",
+                type:"error",
+                width: 1000,
+                text: `Se presento un problema al procesar la póliza en BPRO
+                No ha sido procesado. Por favor intente nuevamente`,
+                showConfirmButton: true,
+                showCloseButton:  false
+                //timer:10000
+            })
+        }
+        else{
         swal({
             title:"Aviso",
             type:"error",
@@ -4067,6 +4124,7 @@ $scope.insertaPolizaFrontCVFR = async function () {
             showCloseButton:  false
             //timer:10000
         })
+      }
     }
 
     respLog = await LogApiBpro(datalog)
@@ -4160,6 +4218,20 @@ $scope.generaOCCVFR = async function () {
             datalog.resuelto = 0
         }
 
+        if(datalog.mensajeError.includes('interbloqueo'))
+        {
+            swal({
+                title:"Aviso",
+                type:"error",
+                width: 1000,
+                text: `Se presento un problema al procesar la póliza en BPRO
+                No ha sido procesado. Por favor intente nuevamente`,
+                showConfirmButton: true,
+                showCloseButton:  false
+                //timer:10000
+            })
+        }
+        else{
         $('#loading').modal('hide');
         swal({
             title:"Aviso",
@@ -4176,6 +4248,7 @@ $scope.generaOCCVFR = async function () {
             showCloseButton:  false
             //timer:10000
         })
+        }
       
     }
 
@@ -4332,6 +4405,20 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
             datalog.resuelto = 0
         }
 
+        if(datalog.mensajeError.includes('interbloqueo'))
+        {
+            swal({
+                title:"Aviso",
+                type:"error",
+                width: 1000,
+                text: `Se presento un problema al procesar la póliza en BPRO
+                No ha sido procesado. Por favor intente nuevamente`,
+                showConfirmButton: true,
+                showCloseButton:  false
+                //timer:10000
+            })
+        }
+        else{
         swal({
             title:"Aviso",
             type:"error",
@@ -4348,6 +4435,7 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
             showCloseButton:  false
             //timer:10000
         })
+        }
     }
 
     respLog = await LogApiBpro(datalog)
@@ -4489,6 +4577,20 @@ $scope.insertaPolizaFFCVFM = async function () {
             datalog.resuelto = 0
         }
 
+        if(datalog.mensajeError.includes('interbloqueo'))
+        {
+            swal({
+                title:"Aviso",
+                type:"error",
+                width: 1000,
+                text: `Se presento un problema al procesar la póliza en BPRO
+                No ha sido procesado. Por favor intente nuevamente`,
+                showConfirmButton: true,
+                showCloseButton:  false
+                //timer:10000
+            })
+        }
+        else {
         swal({
             title:"Aviso",
             type:"error",
@@ -4505,6 +4607,7 @@ $scope.insertaPolizaFFCVFM = async function () {
             showCloseButton:  false
             //timer:10000
         })
+        }
     }
 
     respLog = await LogApiBpro(datalog)
