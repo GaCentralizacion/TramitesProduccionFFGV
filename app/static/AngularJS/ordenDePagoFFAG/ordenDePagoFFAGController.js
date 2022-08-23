@@ -545,7 +545,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             $scope.showRechazar = true;
         }
         if( documento.id_documento == 4 && $scope.idTramite === '9'){
-            $scope.showRechazar = false;
+            $scope.showRechazar = true;
         }
         $scope.rechazarDocumentoTesoreria = documento;
         $('#pdfReferenceContent object').remove();
@@ -920,7 +920,7 @@ function zeroDelete (item)
                     if (value.id_documento == 4) {
                         //|| value.id_documento == 46 || value.id_documento == 47) {
                             $scope.docTesoreria.push(value);
-                            if( value.estatus === 3 ){
+                            if( value.detEstatusIne === 3 ){
                                 $scope.rechazoDeDocs = true;
                             }
                         }
@@ -1596,5 +1596,27 @@ function zeroDelete (item)
         })
     }
 
+    $scope.sendRechazo = function (){
+        if ($scope.razonesRechazo == '' || $scope.razonesRechazo === undefined || $scope.razonesRechazo=== null) {
+            swal('Alto', 'Debes mandar las razones por la cual rechazas el documento', 'warning');
+        } else {
+            $("#rechazarDoc").modal("hide");
+            $("#loading").modal("show");
+            ordenDePagoFFAGRepository.rechazarDocumento($scope.sendDetIdPerTra, $scope.razonesRechazo, $scope.idPerTra, $scope.id_documento, $rootScope.user.usu_idusuario).then((res) => {
+                if (res.data[0].success == 1) {
+                    $("#loading").modal("hide");
+                    $scope.sendMail(res.data[0].destinatarios, ` INE incorrecto trámite ${$scope.idPerTra} de Gastos de Viaje`, res.data[0].html);
+                    $scope.getDocumentosUsuarioGV($scope.idPerTra)
+                    $scope.razonesRechazo = '';
+                    $scope.sendDetIdPerTra = 0;
+                    swal('Listo', `${res.data[0].msg} \n El usuario solicitante ha sido notificado`, 'success');
+                } else {
+                    $scope.sendDetIdPerTra = 0;
+                    $("#loading").modal("hide");
+                    swal('Alto', 'Ocurrio un error al rechazar el documento', 'warning');
+                }
+            });
+        }
+    }
 
 });

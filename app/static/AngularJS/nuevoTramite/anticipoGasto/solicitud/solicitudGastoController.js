@@ -57,7 +57,7 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
     $scope.disabledTipoViaje = true;
     $scope.disabledConcepto = true;
     $scope.disabledMonto = true;
-    $scope.mostrarCuentas = false;
+    $scope.mostrarCuentas = true;
 
     $scope.documento = {url:'',archivo:'', ext_nombre:'pdf', idDocumento:13};
     $scope.documentoINE =  {url:'',archivo:'', ext_nombre:'pdf', idDocumento:4};
@@ -127,6 +127,7 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
     $scope.idpersonaAdicional = 0;
     $scope.dominiosValidos = [];
     $scope.usuarioActivo = 0;
+    $scope.notificaTesoreriaIne = false
 
     $scope.init = () => {
         $rootScope.usuario = JSON.parse(localStorage.getItem('usuario'));
@@ -218,7 +219,7 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
                 }else if(res.data[i].id_documento === 4 )
                 {
                     $scope.documentoINE=res.data[i];
-                    if($scope.documentoINE.archivo === undefined && $scope.documentoINE.id_perTra === null){
+                    if($scope.documentoINE.archivo === undefined && $scope.documentoINE.id_perTra === null || $scope.documentoINE.estatusDocumento === 3){
                         $scope.documentoINE.archivo = ''
                     }
                    
@@ -585,6 +586,9 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
         } else if (tramiteItem.motivo === undefined || tramiteItem.motivo.length < 15){
             return 'El motivo del viaje debe ser mas detallado máximo 150 caracteres mínimo 15 caracteres'
         } 
+        // else if ($scope.documentoINE.archivo === '' ){
+        //     return 'Es necesario cargar el INE por ambas caras en un mismo archivo pdf'
+        // } 
         // else if( 
         //     (tramiteItem.cuenta.clabe == '' || tramiteItem.cuenta.clabe == undefined) 
         //     && (tramiteItem.cuenta.cuenta == '' || tramiteItem.cuenta.cuenta == undefined)
@@ -823,14 +827,14 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
         else{
             //Buscar al autorizador al que se le va a enviar la notificación
             var error = $scope.validarTramite($scope.tramite);
-            // if( $scope.documentoINE.id_perTra !== null && $scope.documentoINE.id_perTra !== undefined){
+            if( $scope.documentoINE.id_perTra !== null && $scope.documentoINE.id_perTra !== undefined){
             if(error == ''){
                 $scope.accionEnviar = true;
                 $scope.buscarAutorizador($scope.selEmpresa);
             }
-            // }
-            // else
-            // swal('Anticipo de Gastos','El documento INE es obligatorio ')
+             }
+             else
+             swal('Anticipo de Gasto','Es necesario cargar el INE por ambas caras en un mismo archivo pdf', 'warning')
 
         }
     };
@@ -1657,6 +1661,7 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
                                                 }                              
                                                 console.log($scope.documento)
                                             })  
+
                                         }
                                     });
                 });
@@ -1669,6 +1674,7 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
     };
 
     $scope.saveDocumentosTramiteBanco = function (idPertra,  contDocs, documento) {
+        $("#loading").modal("show");
         var sendData = {};
         //var saveUrl = 'C:\\app\\public\\Imagenes\\Comprobaciones\\';
         // var saveUrl = 'C:\\NodeApps\\Tramites\\app\\static\\documentos\\';
@@ -1693,8 +1699,8 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
                     consecutivo:1
                 }
 
-                anticipoGastoRepository.saveEdoCuentas(sendData.idDocumento, sendData.idTramite, sendData.idPerTra).then(resp => {
-                    console.log(resp)
+                 anticipoGastoRepository.saveEdoCuentas(sendData.idDocumento, sendData.idTramite, sendData.idPerTra).then(resp => {
+                //     console.log(resp)
                     anticipoGastoRepository.saveDocumentos(sendData).then((res) => {
                                         if (res.data.ok) {
                                             console.log(res.data);
@@ -1707,11 +1713,60 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
                                                         }
                                                         else{
                                                             $scope.documentoINE = res.data[i];
+                                                            $scope.documentoINE.estatusDocumento = 2
                                                         }
                                                     }
                                                 }                              
                                                 console.log($scope.documento)
+
+                                                $("#loading").modal("hide");
                                             })  
+                                           
+                                            if($scope.notificaTesoreriaIne === true){
+
+                                                var html = `
+                                                <!DOCTYPE html>
+                                                <html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+                                                </head>
+                                                <body>
+                                                <div style="font-family: Arial;"><div style="font-size: 16px;color: #023671;margin-left: 10px; text-align: center;">
+                                                    <h2>INE ACTUALIZADO </h2>
+                                                </div>
+                                                  <div style="font-family: Arial;font-size: 14px; text-align: center;">
+                                                    <div style="font-size: 14px;color: #023671;margin-left: 100px; text-align: justify; width:700px;">
+                                                          
+                                                        <p>
+                                                        Buen día.
+                                                        </p>
+                                                        <p>
+                                                        El usuario <strong> ${$scope.nombrePersona} </strong>  actualizó el INE para poder continuar con el proceso <strong> Anticipo de Gastos - Orden de Pago</strong> que tiene pendiente de orden de pago. \n
+                                                        Puede buscarlos en su panel de tramites con los siguientes filtros:
+                                                        </p>
+                                                        <p>
+                                                            <ul>
+                                                            <li>
+                                                                Tramite: <strong> Anticipo de Gastos - Orden de Pago </strong>
+                                                            </li>
+                                                            <li>
+                                                                Persona: <strong> ${$scope.nombrePersona} </strong>
+                                                            </li>
+                                                            </ul>
+                                                        </p>
+                                                        
+                                                    </div>
+                                        
+                                                </div>
+                                                </body>
+                                                </html>
+                                                
+                                        
+                                                `
+
+                                                $scope.sendMail($scope.dataCorreosTesoreria, `INE actualizado para el tramite ${$scope.idSolicitud} de gastos de viaje`, html);
+                                                swal('Aviso','Se actualizo el archivo de INE en el sistema \n se notificara a Tesoreria','info')
+                                            }else{
+                                                swal('Aviso','Se guardo el archivo de INE en el sistema correctamente','info')
+                                            }
                                         }
                                     });
                 });
@@ -2344,7 +2399,7 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
 
     $scope.GetCorreosTesoreria = function(){
         anticipoGastoRepository.GetCorreosTesoreria().then( (res) =>{
-            $scope.dataCorreosTesoreria = res.data[0].correoTesoreria;
+            $scope.dataCorreosTesoreria = res.data[0].correosTesoreria;
             $scope.rutaDocumentosGV = res.data[0].rutaDocumentosGV
         });
     }
@@ -2577,7 +2632,9 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
    
    }
 
-   $scope.SustituirDoctuentos = function(){
+   $scope.SustituirDoctuentos = async function(){
+   
+    var correos =  await correosTesoreria()
      
     $scope.documentosCuentaUsuario = [];
         if($scope.documento.archivo !== '' && $scope.documento !== undefined){
@@ -2590,7 +2647,10 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
 
         if($scope.documentosCuentaUsuario.length > 0){
             for(let i= 0; i<$scope.documentosCuentaUsuario.length;i++){
-                if($scope.documentosCuentaUsuario[i].id_perTra === null){
+                if($scope.documentosCuentaUsuario[i].id_traDo === 107 && $scope.documentosCuentaUsuario[i].estatusDocumento === 3){
+                    $scope.notificaTesoreriaIne = true
+                    $scope.saveDocumentosTramiteBanco($scope.idSolicitud, 0, $scope.documentosCuentaUsuario[i]);
+                }else if($scope.documentosCuentaUsuario[i].id_perTra === null){
                     $scope.saveDocumentosTramiteBanco($scope.idSolicitud, 0, $scope.documentosCuentaUsuario[i]);
                 }
   
@@ -2600,6 +2660,7 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
             // })
         }
 
+      
     }
 
     $scope.DominiosGA = function(){
@@ -2616,6 +2677,19 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
             $scope.idAutorizador = res.data[0].idAutorizador;
             $scope.correoAutorizador = res.data[0].usu_correo;
             $scope.nombreAutorizador = res.data[0].nombreUsuario;
+        })
+    }
+
+    function correosTesoreria (){
+        return new Promise((resolve,reject) => {
+          
+                anticipoGastoRepository.GetCorreosTesoreria().then( (res) =>{
+                    $scope.dataCorreosTesoreria = res.data[0].correosTesoreria;
+                    $scope.rutaDocumentosGV = res.data[0].rutaDocumentosGV
+
+                    resolve(true)
+                });
+            
         })
     }
     

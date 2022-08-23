@@ -15,14 +15,14 @@ function envia (to, subject, html){
             host: 'smtp.gmail.com',            
             secure: false,           
             auth: {
-                user: 'reportesauxiliar@grupoandrade.com',
-                pass: 'SuuDU3%56pl#'
+                user: 'reportes.bpro1@grupoandrade.com',
+                pass: '#h&EdV4R'
             },
             tls: { rejectUnauthorized: false }
        });
 
          var message = {
-            from: '"Grupo Andrade"<reportesauxiliar@grupoandrade.com>',
+            from: '"Grupo Andrade"<reportes.bpro1@grupoandrade.com>',
             to: to,
             subject: subject + '== PRUEBAS ==' ,
             html: html,

@@ -130,6 +130,23 @@ registrationModule.factory('ordenDePagoFFAGRepository', function($http) {
                     'Content-Type': 'application/json'
                 }
             });
+        },
+        rechazarDocumento: (det_idPerTra, razonesRechazo, id_perTra, id_documento, id_usuario) => {
+            return $http({
+                url: ordenDePagoFFAG + 'rechazarDocumento/',
+                method: "POST",
+                data: {
+                    det_idPerTra: det_idPerTra,
+                    razonesRechazo: razonesRechazo,
+                    id_perTra: id_perTra,
+                    id_documento: id_documento,
+                    id_usuario: id_usuario
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+
+            });
         }
         
         
