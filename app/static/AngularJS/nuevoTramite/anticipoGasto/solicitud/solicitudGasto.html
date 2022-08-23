@@ -187,32 +187,80 @@
                         <i class="fa fa-caret-right"></i>  Datos del solicitante
                     </label>
                 </div>
+                <div class="row">
+                    <div class="col-sm-3 form-inline">
+                        <label class="labelIdCliente"><small>ID Persona:</small></label>
+                        <input class="form-control" required style="width: 93% !important;"
+                            ng-model="selUsuario" ng-change="GeneraCambio()"
+                            ng-class="{ErrorControl: selUsuario === '' || selUsuario === 0 }">
+                    </div>
 
-                <div class="col-sm-3 form-inline">
-                    <label class="labelIdCliente"><small>ID Persona:</small></label>
-                    <input class="form-control" required style="width: 93% !important;"
-                         ng-model="selUsuario" ng-change="GeneraCambio()"
-                        ng-class="{ErrorControl: selUsuario === '' || selUsuario === 0 }">
+                    <div class="col-sm-1 form-inline">
+                        <label class="labelIdCliente" style="visibility: hidden;">:</label>
+                        <br>
+                        <button type="button"  ng-click="buscarPersona(selUsuario,1)" data-toggle="tooltip" title="Buscar Persona" class="btn btn-info btn-icon"><i class="fa fa-search"></i></button>
+                    </div>
+
+                    <div class="col-sm-5 form-inline" ng-show="verNombrePersona">
+                        <label class="labelIdCliente"><small>Nombre Persona:</small></label>
+                        <br>
+                        <input type="hidden" disabled  ng-model="tramite.idPersona" class="form-control" style="width: 100%">
+                        <input disabled  ng-model="nombrePersona" class="form-control"  style="width: 100%">
+                    </div>
+
+                    <div class="col-sm-3 form-inline" ng-show="muestraAutorizador">
+                        <label class="labelIdCliente"><small>Autorizador:</small></label>
+                        <br>
+                        <input disabled  ng-model="nombreAutorizador" class="form-control"  style="width: 100%">
+                    </div>                 
                 </div>
 
-                <div class="col-sm-1 form-inline">
-                    <label class="labelIdCliente" style="visibility: hidden;">:</label>
-                    <br>
-                    <button type="button"  ng-click="buscarPersona(selUsuario,1)" data-toggle="tooltip" title="Buscar Persona" class="btn btn-info btn-icon"><i class="fa fa-search"></i></button>
+                <div class="row">
+                    <div class="col-sm 12 form-inline" style="padding-top: 10px;"> <strong>INE:</strong> </div>
+                    <div class="row">
+                        <div class="col-sm-1">
+                            <button class="btn btn-circle btn-cir-view" ng-click="verPdf(documentoINE)" ng-disabled = "documentoINE.archivo === '' && documentoINE.url === ''">
+                                <i style="color: #62A3EB;" class="fa fa-eye" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="col-sm-1">
+                            <center>
+                                <span ng-class="{adjuntado: documentoINE.archivo == '', noadjuntado: documentoINE.archivo != ''}">*</span>&nbsp;
+                                <label class="documentosLabel" style="margin: 0; padding-top: 5px;">Subir INE</label>    
+                            </center>
+                            
+                        </div>
+                        <div class="col-sm-1 picture-container">
+                            <div class="picture ">
+                                <img ng-show="documentoINE.archivo !== ''" src="../images/autorizacion@2x.png" style="width: 100%" title="Documento Adjuntado"/>
+                                <img ng-show="documentoINE.archivo === ''" style="width: 100%" src="../images/subir@2x.png" class="picture-src"
+                                     title="Subir Archivo" />
+                                <input type="file" ng-model="documentoINE.archivo" id="wizard-pictureINE"  ng-disabled="usuarioActivo == 0"
+                                    ng-file-select="onFileSelect($files)" class="picture"
+                                    accept="{{documentoINE.ext_nombre == 'pdf' ? 'application/pdf': 'image/'+ documentoINE.ext_nombre  }}">
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <button class="btn btnNuevos" 
+                            ng-disabled ="documentoINE.estatusDocumento !== 3 && documentoINE.estatusDocumento !== null "
+                             ng-click="SustituirDoctuentos()" 
+                             style="background-color: #62a3eb !important; width: auto;">
+                                <i class="fa fa-credit-card" aria-hidden="true"></i>
+                                Guarda o actualiza INE
+                            </button>
+                            <!-- <a 
+                            ng-hide="tramite.cuenta.estatus == 0"
+                            class="label label-primary pull-right" 
+                            style="font-size: 12px; padding: 10px; margin-right: 20px; margin-top: 1px;"
+                            href="#" 
+                            ng-click="SustituirDoctuentos()"
+                            ng-disabled ="documentoINE.estatusDocumento !== 3">
+                            <i class="fa fa-credit-card" aria-hidden="true"></i> Guarda o actualiza INE
+                            </a> -->
+                        </div>
+                    </div>
                 </div>
 
-                <div class="col-sm-5 form-inline" ng-show="verNombrePersona">
-                    <label class="labelIdCliente"><small>Nombre Persona:</small></label>
-                    <br>
-                    <input type="hidden" disabled  ng-model="tramite.idPersona" class="form-control" style="width: 100%">
-                    <input disabled  ng-model="nombrePersona" class="form-control"  style="width: 100%">
-                </div>
-
-                <div class="col-sm-3 form-inline" ng-show="muestraAutorizador">
-                    <label class="labelIdCliente"><small>Autorizador:</small></label>
-                    <br>
-                    <input disabled  ng-model="nombreAutorizador" class="form-control"  style="width: 100%">
-                </div>
             </div>
 
 

@@ -69,7 +69,6 @@ apiBpro.prototype.get_GetTokenBPRO = function(req, res, next) {
     var self = this;
     var ajax = require('rxjs/ajax');
     const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-    var rx = require('rxjs');
     
     ajax.ajax({  
         createXHR,
@@ -86,12 +85,27 @@ apiBpro.prototype.get_GetTokenBPRO = function(req, res, next) {
             "apiKey": "24779r0j-1802-2010-06ag-201f768348tg",
             "apiSecret": "xVgUwolpX8qQ75TF5Ionny6iz5vu+LbO9gm9qxTsR9nvYfJ0N8y5Bfi7L2EI2AxS6PTbNnCaGfLs+7u69UdJtODCeBO+ZJpc"
           }
-    }).subscribe( async (resp) =>  {
+    })
+    .subscribe( async (resp) =>  {
         console.log(resp)
         self.view.expositor(res, {
             result: resp.response
         });
-    })
+    }
+    ,error => {
+        console.log(error);
+        self.view.expositor(res, {
+            result: {
+                Token:'Error al generar el token de api',
+                Error:{
+                    mensajeError:'Error al generar el token de api',
+                    apiKey: "24779r0j-1802-2010-06ag-201f768348tg",
+                    apiSecret: "xVgUwolpX8qQ75TF5Ionny6iz5vu+LbO9gm9qxTsR9nvYfJ0N8y5Bfi7L2EI2AxS6PTbNnCaGfLs+7u69UdJtODCeBO+ZJpc"
+                }
+            }
+        });
+    }
+    )
 
     function createXHR() {
         return new XMLHttpRequest();
@@ -106,7 +120,7 @@ apiBpro.prototype.get_GeneraPolizaBPRO = function(req, res, next) {
     const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
     var rx = require('rxjs');
 
-    var token		=  req.query.token;
+    var token   =  req.query.token;
     var data	=  req.query.data;
     
     ajax.ajax({  
@@ -125,6 +139,12 @@ apiBpro.prototype.get_GeneraPolizaBPRO = function(req, res, next) {
         console.log(resp)
         self.view.expositor(res, {
             result: resp.response
+        });
+    }
+    ,error => {
+        console.log(error);
+        self.view.expositor(res, {
+            result: 'Error al generar en el api'
         });
     })
 

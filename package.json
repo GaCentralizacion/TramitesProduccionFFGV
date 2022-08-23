@@ -16,7 +16,7 @@
     "multer": "^1.1.0",
     "node-cron": "^2.0.3",
     "nodemailer": "^6.3.0",
-    "nodemon": "^2.0.4",
+    "nodemon": "^2.0.19",
     "phantom": "^2.1.21",
     "rxjs": "^6.5.5",
     "save": "^2.4.0",

@@ -23,7 +23,13 @@ registrationModule.controller('anticipoGastoController', function ($scope, $root
                         $scope.accionFormulario = 0;
                     }
                     else if (idEstatus == 2) {
-                        $scope.comprobar = res.data[0].Comprobar;
+
+                        if(res.data[0].estatusAnticipo < 5)
+                        {
+                            $scope.comprobar = 0
+                        }else{
+                            $scope.comprobar = res.data[0].Comprobar;
+                        }
                         $('#modalConfirmarAccion').modal('show');
                     } else {
                         $scope.accionFormulario = 1;

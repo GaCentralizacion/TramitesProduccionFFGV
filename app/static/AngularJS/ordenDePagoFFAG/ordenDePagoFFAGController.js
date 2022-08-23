@@ -545,7 +545,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             $scope.showRechazar = true;
         }
         if( documento.id_documento == 4 && $scope.idTramite === '9'){
-            $scope.showRechazar = false;
+            $scope.showRechazar = true;
         }
         $scope.rechazarDocumentoTesoreria = documento;
         $('#pdfReferenceContent object').remove();
@@ -639,16 +639,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             apiBproRepository.GetTokenBPRO().then(resp =>{
                 console.log('resp: ',resp)
                 resolve(resp.data)
-            }).catch(err =>{
-                console.log('Error api: ',err)
-                resolve(
-                    {
-                        Token:'Error al generar el token de api',
-                        UnniqId:''
-                    }
-                )
             })
-
         })
     }
 
@@ -778,6 +769,34 @@ function zeroDelete (item)
 
         AuthToken = await promiseAutBPRO();
 
+        if(AuthToken.Token.includes('Error al generar el token de api')){
+
+            datalog.tokenGenerado = AuthToken.Token
+            datalog.unniqIdGenerado = ''
+            datalog.jsonEnvio = JSON.stringify($scope.apiJson)
+            datalog.mensajeError = JSON.stringify(AuthToken.Error) 
+
+            let respLog = await LogApiBpro(datalog)
+
+            swal({
+                title:"Aviso",
+                type:"error",
+                width: 1000,
+                text: `Se presento un problema al generar el token del api de BPRO
+                El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                
+                Codigo: Error al generar el token de api \n folio bitácora: ${respLog.folio}
+                
+                Reitentar cuando se le notifique la solución a la incidencia`,
+                showConfirmButton: true,
+                showCloseButton:  false,
+                //timer:10000
+            })
+            
+            resolve(false)
+            return
+        }
+
         datalog.tokenGenerado = AuthToken.Token
         datalog.unniqIdGenerado = AuthToken.UnniqId
         datalog.jsonEnvio = JSON.stringify($scope.apiJson)
@@ -901,16 +920,12 @@ function zeroDelete (item)
                     if (value.id_documento == 4) {
                         //|| value.id_documento == 46 || value.id_documento == 47) {
                             $scope.docTesoreria.push(value);
-                            if( value.estatus === 3 ){
+                            if( value.detEstatusIne === 3 ){
                                 $scope.rechazoDeDocs = true;
                             }
                         }
                     }); 
         })
-    }
-
-    $scope.AplicaPolizaGVOP = function async (){
-        
     }
 
     async function AplicaPolizaGVTE (){
@@ -954,6 +969,34 @@ function zeroDelete (item)
                 datalog.opcion = 1        
 
             AuthToken = await promiseAutBPRO();
+
+            if(AuthToken.Token.includes('Error al generar el token de api')){
+
+                datalog.tokenGenerado = AuthToken.Token
+                datalog.unniqIdGenerado = ''
+                datalog.jsonEnvio = JSON.stringify($scope.apiJson)
+                datalog.mensajeError = JSON.stringify(AuthToken.Error) 
+    
+                let respLog = await LogApiBpro(datalog)
+
+                swal({
+                    title:"Aviso",
+                    type:"error",
+                    width: 1000,
+                    text: `Se presento un problema al generar el token del api de BPRO
+                    El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                    
+                    Codigo: Error al generar el token de api \n folio bitácora: ${respLog.folio}
+                    
+                    Reitentar cuando se le notifique la solución a la incidencia`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    //timer:10000
+                })
+                
+                resolve(false)
+                return
+            }
 
             datalog.tokenGenerado = AuthToken.Token
             datalog.unniqIdGenerado = AuthToken.UnniqId
@@ -1094,6 +1137,13 @@ function zeroDelete (item)
 
             if(AuthToken.Token.includes('Error al generar el token de api')){
 
+                datalog.tokenGenerado = AuthToken.Token
+                datalog.unniqIdGenerado = ''
+                datalog.jsonEnvio = JSON.stringify($scope.apiJson)
+                datalog.mensajeError = JSON.stringify(AuthToken.Error) 
+    
+                let respLog = await LogApiBpro(datalog)
+
                 swal({
                     title:"Aviso",
                     type:"error",
@@ -1101,13 +1151,16 @@ function zeroDelete (item)
                     text: `Se presento un problema al generar el token del api de BPRO
                     El trámite no ha sido procesado, favor de notificar al área de sistemas 
                     
-                    Codigo: Error al generar el token de api
+                    Codigo: Error al generar el token de api \n folio bitácora: ${respLog.folio}
                     
                     Reitentar cuando se le notifique la solución a la incidencia`,
                     showConfirmButton: true,
                     showCloseButton:  false,
                     //timer:10000
                 })
+                
+                resolve(false)
+                return
             }
 
             datalog.tokenGenerado = AuthToken.Token
@@ -1247,7 +1300,34 @@ function zeroDelete (item)
                 datalog.opcion = 1        
 
             AuthToken = await promiseAutBPRO();
-            //AuthToken = await AuthApi()
+            
+            if(AuthToken.Token.includes('Error al generar el token de api')){
+
+                datalog.tokenGenerado = AuthToken.Token
+                datalog.unniqIdGenerado = ''
+                datalog.jsonEnvio = JSON.stringify($scope.apiJson)
+                datalog.mensajeError = JSON.stringify(AuthToken.Error) 
+    
+                let respLog = await LogApiBpro(datalog)
+
+                swal({
+                    title:"Aviso",
+                    type:"error",
+                    width: 1000,
+                    text: `Se presento un problema al generar el token del api de BPRO
+                    El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                    
+                    Codigo: Error al generar el token de api \n folio bitácora: ${respLog.folio}
+                    
+                    Reitentar cuando se le notifique la solución a la incidencia`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    //timer:10000
+                })
+                
+                resolve(false)
+                return
+            }
 
             datalog.tokenGenerado = AuthToken.Token
             datalog.unniqIdGenerado = AuthToken.UnniqId
@@ -1395,7 +1475,34 @@ function zeroDelete (item)
                 datalog.opcion = 1        
 
             AuthToken = await promiseAutBPRO();
-            //AuthToken = await AuthApi()
+            
+            if(AuthToken.Token.includes('Error al generar el token de api')){
+
+                datalog.tokenGenerado = AuthToken.Token
+                datalog.unniqIdGenerado = ''
+                datalog.jsonEnvio = JSON.stringify($scope.apiJson)
+                datalog.mensajeError = JSON.stringify(AuthToken.Error) 
+    
+                let respLog = await LogApiBpro(datalog)
+
+                swal({
+                    title:"Aviso",
+                    type:"error",
+                    width: 1000,
+                    text: `Se presento un problema al generar el token del api de BPRO
+                    El trámite no ha sido procesado, favor de notificar al área de sistemas 
+                    
+                    Codigo: Error al generar el token de api \n folio bitácora: ${respLog.folio}
+                    
+                    Reitentar cuando se le notifique la solución a la incidencia`,
+                    showConfirmButton: true,
+                    showCloseButton:  false,
+                    //timer:10000
+                })
+                
+                resolve(false)
+                return
+            }
 
             datalog.tokenGenerado = AuthToken.Token
             datalog.unniqIdGenerado = AuthToken.UnniqId
@@ -1489,5 +1596,27 @@ function zeroDelete (item)
         })
     }
 
+    $scope.sendRechazo = function (){
+        if ($scope.razonesRechazo == '' || $scope.razonesRechazo === undefined || $scope.razonesRechazo=== null) {
+            swal('Alto', 'Debes mandar las razones por la cual rechazas el documento', 'warning');
+        } else {
+            $("#rechazarDoc").modal("hide");
+            $("#loading").modal("show");
+            ordenDePagoFFAGRepository.rechazarDocumento($scope.sendDetIdPerTra, $scope.razonesRechazo, $scope.idPerTra, $scope.id_documento, $rootScope.user.usu_idusuario).then((res) => {
+                if (res.data[0].success == 1) {
+                    $("#loading").modal("hide");
+                    $scope.sendMail(res.data[0].destinatarios, ` INE incorrecto trámite ${$scope.idPerTra} de Gastos de Viaje`, res.data[0].html);
+                    $scope.getDocumentosUsuarioGV($scope.idPerTra)
+                    $scope.razonesRechazo = '';
+                    $scope.sendDetIdPerTra = 0;
+                    swal('Listo', `${res.data[0].msg} \n El usuario solicitante ha sido notificado`, 'success');
+                } else {
+                    $scope.sendDetIdPerTra = 0;
+                    $("#loading").modal("hide");
+                    swal('Alto', 'Ocurrio un error al rechazar el documento', 'warning');
+                }
+            });
+        }
+    }
 
 });

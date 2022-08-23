@@ -3248,5 +3248,29 @@ fondoFijo.prototype.get_verificaDatosPolizaApi = function(req, res, next) {
     });
 };
 
+fondoFijo.prototype.post_rechazarDocumento = function(req, res, next) {
+    var self = this;
+    var det_idPerTra = req.body.det_idPerTra;
+    var razonesRechazo = req.body.razonesRechazo;
+    var id_perTra = req.body.id_perTra;
+    var id_documento = req.body.id_documento;
+    var id_usuario = req.body.id_usuario;
+
+    var params = [
+        { name: 'det_idPerTra', value: det_idPerTra, type: self.model.types.INT },
+        { name: 'razonesRechazo', value: razonesRechazo, type: self.model.types.STRING },
+        { name: 'id_perTra', value: id_perTra, type: self.model.types.INT },
+        { name: 'id_documento', value: id_documento, type: self.model.types.INT },
+        { name: 'id_usuario', value: id_usuario, type: self.model.types.INT }
+    ];
+    
+    this.model.query('UPD_RECHAZO_ESTATUS_DOCUMENTO_GV', params, function(error, result) {
+        self.view.expositor(res, {
+            error: error,
+            result: result
+        });
+    });
+};
+
 
 module.exports = fondoFijo;
