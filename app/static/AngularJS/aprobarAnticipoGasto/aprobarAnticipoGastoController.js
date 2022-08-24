@@ -2515,7 +2515,7 @@ return x;
         apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.tramite.idPersona
         apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado =  $scope.tramite.documentoConcepto
         apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
-        apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario =  monto
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario =  monto.toFixed(2)
         apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.tramite.documentoConcepto
 
 
