@@ -1,4 +1,4 @@
-registrationModule.controller('FondoFijoController', function ($scope, $rootScope, $location, localStorageService, fondoFijoRepository, devolucionesRepository, misTramitesValesRepository, aprobarValeRepository, aprobarRepository,anticipoGastoRepository, clientesRepository,aprobarDevRepository, aprobarFondoRepository,apiBproRepository ) {
+registrationModule.controller('FondoFijoController', function ($scope, $rootScope, $location, localStorageService, fondoFijoRepository, devolucionesRepository, misTramitesValesRepository, aprobarValeRepository, aprobarRepository,anticipoGastoRepository, clientesRepository,aprobarDevRepository, aprobarFondoRepository,apiBproRepository, traspasosFondoFijoRepository ) {
     $scope.tab = 1;
     $scope.documentosCliente = [];
     $scope.modalTitle = '';
@@ -250,8 +250,25 @@ $scope.actualizarVale = function (accion) {
 
             console.log("INICIO API Bpro Poliza PVFF")          
             $scope.tipoProcesoAPI = 6
-            $scope.insertaPolizaFFPVFF(sendData);              
 
+            let validaProvision = await ValidaPolizaCaja($scope.idSucursal,  $scope.idValeFF, 'PVFF')
+            if(validaProvision[0].success == 1)
+            {
+            $scope.insertaPolizaFFPVFF(sendData);              
+            }
+            else
+            {
+                swal({
+                    title:"Aviso",
+                    type:"success",
+                    width: 1000,
+                    text:validaRegreso[0].msg,
+                    showConfirmButton: true,
+                    showCloseButton:  false        
+                }) 
+                $('#loading').modal('hide'); 
+                $scope.regresarVale();
+            }
             // if($scope.idTramite == 10)
             // {           
             // }
@@ -1881,7 +1898,26 @@ $scope.verPdfComprobacion = function(item) {
                         if (estatusVales.monto > 0) {
                             $scope.montoCVFM = estatusVales.monto 
                             $scope.personaCVFM = estatusVales.personaCVFM
-                            $scope.insertaPolizaFFCVFM();
+                            let validaRegreso = await ValidaPolizaCaja($scope.idSucursal,  $scope.idValeFF, 'CVFM')
+                            if(validaRegreso[0].success == 1)
+                            {
+                                $scope.insertaPolizaFFCVFM();
+                            }
+                            else
+                            {
+                                swal({
+                                    title:"Aviso",
+                                    type:"success",
+                                    width: 1000,
+                                    text:validaRegreso[0].msg,
+                                    showConfirmButton: true,
+                                    showCloseButton:  false
+                                    //timer:10000         
+                        
+                                })  
+                                $('#loading').modal('hide'); 
+                                $scope.regresarVale();
+                            }
                         }    
                         // fondoFijoRepository.valeSinComprobar($scope.idVale,monto).then(function (result) {
                         //     if (result.data.length > 0) {
@@ -4618,6 +4654,14 @@ $scope.insertaPolizaFFCVFM = async function () {
     $scope.regresarVale();
 };
 
-
+async function ValidaPolizaCaja (idsucursal, id_perTraReembolso, tipoPol) {
+    return new Promise((resolve, reject) => {
+        traspasosFondoFijoRepository.validaPoliza(idsucursal, id_perTraReembolso, tipoPol).then(function (result) {
+        if (result.data.length > 0) {
+            resolve(result.data);
+        }
+    });
+});
+}
 
 });

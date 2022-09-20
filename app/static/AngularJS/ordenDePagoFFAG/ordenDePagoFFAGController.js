@@ -1,4 +1,4 @@
-registrationModule.controller('ordenDePagoFFAGController', function ($scope, $rootScope, $location, localStorageService, ordenDePagoRepository, aprobarDevRepository, aprobarRepository, devolucionesRepository, fondoFijoRepository, aprobarFondoRepository, ordenDePagoFFAGRepository, anticipoGastoRepository,apiBproRepository) {
+registrationModule.controller('ordenDePagoFFAGController', function ($scope, $rootScope, $location, localStorageService, ordenDePagoRepository, aprobarDevRepository, aprobarRepository, devolucionesRepository, fondoFijoRepository, aprobarFondoRepository, ordenDePagoFFAGRepository, anticipoGastoRepository,apiBproRepository, traspasosFondoFijoRepository) {
                                
     $scope.referencia = '';
     $scope.EsTGM = 0;
@@ -578,7 +578,25 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
         let respRFOP
         let respRFCS
 
-        respRFOP = await AplicaPolizaRFOP()
+        let validaRFOP = await ValidaPolizaCaja($scope.idSucursal, $scope.idPerTra, 'RFOP')
+
+        if(validaRFOP[0].success == 1)
+        {
+           //No existe poliza y se genera
+           respRFOP = await AplicaPolizaRFOP()
+        }
+        else
+        {
+            respRFOP == true
+            swal({
+                title:"Aviso",
+                type:"success",
+                width: 1000,
+                text:validaRFOP[0].msg,
+                showConfirmButton: true,
+                showCloseButton:  false        
+            }) 
+        }
 
          if(respRFOP == true){
             $location.path('/tesoreriaHome');
@@ -1617,6 +1635,16 @@ function zeroDelete (item)
                 }
             });
         }
+    }
+
+    async function ValidaPolizaCaja (idsucursal, id_perTraReembolso, tipoPol) {
+        return new Promise((resolve, reject) => {
+            traspasosFondoFijoRepository.validaPoliza(idsucursal, id_perTraReembolso, tipoPol).then(function (result) {
+            if (result.data.length > 0) {
+                resolve(result.data);
+            }
+        });
+    });
     }
 
 });
