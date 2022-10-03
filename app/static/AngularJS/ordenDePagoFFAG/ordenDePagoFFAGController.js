@@ -596,6 +596,15 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                 showConfirmButton: true,
                 showCloseButton:  false        
             }) 
+            if(validaRFOP[0].msj == 'La poliza se encuentra procesada')
+            {
+                ordenDePagoFFAGRepository.changeEstatusFA($scope.idPerTra,$scope.tipoTramite, $scope.consecutivoTramite).then((res)=>{
+                    if( res.data[0].success == 1 ){
+    
+                    }
+                });
+            }       
+           
         }
 
          if(respRFOP == true){
@@ -1296,6 +1305,8 @@ function zeroDelete (item)
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `RFOP${$scope.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = FF
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 =  FF
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].ReferenciaA =  $scope.idPerTra.toString()
+
 
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= FF
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'

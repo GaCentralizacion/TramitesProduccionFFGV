@@ -234,10 +234,26 @@ registrationModule.controller('reembolsoFondoFijoController', function ($scope, 
         //$("#mostrarPdf").modal("show");
         //$('#pdfReferenceContent object').remove();
         //$scope.modalTitle = doc.doc_nomDocumento;
+        if(item.tipoGasto == 'Gasto')
+        {
             $("#mostrarPdf").modal("show");
-            //var pdf = doc.url;
             $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='500px' <iframe src='https://docs.google.com/viewer?url=" + pdf + "'&embedded=true' > >").appendTo('#pdfReferenceContent');
             $('#mostrarPdf').insertAfter($('body'));
+        }
+        else{
+            fondoFijoRepository.verFacturaAPIBack(item.evidenciaAPI).then((res) => {
+                if (res.data) {
+                   const blob = b64toBlob(res.data.file, 'application/pdf');
+                   const blobUrl = URL.createObjectURL(blob);
+                   $("#mostrarPdf").modal("show");
+                   $("<object class='lineaCaptura' data='" + blobUrl + "' width='100%' height='500px' <iframe src='https://docs.google.com/viewer?url=" + pdf + "'&embedded=true' > >").appendTo('#pdfReferenceContent');
+                   $('#mostrarPdf').insertAfter($('body'));
+    
+               } else {
+                    swal('Alto', 'Ocurrio un error al mostrar el proceso, intento mas tarde', 'warning');
+                }
+            });
+        }
         }else{
             window.open(`https://docs.google.com/viewerng/viewer?url=${pdf}`,'_self');
             
@@ -249,6 +265,28 @@ registrationModule.controller('reembolsoFondoFijoController', function ($scope, 
 
     }
    
+
+    const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
+        const byteCharacters = atob(b64Data);
+        const byteArrays = [];
+      
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+          const slice = byteCharacters.slice(offset, offset + sliceSize);
+      
+          const byteNumbers = new Array(slice.length);
+          for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+          }
+      
+          const byteArray = new Uint8Array(byteNumbers);
+          byteArrays.push(byteArray);
+        }
+      
+        const blob = new Blob(byteArrays, {type: contentType});
+        return blob;
+      }
+    
+
     $scope.openWizard = function () {
         fondoFijoRepository.estatusFondoFijo(1).then((res) => {
             if (res.data.length > 0) {

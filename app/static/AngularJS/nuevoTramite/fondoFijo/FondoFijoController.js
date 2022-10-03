@@ -262,7 +262,7 @@ $scope.actualizarVale = function (accion) {
                     title:"Aviso",
                     type:"success",
                     width: 1000,
-                    text:validaRegreso[0].msg,
+                    text:validaProvision[0].msg,
                     showConfirmButton: true,
                     showCloseButton:  false        
                 }) 
@@ -1837,9 +1837,47 @@ $scope.verPdfVale = function(item) {
     $scope.obervacionesDoc = item.comentario;
     $scope.verComentarios = item.estatusReembolso == 2 ? true : false;
     var pdf = item.evidencia;
+    if(item.tipoGasto == 2)
+    {
     $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
     $("#mostrarPdf").modal("show");
+    }
+    else
+    {
+        fondoFijoRepository.verFacturaAPIBack(item.evidenciaAPI).then((res) => {
+            if (res.data) {
+               const blob = b64toBlob(res.data.file, 'application/pdf');
+               const blobUrl = URL.createObjectURL(blob);
+               $("<object class='lineaCaptura' data='" + blobUrl + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
+               $("#mostrarPdf").modal("show");
+
+           } else {
+                swal('Alto', 'Ocurrio un error al mostrar el proceso, intento mas tarde', 'warning');
+            }
+        });
+    }
 }
+
+const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
+    const byteCharacters = atob(b64Data);
+    const byteArrays = [];
+  
+    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+      const slice = byteCharacters.slice(offset, offset + sliceSize);
+  
+      const byteNumbers = new Array(slice.length);
+      for (let i = 0; i < slice.length; i++) {
+        byteNumbers[i] = slice.charCodeAt(i);
+      }
+  
+      const byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
+    }
+  
+    const blob = new Blob(byteArrays, {type: contentType});
+    return blob;
+  }
+
 
 $scope.verPdfComprobacion = function(item) {
     $('#pdfReferenceContent object').remove();
@@ -3395,6 +3433,7 @@ $scope.insertaPolizaFFPVFF = async function (sendData) {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `PVFF${$scope.complementoPolizas}`
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = FFVale
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  FFVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA =  FFVale
 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= FFVale
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
@@ -3564,7 +3603,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
 
         let fecha = new Date()
         let anio = fecha.getFullYear().toString()
-        let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
+        let mes = (fecha.getMonth()+1).toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
         let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
         $('#loading').modal('show');
@@ -3581,6 +3620,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
         $scope.apiJson.OrdenCompra.TipoComprobante = '1'
         $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
         $scope.apiJson.OrdenCompra.FechaAplicacion = `${anio}-${mes}-${dia}`
+        $scope.apiJson.OrdenCompra.ReferenciaA = $scope.datoPoliza.idComprobacionVale
 
         //DatosOrdenesCompra DETALLE
         $scope.apiJson.OrdenCompra.Detalle[0].ConceptoContable = $scope.conceptoContable
@@ -3600,6 +3640,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `AVFF${$scope.complementoPolizas}`
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = '' //OC
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 = '' //OC        
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA =  $scope.datoPoliza.idComprobacionVale
 
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.datoPoliza.idComprobacionVale
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
@@ -3774,6 +3815,8 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
 
     let fecha = new Date()
     let anio = fecha.getFullYear().toString()
+    console.log(fecha.getMonth())
+    console.log(fecha.getMonth().toString().length)
     let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
@@ -3809,6 +3852,7 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `AVFF${$scope.complementoPolizas}`
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = $scope.datoPoliza.InventarioOC //OC
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  $scope.datoPoliza.InventarioOC //OC
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA =  $scope.datoPoliza.idComprobacionVale
 
 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.datoPoliza.idComprobacionVale
@@ -4330,6 +4374,7 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `CVFR${$scope.complementoPolizas}`
     // $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = 'OC' //OC
     // $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  'OC' //OC
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA =  $scope.datoPoliza.idComprobacionVale
 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.datoPoliza.idComprobacionVale
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
@@ -4508,6 +4553,8 @@ $scope.insertaPolizaFFCVFM = async function () {
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `CVFM${$scope.complementoPolizas}`
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = FFVale
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  FFVale
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA =  FFVale
+
 
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= FFVale
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'

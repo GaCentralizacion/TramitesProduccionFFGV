@@ -1129,6 +1129,19 @@ registrationModule.factory('fondoFijoRepository', function($http) {
                 }
 
             });
-        }
+        },
+        verFacturaAPIBack: (url) => {
+            return $http({
+                url: fondoFijo + 'verFacturaAPI/',
+                method: "GET",
+                params:{
+                    url: url
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        },
+
     };
 });

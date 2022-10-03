@@ -416,6 +416,8 @@ return x;
                         }
                         else
                         {
+                            if(validaSalida[0].msj == 'La poliza se encuentra procesada')
+                            {$scope.avanzaReembolso();}
                             //Seteamos el valor para que pueda generar la siguiente poliza
                             respRFCS = true;
                             swal({
@@ -428,6 +430,8 @@ return x;
                                 //timer:10000         
                     
                             }) 
+                           
+                        
                         }
 
                         $location.path('/tesoreriaHome');
@@ -912,7 +916,7 @@ return x;
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `RFCE${$scope.polizaCaja.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = $scope.polizaCaja.idFondoFijo
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 =  $scope.polizaCaja.idFondoFijo
-
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].ReferenciaA = $scope.polizaCaja.id_perTraReembolso.toString()
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.polizaCaja.idFondoFijo
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '0'
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto= $scope.polizaCaja.dep_nombrecto
@@ -1177,6 +1181,8 @@ return x;
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `RFCS${$scope.polizaCaja.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = $scope.polizaCaja.idFondoFijo
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 =  $scope.polizaCaja.idFondoFijo
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].ReferenciaA = $scope.polizaCaja.id_perTraReembolso.toString()
+
 
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.polizaCaja.idFondoFijo
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '0'

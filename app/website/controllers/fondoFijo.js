@@ -3272,5 +3272,29 @@ fondoFijo.prototype.post_rechazarDocumento = function(req, res, next) {
     });
 };
 
+fondoFijo.prototype.get_verFacturaAPI = function(req, res, next) {
+    var self = this;
+    var url =  req.query.url;
+
+    var request = require('request');
+    var options = {
+      'method': 'GET',
+      'url': 'http://192.168.20.105/ApiDocumentos/api/Files/getDocument',
+      'headers': {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({"url": url})
+    
+    };
+    request(options, function (error, response) {
+      if (error) throw new Error(error);
+      self.view.expositor(res, {
+        result: JSON.parse(response.body)
+        });
+    });
+
+};
+
+
 
 module.exports = fondoFijo;

@@ -12,6 +12,7 @@ var apiJsonBPRO2detalles = {
       "CantidadAnticipo": 0,
       "PorcentajeAnticipo": 0,
       "FechaAnticipo": "",
+      "ReferenciaA": "",
       "Detalle": [
         {
           "ConceptoContable": "",
@@ -32,6 +33,7 @@ var apiJsonBPRO2detalles = {
           "NumeroControl": "",
           "Documento": "",
           "Referencia2": "",
+          "ReferenciaA": "",
           "Deta": [
             {
               "DocumentoOrigen": "",
