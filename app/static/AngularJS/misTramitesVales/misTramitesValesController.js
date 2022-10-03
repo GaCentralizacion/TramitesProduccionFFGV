@@ -1135,7 +1135,7 @@
               $('#loading').modal('show');           
               misTramitesValesRepository.renunciaEvidencia($scope.datosEvidencia.idValeEvidencia).then(function (result) {
                 if (result.data != undefined) {
-                    log.console(result)
+                    //log.console(result)
                     $('#loading').modal('hide');   
                     $("#actualizaEvidencia").modal("hide");
                     $scope.regresarmisVales(1);
@@ -1238,9 +1238,51 @@
         $scope.comentario = item.comentario;
         $scope.verComentarios = item.estatusReembolso == 2 ? true : false;
         var pdf = item.evidencia;
-        $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
-        $("#mostrarPdf").modal("show");
+        if(item.tipoGasto == 2)
+        {
+            $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
+            $("#mostrarPdf").modal("show");
+        }
+        else
+        {
+             fondoFijoRepository.verFacturaAPIBack(item.evidenciaAPI).then((res) => {
+                 if (res.data) {
+                    //const file = new Blob([res.data.file], {type: 'application/pdf'});
+                    const blob = b64toBlob(res.data.file, 'application/pdf');
+                    const blobUrl = URL.createObjectURL(blob);
+                    
+                    //window.location = blobUrl;
+ 
+                    $("<object class='lineaCaptura' data='" + blobUrl + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
+                    $("#mostrarPdf").modal("show");
+
+                } else {
+                     swal('Alto', 'Ocurrio un error al mostrar el proceso, intento mas tarde', 'warning');
+                 }
+             });
+        }
     }
+
+
+    const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
+        const byteCharacters = atob(b64Data);
+        const byteArrays = [];
+      
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+          const slice = byteCharacters.slice(offset, offset + sliceSize);
+      
+          const byteNumbers = new Array(slice.length);
+          for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+          }
+      
+          const byteArray = new Uint8Array(byteNumbers);
+          byteArrays.push(byteArray);
+        }
+      
+        const blob = new Blob(byteArrays, {type: contentType});
+        return blob;
+      }
 
     $scope.SubirFacturas = async function () {
         console.log( "montoEvidenciaVale a validar", $scope.subtotalVale, $scope.montoEvidenciaVale );
@@ -1808,6 +1850,13 @@ $scope.validaValeAct = function () {
                 let iva =  Number($scope.ivaVale) - Number($scope.retencion);
                 $scope.subtotalVale = (Number(subTotal) - Number(iva));
             }
+            else if (retIVA == 0 && retISR != 0)
+            {
+                $scope.subtotalVale = $scope.montoEvidenciaVale * 0.8714597;
+                $scope.ivaVale = ($scope.subtotalVale * IVA).toFixed(2);
+                $scope.retencion = 0
+                $scope.ISRretencion = $scope.subtotalVale * retISR
+            }
             else
             {
                 $scope.subtotalVale =  (Number(subTotal) + Number($scope.ivaVale) - Number($scope.retencion) - Number($scope.ISRretencion)).toFixed(2);
@@ -2096,6 +2145,15 @@ $scope.validaValeAct = function () {
                                 let TasaOCuota = parseFloat(retenciones['@attributes'].TasaOCuota * 100).toFixed(4);
                                 TasaOCuota = TasaOCuota.includes('10.66') ? 10.6667 : TasaOCuota;
                                 if (tipo.PAR_IMPORTE1 == TasaOCuota) {
+                                    tipoComprobante = tipo;
+                                    console.log("===================", 4);
+                                    tieneISR = true;
+                                }
+                            }
+                            if (tipo.PAR_IMPORTE2 > 0) {
+                                let TasaOCuota2 = parseFloat(retenciones['@attributes'].TasaOCuota * 100).toFixed(4);
+                                TasaOCuota2 = TasaOCuota2.includes('1.2500') ? 1.2500 : TasaOCuota2;
+                                if (tipo.PAR_IMPORTE1 == 0.00000 && tipo.PAR_IMPORTE2 == TasaOCuota2) {
                                     tipoComprobante = tipo;
                                     console.log("===================", 4);
                                     tieneISR = true;

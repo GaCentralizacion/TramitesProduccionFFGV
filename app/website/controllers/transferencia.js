@@ -212,4 +212,21 @@ transferencia.prototype.get_infoPolizaCajaGV = function(req, res, next){
     });
 }
 
+transferencia.prototype.get_validaPoliza = function(req, res, next){
+    var self = this;
+
+    var params = [
+        { name: 'idSucursal', value: req.query.idSucursal, type: self.model.types.INT },
+        { name: 'id_perTra', value: req.query.id_perTra, type: self.model.types.INT },
+        { name: 'tipoPol', value: req.query.tipoPol, type: self.model.types.STRING }
+    ];
+
+    this.model.query('SEL_VALIDAPOLIZA', params, function(error, result){
+        self.view.expositor(res,{
+            error:error,
+            result: result
+        });
+    });
+}
+
 module.exports = transferencia;

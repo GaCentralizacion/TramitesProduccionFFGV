@@ -99,5 +99,19 @@ registrationModule.factory('traspasosFondoFijoRepository', function($http){
                 }
             });
         },
+        validaPoliza: (idSucursal, id_perTra, tipoPol) => {
+            return $http({
+                url:  `${ObtieneDatosTransferencia}/validaPoliza`,
+                method: "GET",
+                params: {
+                    idSucursal: idSucursal,
+                    id_perTra : id_perTra, 
+                    tipoPol: tipoPol
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        },
     }
 });

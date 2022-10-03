@@ -1,4 +1,4 @@
-registrationModule.controller('ordenDePagoFFAGController', function ($scope, $rootScope, $location, localStorageService, ordenDePagoRepository, aprobarDevRepository, aprobarRepository, devolucionesRepository, fondoFijoRepository, aprobarFondoRepository, ordenDePagoFFAGRepository, anticipoGastoRepository,apiBproRepository) {
+registrationModule.controller('ordenDePagoFFAGController', function ($scope, $rootScope, $location, localStorageService, ordenDePagoRepository, aprobarDevRepository, aprobarRepository, devolucionesRepository, fondoFijoRepository, aprobarFondoRepository, ordenDePagoFFAGRepository, anticipoGastoRepository,apiBproRepository, traspasosFondoFijoRepository) {
                                
     $scope.referencia = '';
     $scope.EsTGM = 0;
@@ -578,7 +578,34 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
         let respRFOP
         let respRFCS
 
-        respRFOP = await AplicaPolizaRFOP()
+        let validaRFOP = await ValidaPolizaCaja($scope.idSucursal, $scope.idPerTra, 'RFOP')
+
+        if(validaRFOP[0].success == 1)
+        {
+           //No existe poliza y se genera
+           respRFOP = await AplicaPolizaRFOP()
+        }
+        else
+        {
+            respRFOP == true
+            swal({
+                title:"Aviso",
+                type:"success",
+                width: 1000,
+                text:validaRFOP[0].msg,
+                showConfirmButton: true,
+                showCloseButton:  false        
+            }) 
+            if(validaRFOP[0].msj == 'La poliza se encuentra procesada')
+            {
+                ordenDePagoFFAGRepository.changeEstatusFA($scope.idPerTra,$scope.tipoTramite, $scope.consecutivoTramite).then((res)=>{
+                    if( res.data[0].success == 1 ){
+    
+                    }
+                });
+            }       
+           
+        }
 
          if(respRFOP == true){
             $location.path('/tesoreriaHome');
@@ -1278,6 +1305,8 @@ function zeroDelete (item)
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `RFOP${$scope.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = FF
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 =  FF
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].ReferenciaA =  $scope.idPerTra.toString()
+
 
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= FF
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
@@ -1617,6 +1646,16 @@ function zeroDelete (item)
                 }
             });
         }
+    }
+
+    async function ValidaPolizaCaja (idsucursal, id_perTraReembolso, tipoPol) {
+        return new Promise((resolve, reject) => {
+            traspasosFondoFijoRepository.validaPoliza(idsucursal, id_perTraReembolso, tipoPol).then(function (result) {
+            if (result.data.length > 0) {
+                resolve(result.data);
+            }
+        });
+    });
     }
 
 });
