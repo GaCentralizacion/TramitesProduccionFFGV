@@ -388,7 +388,7 @@ return x;
                    else
                    {
                         //Seteamos el valor para que pueda generar la siguiente poliza
-                       if(validaEntrada[0].msj == 'La poliza se encuentra procesada')
+                       if(validaEntrada[0].msg == 'La poliza se encuentra procesada')
                        { respRFCE = true;}
                        else
                        {
@@ -416,7 +416,7 @@ return x;
                         }
                         else
                         {
-                            if(validaSalida[0].msj == 'La poliza se encuentra procesada')
+                            if(validaSalida[0].msg == 'La poliza se encuentra procesada')
                             {$scope.avanzaReembolso();}
                             //Seteamos el valor para que pueda generar la siguiente poliza
                             respRFCS = true;
@@ -430,8 +430,7 @@ return x;
                                 //timer:10000         
                     
                             }) 
-                           
-                        
+                            $('#loading').modal('hide');
                         }
 
                         $location.path('/tesoreriaHome');

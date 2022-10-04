@@ -283,7 +283,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                     $scope.verSalidaReembolso = t.estatusPerTraReembolso
                  });
                 $scope.montoReembolso =  sum.toFixed(2);
-                $scope.evidenciasReembolsoHistorico = res.data[1];
+                $scope.evidenciasReembolsoHistorico = res.data[1] == undefined ? []: res.data[1];
                 $scope.verHistorico = $scope.evidenciasReembolsoHistorico.length > 0 ? true : false;
             } 
         });
@@ -587,7 +587,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
         }
         else
         {
-            respRFOP == true
+            respRFOP = true;
             swal({
                 title:"Aviso",
                 type:"success",
@@ -596,7 +596,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                 showConfirmButton: true,
                 showCloseButton:  false        
             }) 
-            if(validaRFOP[0].msj == 'La poliza se encuentra procesada')
+            if(validaRFOP[0].msg == 'La poliza se encuentra procesada')
             {
                 ordenDePagoFFAGRepository.changeEstatusFA($scope.idPerTra,$scope.tipoTramite, $scope.consecutivoTramite).then((res)=>{
                     if( res.data[0].success == 1 ){

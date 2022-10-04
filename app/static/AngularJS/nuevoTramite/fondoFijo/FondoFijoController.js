@@ -4062,6 +4062,7 @@ $scope.insertaPolizaFrontCVFR = async function () {
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `CVFR${$scope.complementoPolizas}`
         $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.datoPoliza.idComprobacionVale
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `CVFR${$scope.complementoPolizas}`
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA = $scope.ordenCompraAVFF
     
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.datoPoliza.idComprobacionVale
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
