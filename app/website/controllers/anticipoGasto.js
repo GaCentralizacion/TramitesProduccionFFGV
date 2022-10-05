@@ -906,6 +906,11 @@ anticipoGasto.prototype.post_saveDocumentos = function (req, res, next) {
                                             impuestosGeneral.forEach(function (impuestos) {
                                                 impuestos['cfdi:Traslado'].forEach(function (impuesto) {
                                                     if (typeof impuesto['$'].impuesto == 'undefined') {
+                                                        
+                                                        if (impuesto['$'].Impuesto != 'IVA'){
+                                                            xmlResult.importeiVA = 0
+                                                        }
+
                                                         if (impuesto['$'].Impuesto == 'IVA' && impuesto['$'].Tasa != '0.00' && impuesto['$'].Importe != '0.00') {
                                                             xmlResult.importeiVA = impuesto['$'].importe;
                                                         }
@@ -1027,6 +1032,11 @@ anticipoGasto.prototype.post_saveDocumentos = function (req, res, next) {
                                     impuestosGeneral.forEach(function (impuestos) {
                                         impuestos['cfdi:Traslado'].forEach(function (impuesto) {
                                             if (typeof impuesto['$'].impuesto == 'undefined') {
+
+                                                if (impuesto['$'].Impuesto != 'IVA'){
+                                                    xmlResult.importeiVA = 0
+                                                }
+
                                                 if (impuesto['$'].Impuesto == 'IVA' && impuesto['$'].Tasa != '0.00' && impuesto['$'].Importe != '0.00') {
                                                     xmlResult.importeiVA = impuesto['$'].importe;
                                                 }
@@ -2111,6 +2121,49 @@ anticipoGasto.prototype.get_ActualizaTramitePoliza = function(req, res, next) {
     ];
     
     this.model.query('UPD_TRAMITE_GASTO_VIAJE', params, function(error, result) {
+        
+        self.view.expositor(res, {
+            error: error,
+            result: result
+        });
+    });
+};
+
+anticipoGasto.prototype.get_OrdenesNoCobradas = function(req, res, next) {
+    var self = this;
+    var idPertra = req.query.idPertra;
+
+    var params = [
+        { name: 'idPertra', value: idPertra, type: self.model.types.INT }
+    ];
+    
+    this.model.query('GET_ORNDES_PAGO_NO_COBRADAS', params, function(error, result) {
+        
+        self.view.expositor(res, {
+            error: error,
+            result: result
+        });
+    });
+};
+
+
+anticipoGasto.prototype.get_BuscaPolizaGV = function(req, res, next) {
+    var self = this;
+    var idSucursal = req.query.idSucursal;
+    var idPertra = req.query.idPertra;
+    var tipoPol = req.query.tipoPol;
+    var documento = req.query.documento;
+    var importe = req.query.importe;
+
+    var params = [
+        { name: 'idSucursal', value: idSucursal, type: self.model.types.INT },
+        { name: 'idPertra', value: idPertra, type: self.model.types.INT },
+        { name: 'tipoPol', value: tipoPol, type: self.model.types.STRING },
+        { name: 'documento', value: documento, type: self.model.types.STRING },
+        { name: 'importe', value: importe, type: self.model.types.DECIMAL }
+    ];
+    
+    this.model.query('VALIDA_EXISTENCIA_POLIZA_BPRO_GV', params, function(error, result) {
         
         self.view.expositor(res, {
             error: error,

@@ -219,7 +219,7 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
                 }else if(res.data[i].id_documento === 4 )
                 {
                     $scope.documentoINE=res.data[i];
-                    if($scope.documentoINE.archivo === undefined && $scope.documentoINE.id_perTra === null || $scope.documentoINE.estatusDocumento === 3){
+                    if($scope.documentoINE.archivo === undefined && $scope.documentoINE.id_perTra === null || $scope.documentoINE.estatusDocumento === 2){
                         $scope.documentoINE.archivo = ''
                     }
                    
