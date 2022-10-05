@@ -989,11 +989,26 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
     
         let fecha = new Date()
         let anio = fecha.getFullYear().toString()
-        let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
+        let mes = (fecha.getMonth()+1).toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
         let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
                 if($scope.idEstatusConcepto == 9)
                 {
+
+                    let existePoliza = await ValidaPolizaGV($scope.tramite.idSucursal,$scope.tramite.idSolicitud,'AGVV',$scope.archivo.idComprobacionConcepto,$scope.archivo.totalPoliza)
+        
+                    if(existePoliza.success == 2 ){
+                        swal('AVISO',existePoliza.msg,'info')
+                        $('#spinner-loading').modal('hide');
+                        return
+                    }
+            
+                    if(existePoliza.success == 3){
+                        swal('Aviso',existePoliza.msg, 'info')
+                        $('#spinner-loading').modal('hide');
+                        return
+                    }
+
                     dataOrden = 
                     {
                     idusuario: $rootScope.usuario.usu_idusuario,
@@ -1019,6 +1034,7 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                         $scope.apiJson.OrdenCompra.TipoComprobante = '1'
                         $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
                         $scope.apiJson.OrdenCompra.FechaAplicacion = `${anio}-${mes}-${dia}`
+                        $scope.apiJson.OrdenCompra.ReferenciaA = $scope.archivo.idComprobacionConcepto
     
                         $scope.apiJson.OrdenCompra.Detalle[0].ConceptoContable = $scope.archivo.idConceptoContable
                         $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
@@ -1036,6 +1052,7 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                         $scope.apiJson.OrdenCompra.TipoComprobante = '1'
                         $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
                         $scope.apiJson.OrdenCompra.FechaAplicacion = `${anio}-${mes}-${dia}`
+                        $scope.apiJson.OrdenCompra.ReferenciaA = $scope.archivo.idComprobacionConcepto
     
                         $scope.apiJson.OrdenCompra.Detalle[0].ConceptoContable = $scope.archivo.idConceptoContable
                         $scope.apiJson.OrdenCompra.Detalle[0].Cantidad = 1
@@ -1046,6 +1063,7 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                         $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `AGVV${$scope.tramite.complementoPoliza}`
                         $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.archivo.documentoOrigen
                         $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `AGVV${$scope.tramite.complementoPoliza}`
+                        $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA = $scope.archivo.idComprobacionConcepto
        
                         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.archivo.idComprobacionConcepto
                         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
@@ -2496,6 +2514,20 @@ return x;
      }
 
      $scope.AplicaPolizaCGFM = async function(monto){
+    
+        let existePoliza = await ValidaPolizaGV($scope.tramite.idSucursal,$scope.tramite.idSolicitud,'CGFM',$scope.tramite.documentoConcepto,monto.toFixed(2))
+        
+        if(existePoliza.success == 2 ){
+            swal('AVISO',existePoliza.msg,'info')
+            $('#spinner-loading').modal('hide');
+            return
+        }
+
+        if(existePoliza.success == 3){
+            swal('Aviso',existePoliza.msg, 'info')
+            $('#spinner-loading').modal('hide');
+            return
+        }
 
         let apiJson1Detalle = structuredClone(apiJsonBPRO1detalle)
         apiJson1Detalle.IdEmpresa = $scope.tramite.idCompania
@@ -2507,6 +2539,7 @@ return x;
         apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `CGFM${$scope.tramite.complementoPoliza}`
         apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = $scope.tramite.documentoConcepto
         apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 = $scope.tramite.documentoConcepto
+        apiJson1Detalle.ContabilidadMasiva.Polizas[0].ReferenciaA = $scope.tramite.documentoConcepto
 
         apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.tramite.documentoConcepto
         apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '0'
@@ -2611,5 +2644,13 @@ return x;
 
         respLog = await LogApiBpro(datalog)
      }
+
+     async function ValidaPolizaGV(idSucursal,idPertra,tipoPol,documento,importe){
+        return new Promise((resolve, reject) => {
+            anticipoGastoRepository.BuscaPolizaGV(idSucursal,idPertra,tipoPol,documento,importe).then(resp =>{
+                resolve(resp.data[0])
+            })
+        })
+    }
 
 });

@@ -1350,6 +1350,36 @@ registrationModule.factory('anticipoGastoRepository', function ($http) {
                 }
 
             });
+        },
+        OrdenesNoCobradas:(idPertra)=>{
+            return $http({
+                url: `${anticipoGasto}OrdenesNoCobradas`,
+                method: "GET",
+                params: {
+                    idPertra
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+
+            });
+        },
+        BuscaPolizaGV:(idSucursal,idPertra,tipoPol,documento,importe)=>{
+            return $http({
+                url: `${anticipoGasto}BuscaPolizaGV`,
+                method: "GET",
+                params: {
+                     idSucursal
+                    ,idPertra
+                    ,tipoPol
+                    ,documento
+                    ,importe
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+
+            });
         }
     };
 });

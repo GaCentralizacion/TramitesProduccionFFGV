@@ -625,12 +625,43 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
         let banco = zeroDelete($scope.cuentaContableSalida);
         let respGVOP
         let respGVTE
-        
-        respGVOP = await AplicaPolizaGVOP()
+        let AG = `AG-${$scope.emp_nombrecto}-${$scope.suc_nombrecto}-${$scope.dep_nombrecto}-${$scope.idPerTra}-${$scope.incremental}`
 
-        if(respGVOP == true){
-            respGVTE = await AplicaPolizaGVTE()
+        let existePoliza = await ValidaPolizaGV($scope.idSucursal,$scope.idPerTra,'GVOP',AG,$scope.monto)
+
+        /** si success == 1 la poliza no existe y se puede insertar */
+        if(existePoliza.success == 1){
+            respGVOP = await AplicaPolizaGVOP(AG)
+            if(respGVOP == true){
+                respGVTE = await AplicaPolizaGVTE()
+            }
         }
+
+        /** Si success == 2 la poliza existe y esta procesada */
+       if(existePoliza.success == 2 ){
+
+            /** Validamos si existe la poliza GVTE */
+            existePoliza = await ValidaPolizaGV($scope.idSucursal,$scope.idPerTra,'GVTE',AG,$scope.monto)
+
+            if(existePoliza.success == 1){
+                respGVTE = await AplicaPolizaGVTE()
+            }
+
+            if(existePoliza.success == 2 ){
+                swal('AVISO',existePoliza.msg,'info')
+            }
+
+            if(existePoliza.success == 3){
+                swal('Aviso',existePoliza.msg, 'info')
+            }
+
+       }
+
+       if(existePoliza.success == 3){
+        swal('Aviso',existePoliza.msg, 'info')
+       }
+
+
 
         //var tipoProceso = true;
         // tipoProceso = await promiseInsertaDatos($rootScope.user.usu_idusuario, $scope.idSucursal, 15,'AG', $scope.monto,'AC', $scope.nombreDep, $scope.idPerTra,banco,'');
@@ -639,6 +670,14 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
         // if(!tipoProceso)
         // {   swal('Alto', 'Ocurrio un error al crear la poliza', 'warning');}
     
+    }
+
+    async function ValidaPolizaGV(idSucursal,idPertra,tipoPol,documento,importe){
+        return new Promise((resolve, reject) => {
+            anticipoGastoRepository.BuscaPolizaGV(idSucursal,idPertra,tipoPol,documento,importe).then(resp =>{
+                resolve(resp.data[0])
+            })
+        })
     }
 
     async function GeneraPolizaBPRO(token, data){
@@ -754,11 +793,24 @@ function zeroDelete (item)
         let respUpdate
         let AuthToken;
 
+        let existePoliza = await ValidaPolizaGV($scope.idSucursal,$scope.idPerTra,'CGFR',$scope.idComprobacionConcepto,$scope.monto)
+        
+        if(existePoliza.success == 2 ){
+            swal('AVISO',existePoliza.msg,'info')
+            return
+        }
+
+        if(existePoliza.success == 3){
+            swal('Aviso',existePoliza.msg, 'info')
+            return
+        }
+
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `CGFR${$scope.complementoPolizas}`
         $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.idComprobacionConcepto
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `CGFR${$scope.complementoPolizas}`
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = $scope.ordenCompra
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  $scope.ordenCompra
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA = $scope.ordenCompra
 
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.idComprobacionConcepto
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
@@ -972,6 +1024,7 @@ function zeroDelete (item)
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `GVTE${$scope.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = AG
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 = AG
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].ReferenciaA = AG
     
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= AG
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '0'
@@ -1112,10 +1165,10 @@ function zeroDelete (item)
     }
 
 
-    async function AplicaPolizaGVOP (){
+    async function AplicaPolizaGVOP (AG){
         return new Promise( async (resolve, reject) => {
             let AuthToken;
-            let AG = `AG-${$scope.emp_nombrecto}-${$scope.suc_nombrecto}-${$scope.dep_nombrecto}-${$scope.idPerTra}-${$scope.incremental}`
+            
             let resPoliza
             let respUpdate
 
@@ -1126,6 +1179,7 @@ function zeroDelete (item)
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `GVOP${$scope.complementoPolizas}`
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = AG
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  AG
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA = AG
 
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= AG
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'

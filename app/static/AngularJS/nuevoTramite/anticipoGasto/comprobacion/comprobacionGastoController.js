@@ -180,6 +180,8 @@
                 $scope.getArchivosPorIdentificador($scope.idSolicitud, 1);
                 $scope.archivos = [];
 
+                OrdenesNoCobradas()
+
                 anticipoGastoRepository.getBuscarAutorizador(
                     $scope.selEmpresa, 
                     $scope.selSucursal, 
@@ -2412,6 +2414,54 @@
         }
 
         return total
+     }
+
+     function OrdenesNoCobradas(){
+        let OPNoCobradas = []
+        anticipoGastoRepository.OrdenesNoCobradas($scope.tramite.idSolicitud).then(resp =>{
+            OPNoCobradas =resp.data
+            console.log(OPNoCobradas)
+            if(OPNoCobradas.length > 0){
+                let item = OPNoCobradas.map(item =>{
+                    return `
+                        <tr>
+                            <td>${item.referencia}</td>
+                            <td style="text-align: right;">$${ formatMoney( item.monto )}</td>
+                        </tr>
+                    `
+                })
+                let html = `<strong>Lista de Ordenes no cobradas: </strong> <br>
+                <table   id="tablePoliza"   class="table table-bordered"   cellspacing="0"   width="100%">
+                    <thead>
+                    <tr>
+                        <th>Referencia</th>
+                        <th>Monto</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        ${item}
+                    </tbody>
+                </table>`
+              console.log(html)
+
+              Swal.fire({
+                title: 'Ordenes de pago',
+                icon: 'info',
+                html:html,
+                showCancelButton: false,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Aceptar",
+                cancelButtonText: "Cancelar",
+                allowOutsideClick: false,
+                showCloseButton: true
+              })
+
+              
+            }
+
+
+        })
      }
 
 });                                                                                                                    
