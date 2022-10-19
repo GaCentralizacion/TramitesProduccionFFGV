@@ -3817,7 +3817,7 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
     let anio = fecha.getFullYear().toString()
     console.log(fecha.getMonth())
     console.log(fecha.getMonth().toString().length)
-    let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
+    let mes = (fecha.getMonth()+1).toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
     $('#loading').modal('show');
@@ -4030,7 +4030,7 @@ $scope.insertaPolizaFrontCVFR = async function () {
 
     let fecha = new Date()
     let anio = fecha.getFullYear().toString()
-    let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
+    let mes = (fecha.getMonth()+1).toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
     //Encabezado 
@@ -4222,7 +4222,7 @@ $scope.generaOCCVFR = async function () {
 
     let fecha = new Date()
     let anio = fecha.getFullYear().toString()
-    let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
+    let mes = (fecha.getMonth()+1).toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
     //Encabezado
@@ -4351,7 +4351,7 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
 
     let fecha = new Date()
     let anio = fecha.getFullYear().toString()
-    let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
+    let mes = (fecha.getMonth()+1).toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
     $('#loading').modal('show');
