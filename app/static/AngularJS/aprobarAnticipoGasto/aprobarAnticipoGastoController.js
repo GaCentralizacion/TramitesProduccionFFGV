@@ -1029,7 +1029,7 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                         $scope.apiJson.IdSucursal = $scope.tramite.idSucursal
                         $scope.apiJson.Tipo = 3
     
-                        $scope.apiJson.OrdenCompra.IdProveedor = $scope.tramite.idPersona
+                        $scope.apiJson.OrdenCompra.IdProveedor = $scope.archivo.idRfcFactura//$scope.tramite.idPersona
                         $scope.apiJson.OrdenCompra.ArePed = $scope.tramite.dep_nombrecto
                         $scope.apiJson.OrdenCompra.TipoComprobante = '1'
                         $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
@@ -1047,7 +1047,7 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                         $scope.apiJson.IdSucursal = $scope.tramite.idSucursal
                         $scope.apiJson.Tipo = 1
     
-                        $scope.apiJson.OrdenCompra.IdProveedor = $scope.tramite.idPersona
+                        $scope.apiJson.OrdenCompra.IdProveedor = $scope.archivo.idRfcFactura///$scope.tramite.idPersona
                         $scope.apiJson.OrdenCompra.ArePed = $scope.tramite.dep_nombrecto
                         $scope.apiJson.OrdenCompra.TipoComprobante = '1'
                         $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
@@ -1209,6 +1209,8 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                         $scope.archivo.idEstatus = $scope.idEstatusConcepto;
                         $scope.getConceptosPorSolicitud();
                         $('#spinner-loading').modal('hide');
+
+                        /** Colocar aqui la carga de archivos en el 105 */    
                         
                     }else{
 
