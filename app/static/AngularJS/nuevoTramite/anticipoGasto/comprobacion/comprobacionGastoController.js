@@ -2430,7 +2430,7 @@
                         </tr>
                     `
                 })
-                let html = `<strong>Lista de Ordenes no cobradas: </strong> <br>
+                let html = `<strong>La(s) siguiente(s) orden de pago NO han sido cobradas en el banco. Mientras no sean cobradas en el banco aparecerán en cartera del solicitante de gastos de viaje. </strong> <br>
                 <table   id="tablePoliza"   class="table table-bordered"   cellspacing="0"   width="100%">
                     <thead>
                     <tr>
@@ -2445,7 +2445,7 @@
               console.log(html)
 
               Swal.fire({
-                title: 'Ordenes de pago',
+                title: 'Ordenes de pago NO COBRADAS',
                 icon: 'info',
                 html:html,
                 showCancelButton: false,
@@ -2454,7 +2454,8 @@
                 confirmButtonText: "Aceptar",
                 cancelButtonText: "Cancelar",
                 allowOutsideClick: false,
-                showCloseButton: true
+                showCloseButton: true,
+                width: 600
               })
 
               

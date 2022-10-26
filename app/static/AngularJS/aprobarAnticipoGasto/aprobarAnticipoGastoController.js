@@ -1029,7 +1029,7 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                         $scope.apiJson.IdSucursal = $scope.tramite.idSucursal
                         $scope.apiJson.Tipo = 3
     
-                        $scope.apiJson.OrdenCompra.IdProveedor = $scope.tramite.idPersona
+                        $scope.apiJson.OrdenCompra.IdProveedor = $scope.archivo.idRfcFactura//$scope.tramite.idPersona
                         $scope.apiJson.OrdenCompra.ArePed = $scope.tramite.dep_nombrecto
                         $scope.apiJson.OrdenCompra.TipoComprobante = '1'
                         $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
@@ -1047,7 +1047,7 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                         $scope.apiJson.IdSucursal = $scope.tramite.idSucursal
                         $scope.apiJson.Tipo = 1
     
-                        $scope.apiJson.OrdenCompra.IdProveedor = $scope.tramite.idPersona
+                        $scope.apiJson.OrdenCompra.IdProveedor = $scope.archivo.idRfcFactura///$scope.tramite.idPersona
                         $scope.apiJson.OrdenCompra.ArePed = $scope.tramite.dep_nombrecto
                         $scope.apiJson.OrdenCompra.TipoComprobante = '1'
                         $scope.apiJson.OrdenCompra.FechaOrden = `${anio}-${mes}-${dia}`
@@ -1209,6 +1209,32 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                         $scope.archivo.idEstatus = $scope.idEstatusConcepto;
                         $scope.getConceptosPorSolicitud();
                         $('#spinner-loading').modal('hide');
+
+                        /** Colocar aqui la carga de archivos en el 105 */ 
+                        let dataDocuemento = {
+                            "provider": $rootScope.usuario.usu_idusuario,
+                            "rfc":'',
+                            "folio": resPoliza.Folio,
+                            "idRol": 2,
+                            "rfcProvider":$scope.archivo.rfc,
+                            "fechaOC": `${dia}/${mes}/${anio}`,
+                            "tipoDocumento": 1,
+                            "provider": $rootScope.usuario.usu_idusuario,
+                            "rfc": '',
+                            "folio": resPoliza.Folio,
+                            "idRol": 2,
+                            "rfcProvider":$scope.archivo.rfc,
+                            "tipoDocumento": 1,
+                            "file1": $scope.archivo.rutaFisica,
+                            "file2": $scope.archivo.rutaFisicaXML
+                        }
+
+                        if($scope.archivo.esFactura[0] == 1){
+                            let respFactura = await promiseGuardaFactura(dataDocuemento)
+                            console.log(respFactura);    
+                        }
+                         
+
                         
                     }else{
 
@@ -1253,10 +1279,20 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
 
     };
 
+    function promiseGuardaFactura(data){
+        return new Promise((resolve, reject) => {
+            apiBproRepository.GuardaDocumentoFactura(data).then(resp => {
+                console.log('respuesta fac: ',resp);
+                resolve(resp)
+            }).catch(error=>{
+                reject(error)
+            })
+        })
+    }
+
     async function promiseAutBPRO(){
         return new Promise((resolve, reject) => {
             apiBproRepository.GetTokenBPRO().then(resp =>{
-                console.log('token: ',resp.data)
                 resolve(resp.data)
             })
         })
@@ -1265,7 +1301,6 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
     async function GeneraPolizaBPRO(token, data){
         return new Promise((resolve, reject) => {
             apiBproRepository.GeneraPolizaBPRO(token, data).then(resp =>{
-                console.log('respuesta: ',resp.data)
                 resolve(resp.data)
             }).catch(error => {
                 resolve(error)
