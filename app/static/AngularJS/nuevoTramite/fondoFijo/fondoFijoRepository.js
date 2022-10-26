@@ -1142,6 +1142,29 @@ registrationModule.factory('fondoFijoRepository', function($http) {
                 }
             });
         },
+        validaTipoComprobacion: (idComprobacion) => {
+            return $http({
+                url: fondoFijo + 'validaTipoComprobacion/',
+                method: "GET",
+                params:{
+                    idComprobacion: idComprobacion
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        },
+        subirFacturaAPI: (data) => {
+            return $http({
+                url: fondoFijo + 'subirFacturaAPI/',
+                method: "POST",
+                data: data,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+
+            });
+        },
 
     };
 });
