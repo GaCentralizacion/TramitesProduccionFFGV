@@ -3728,14 +3728,14 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
             {
             sendData = 
             {
-                "provider": $rootScope.usuario.usu_idusuario,
+                "provider": $rootScope.user.usu_idusuario,
                 "rfc":'',
                 "folio":  $scope.ordenCompraAVFF,
                 "idRol": 2,
                 "rfcProvider":tipoComprobacion[0].rfcEmisor,
                 "fechaOC": `${dia}/${mes}/${anio}`,
                 "tipoDocumento": 1,
-                "provider": $rootScope.usuario.usu_idusuario,
+                "provider": $rootScope.user.usu_idusuario,
                 "rfc": '',
                 "folio": $scope.ordenCompraAVFF,
                 "idRol": 2,

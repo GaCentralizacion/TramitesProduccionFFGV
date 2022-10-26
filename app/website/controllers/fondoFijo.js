@@ -3295,6 +3295,19 @@ fondoFijo.prototype.get_verFacturaAPI = function(req, res, next) {
 
 };
 
+fondoFijo.prototype.get_validaTipoComprobacion = function(req, res, next) {
+    var self = this; 
+    var idComprobacion =  req.query.idComprobacion;
+    var params = [
+        { name: 'idComprobacion', value: idComprobacion, type: self.model.types.STRING }
+    ];
+    this.model.query('SEL_VALIDATIPOCOMPROBACION', params, function(error, result) {
+        self.view.expositor(res, {
+            error: error,
+            result: result
+        });
+    });
+};
 
 
 module.exports = fondoFijo;
