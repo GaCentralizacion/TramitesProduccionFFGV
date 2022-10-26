@@ -14,7 +14,8 @@ module.exports = {
      tesoreria: require('./controllers/tesoreria'),
      ordenDePago: require('./controllers/ordenDePago'),
      transferencia: require('./controllers/transferencia'),
-     apiBpro: require('./controllers/apiBpro')
+     apiBpro: require('./controllers/apiBpro'),
+     apiGuardaDocumento: require('./controllers/apiGuardaDocumento')
     //  task: require('./controllers/task'),
     //  cuentaAutorizada: require('./controllers/cuentaAutorizada'),
     //  reportesGV: require('./controllers/reportesGV'),
