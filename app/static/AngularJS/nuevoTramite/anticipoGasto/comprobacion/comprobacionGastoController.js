@@ -145,8 +145,11 @@
                     urlServerDoctos: res.data[0].urlServerDoctos,
                     salidaEfectivo: (res.data[0].Comprobar == 1),
                     idPersona:  res.data[0].PER_IDPERSONA,
-                    idPersonaAdicional: res.data[0].idUsuarioAdicional
+                    idPersonaAdicional: res.data[0].idUsuarioAdicional,
+                    montoMaximoFactura: res.data[0].montoMaximoFactura
                 };
+
+                $scope.amountAG = $scope.tramite.montoMaximoFactura
 
                 var fmax = res.data[0].fechaInicio.split('/');
                 var a = fmax[2] + '-' + fmax[1] + '-' + fmax[0]

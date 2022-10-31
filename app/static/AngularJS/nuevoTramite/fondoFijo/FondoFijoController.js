@@ -3723,7 +3723,31 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
             
             console.log($scope.ordenCompraAVFF)
 
-           
+            let tipoComprobacion = await ValidaTipoComprobacion($scope.datoPoliza.idComprobacionVale);
+            if (tipoComprobacion[0].esFactura == 1)
+            {
+            sendData = 
+            {
+                "provider": $rootScope.user.usu_idusuario,
+                "rfc":'',
+                "folio":  $scope.ordenCompraAVFF,
+                "idRol": 2,
+                "rfcProvider":tipoComprobacion[0].rfcEmisor,
+                "fechaOC": `${dia}/${mes}/${anio}`,
+                "tipoDocumento": 1,
+                "provider": $rootScope.user.usu_idusuario,
+                "rfc": '',
+                "folio": $scope.ordenCompraAVFF,
+                "idRol": 2,
+                "rfcProvider":tipoComprobacion[0].rfcEmisor,
+                "tipoDocumento": 1,
+                "file1": tipoComprobacion[0].rutaPDF,
+                "file2": tipoComprobacion[0].rutaXML 
+
+            }
+            let guardafFacAPI = await  subirFacturaAPI(sendData);
+            }
+
             $('#loading').modal('hide');
 
             swal({
@@ -3805,6 +3829,22 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
             }
 };
 
+$scope.subeFac = async function (item) {
+
+    sendData = 
+    {
+        folio: 'AU-AF-AFV-OT-PE-20178',
+        rfcProvider: 'ASE0508051B6',
+        fechaOC: `21/10/2022`,
+        rutaPDF: '/C:/app/public/Imagenes/FondoFijo/FondoFijo_1559/Vales_15654/Factura_100 - PruebasVIGA.pdf', //tipoComprobacion[0].rutaPDF,
+        rutaXML: '/C:/app/public/Imagenes/FondoFijo/FondoFijo_1559/Vales_15654/Factura_100 - PruebasVIGA.xml' //tipoComprobacion[0].rutaXML 
+    }
+
+    let guardafFacAPI = await  subirFacturaAPI(sendData);
+
+}
+
+
 $scope.insertaPolizaFrontAPIGastosInventario = async function () {
     let AuthToken;
     let FFVale = $scope.nombreVale 
@@ -3817,7 +3857,7 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
     let anio = fecha.getFullYear().toString()
     console.log(fecha.getMonth())
     console.log(fecha.getMonth().toString().length)
-    let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
+    let mes = (fecha.getMonth()+1).toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
     $('#loading').modal('show');
@@ -4030,7 +4070,7 @@ $scope.insertaPolizaFrontCVFR = async function () {
 
     let fecha = new Date()
     let anio = fecha.getFullYear().toString()
-    let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
+    let mes = (fecha.getMonth()+1).toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
     //Encabezado 
@@ -4222,7 +4262,7 @@ $scope.generaOCCVFR = async function () {
 
     let fecha = new Date()
     let anio = fecha.getFullYear().toString()
-    let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
+    let mes = (fecha.getMonth()+1).toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
     //Encabezado
@@ -4351,7 +4391,7 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
 
     let fecha = new Date()
     let anio = fecha.getFullYear().toString()
-    let mes = fecha.getMonth().toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
+    let mes = (fecha.getMonth()+1).toString().length < 2 ? `0${fecha.getMonth()+1}`: (fecha.getMonth()+1).toString()
     let dia = fecha.getDate().toString().length < 2 ? `0${fecha.getDate()}`: fecha.getDate().toString()
 
     $('#loading').modal('show');
@@ -4711,5 +4751,26 @@ async function ValidaPolizaCaja (idsucursal, id_perTraReembolso, tipoPol) {
     });
 });
 }
+
+async function ValidaTipoComprobacion (idComprobacion) {
+    return new Promise((resolve, reject) => {
+        fondoFijoRepository.validaTipoComprobacion(idComprobacion).then(function (result) {
+        if (result.data.length > 0) {
+            resolve(result.data);
+        }
+    });
+});
+}
+
+async function subirFacturaAPI (data) {
+    return new Promise((resolve, reject) => {
+        apiBproRepository.GuardaDocumentoFactura(data).then(function (result) {
+        if (result.data) {
+            resolve(result.data);
+        }
+    });
+});
+}
+
 
 });

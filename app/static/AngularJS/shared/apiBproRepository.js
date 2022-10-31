@@ -1,5 +1,6 @@
 var BPROenpoint = global_settings.urlEndPointBPRO + 'api/login/'
 var apiSQL = global_settings.urlCORS + 'api/apiBpro/';
+var apiGurdaDocumento = global_settings.urlCORS + 'api/apiGuardaDocumento/'
 
 registrationModule.factory('apiBproRepository', function ($http) {
     return {
@@ -58,6 +59,22 @@ registrationModule.factory('apiBproRepository', function ($http) {
                 headers:{
                     'Content-Type': 'application/json'
                 }
+            })
+        },
+        GuardaDocumentoFactura:(data) =>{
+            return $http({
+                url: apiGurdaDocumento+'GuardaFactura/',
+                method: 'POST',
+                params:{data},
+                headers:{'content-type': 'multipart/form-data'}
+            })
+        },
+        InsertaLogDocumento:(idPertra,idVale,jsonDatos,respuesta) =>{
+            return $http({
+                url: apiGurdaDocumento+'InsertaLogDocumento/',
+                method: 'GET',
+                params:{idPertra,idVale,jsonDatos,respuesta},
+                headers:{'Content-Type': 'application/json'}
             })
         }
     };
