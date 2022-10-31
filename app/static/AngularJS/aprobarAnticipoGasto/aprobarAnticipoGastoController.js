@@ -1219,19 +1219,14 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                             "rfcProvider":$scope.archivo.rfc,
                             "fechaOC": `${dia}/${mes}/${anio}`,
                             "tipoDocumento": 1,
-                            "provider": $rootScope.usuario.usu_idusuario,
-                            "rfc": '',
-                            "folio": resPoliza.Folio,
-                            "idRol": 2,
-                            "rfcProvider":$scope.archivo.rfc,
-                            "tipoDocumento": 1,
                             "file1": $scope.archivo.rutaFisica,
                             "file2": $scope.archivo.rutaFisicaXML
                         }
 
                         if($scope.archivo.esFactura[0] == 1){
                             let respFactura = await promiseGuardaFactura(dataDocuemento)
-                            console.log(respFactura);    
+
+                            let respLogDocumento = await promiseLogGuardaFactura($scope.tramite.idSolicitud, '', JSON.stringify(dataDocuemento), JSON.stringify(respFactura.data))
                         }
                          
 
@@ -1283,6 +1278,17 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
         return new Promise((resolve, reject) => {
             apiBproRepository.GuardaDocumentoFactura(data).then(resp => {
                 console.log('respuesta fac: ',resp);
+                resolve(resp)
+            }).catch(error=>{
+                reject(error)
+            })
+        })
+    }
+
+    function promiseLogGuardaFactura(idPertra,idVale,jsonDatos,respuesta){
+        return new Promise((resolve, reject) => {
+            apiBproRepository.InsertaLogDocumento(idPertra,idVale,jsonDatos,respuesta).then(resp => {
+                console.log('respuesta log: ',resp);
                 resolve(resp)
             }).catch(error=>{
                 reject(error)

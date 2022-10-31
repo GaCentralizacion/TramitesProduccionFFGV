@@ -68,6 +68,14 @@ registrationModule.factory('apiBproRepository', function ($http) {
                 params:{data},
                 headers:{'content-type': 'multipart/form-data'}
             })
+        },
+        InsertaLogDocumento:(idPertra,idVale,jsonDatos,respuesta) =>{
+            return $http({
+                url: apiGurdaDocumento+'InsertaLogDocumento/',
+                method: 'GET',
+                params:{idPertra,idVale,jsonDatos,respuesta},
+                headers:{'Content-Type': 'application/json'}
+            })
         }
     };
 });                                                                                                                    

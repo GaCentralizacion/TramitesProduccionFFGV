@@ -19,9 +19,11 @@ var apiGuardaDocumento = function(conf){
 }
 
     
-    apiGuardaDocumento.prototype.post_GuardaFactura = function(req, res, next) {
+
+apiGuardaDocumento.prototype.post_GuardaFactura = function(req, res, next) { 
     var self = this;
     var data = JSON.parse(req.query.data);
+
 
     var guarda = unirest('POST', 'http://192.168.20.123:4400/api/fileUpload/files/')
     .headers({'Accept': 'application/json','Content-Type': 'multipart/form-data'})
@@ -39,17 +41,35 @@ var apiGuardaDocumento = function(conf){
     .field('rfcProvider', data.rfcProvider)
     .field('fechaOC', data.fechaOC)
     .field('tipoDocumento', '1')
-    .attach('file[]', fs.createReadStream(data.file1))
-    .attach('file[]', fs.createReadStream(data.file2))
-    .end(function (resp) { 
-      if (resp.error) throw new Error(resp.error); 
-      console.log(resp.raw_body);
-      self.view.expositor(res, {
-        result: JSON.parse(resp.raw_body)
+    .attach('file[]', fs.createReadStream(data.file1.toString().replace('C:','E:')))
+    .attach('file[]', fs.createReadStream(data.file2.toString().replace('C:','E:')))
+    .then((response) => {
+        console.log(response.body)
+        self.view.expositor(res, {result: response.body})
+      })
+}
+
+apiGuardaDocumento.prototype.get_InsertaLogDocumento = function(req, res, next) {
+    
+    var self = this;
+    var idPertra  =  req.query.idPertra;
+    var idVale	  =  req.query.idVale;
+    var jsonDatos =  req.query.jsonDatos;
+    var respuesta =  req.query.respuesta;
+
+
+    var params = [
+        { name: 'idPertra',  value: idPertra,  type: self.model.types.INT },
+        { name: 'idVale',    value: idVale,    type: self.model.types.STRING },
+        { name: 'jsonDatos', value: jsonDatos, type: self.model.types.STRING },
+        { name: 'respuesta', value: respuesta, type: self.model.types.STRING }
+    ];
+    this.model.query('INSERTA_LOG_API_DOCUMENTO', params, function(error, result) {
+        self.view.expositor(res, {
+            error: error,
+            result: result
         });
     });
-
-
-}
+};
 
    module.exports = apiGuardaDocumento;
