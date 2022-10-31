@@ -18,12 +18,12 @@ var apiGuardaDocumento = function(conf){
 
 }
 
-
-apiGuardaDocumento.prototype.post_GuardaFactura = async (req, res, next) => { 
+    
+    apiGuardaDocumento.prototype.post_GuardaFactura = function(req, res, next) {
     var self = this;
     var data = JSON.parse(req.query.data);
 
-    var guarda = await unirest('POST', 'http://192.168.20.123:4400/api/fileUpload/files/')
+    var guarda = unirest('POST', 'http://192.168.20.123:4400/api/fileUpload/files/')
     .headers({'Accept': 'application/json','Content-Type': 'multipart/form-data'})
     .field('provider', data.provider.toString())
     .field('rfc', '')
@@ -45,8 +45,8 @@ apiGuardaDocumento.prototype.post_GuardaFactura = async (req, res, next) => {
       if (resp.error) throw new Error(resp.error); 
       console.log(resp.raw_body);
       self.view.expositor(res, {
-        result: resp.raw_body
-         })
+        result: JSON.parse(resp.raw_body)
+        });
     });
 
 

@@ -375,9 +375,9 @@ return x;
                     // tipoProceso = await promiseInsertaDatos($scope.polizaCaja.idUsuario, $scope.polizaCaja.idSucursal, 13, $scope.polizaCaja.idFondoFijo, $scope.polizaCaja.monto, 'FONFIJ', $scope.polizaCaja.dep_nombrecto, $scope.polizaCaja.id_perTraFF, $scope.polizaCaja.bancoE, '');
                     // tipoProceso = await promiseInsertaDatos($scope.polizaCaja.idUsuario, $scope.polizaCaja.idSucursal, 14, $scope.polizaCaja.idFondoFijo, $scope.polizaCaja.monto, 'FONFIJ', $scope.polizaCaja.dep_nombrecto, $scope.polizaCaja.id_perTraFF, $scope.polizaCaja.bancoS, $scope.polizaCaja.CCDepto);
                   
-
-                    let respRFCE
-                    let respRFCS
+                    tipoProceso = false;
+                    let respRFCE = false;
+                    let respRFCS = false;
                     
                     let validaEntrada = await ValidaPolizaCaja($scope.polizaCaja.id_Sucursal, $scope.polizaCaja.id_perTraReembolso, 'RFCE')
                    if(validaEntrada[0].success == 1)
@@ -413,11 +413,15 @@ return x;
                         {
                             //No existe poliza y se genera
                             respRFCS = await AplicaPolizaRFCS()
+                            tipoProceso = true;
                         }
                         else
                         {
                             if(validaSalida[0].msg == 'La poliza se encuentra procesada')
-                            {$scope.avanzaReembolso();}
+                            {
+                                $scope.avanzaReembolso();
+                                tipoProceso = true;
+                            }
                             //Seteamos el valor para que pueda generar la siguiente poliza
                             respRFCS = true;
                             swal({
