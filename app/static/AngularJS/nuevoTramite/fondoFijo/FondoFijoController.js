@@ -3735,19 +3735,13 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
                 "rfcProvider":tipoComprobacion[0].rfcEmisor,
                 "fechaOC": `${dia}/${mes}/${anio}`,
                 "tipoDocumento": 1,
-                "provider": $rootScope.user.usu_idusuario,
-                "rfc": '',
-                "folio": $scope.ordenCompraAVFF,
-                "idRol": 2,
-                "rfcProvider":tipoComprobacion[0].rfcEmisor,
-                "tipoDocumento": 1,
                 "file1": tipoComprobacion[0].rutaPDF,
                 "file2": tipoComprobacion[0].rutaXML 
 
             }
             let respFactura = await  subirFacturaAPI(sendData);
 
-            let respLogDocumento = await promiseLogGuardaFactura(0, $scope.nombreVale , JSON.stringify(sendData), JSON.stringify(respFactura.data))
+            let respLogDocumento = await promiseLogGuardaFactura(0, $scope.datoPoliza.idComprobacionVale , JSON.stringify(sendData), JSON.stringify(respFactura.data))
 
             }
 
@@ -3831,21 +3825,6 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
                 $scope.regresarVale();
             }
 };
-
-$scope.subeFac = async function (item) {
-
-    sendData = 
-    {
-        folio: 'AU-AF-AFV-OT-PE-20178',
-        rfcProvider: 'ASE0508051B6',
-        fechaOC: `21/10/2022`,
-        rutaPDF: '/C:/app/public/Imagenes/FondoFijo/FondoFijo_1559/Vales_15654/Factura_100 - PruebasVIGA.pdf', //tipoComprobacion[0].rutaPDF,
-        rutaXML: '/C:/app/public/Imagenes/FondoFijo/FondoFijo_1559/Vales_15654/Factura_100 - PruebasVIGA.xml' //tipoComprobacion[0].rutaXML 
-    }
-
-    let guardafFacAPI = await  subirFacturaAPI(sendData);
-
-}
 
 
 $scope.insertaPolizaFrontAPIGastosInventario = async function () {
