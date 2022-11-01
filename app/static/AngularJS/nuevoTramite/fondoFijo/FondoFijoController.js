@@ -3745,7 +3745,10 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
                 "file2": tipoComprobacion[0].rutaXML 
 
             }
-            let guardafFacAPI = await  subirFacturaAPI(sendData);
+            let respFactura = await  subirFacturaAPI(sendData);
+
+            let respLogDocumento = await promiseLogGuardaFactura(0, $scope.nombreVale , JSON.stringify(sendData), JSON.stringify(respFactura.data))
+
             }
 
             $('#loading').modal('hide');
@@ -4764,12 +4767,24 @@ async function ValidaTipoComprobacion (idComprobacion) {
 
 async function subirFacturaAPI (data) {
     return new Promise((resolve, reject) => {
-        apiBproRepository.GuardaDocumentoFactura(data).then(function (result) {
-        if (result.data) {
-            resolve(result.data);
-        }
-    });
+        apiBproRepository.GuardaDocumentoFactura(data).then(resp => {
+            console.log('respuesta fac: ',resp);
+            resolve(resp)
+        }).catch(error=>{
+            reject(error)
+        })
 });
+}
+
+function promiseLogGuardaFactura(idPertra,idVale,jsonDatos,respuesta){
+    return new Promise((resolve, reject) => {
+        apiBproRepository.InsertaLogDocumento(idPertra,idVale,jsonDatos,respuesta).then(resp => {
+            console.log('respuesta log: ',resp);
+            resolve(resp)
+        }).catch(error=>{
+            reject(error)
+        })
+    })
 }
 
 
