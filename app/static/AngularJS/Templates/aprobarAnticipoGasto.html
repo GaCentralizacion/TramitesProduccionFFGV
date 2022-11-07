@@ -300,7 +300,8 @@
                                 <th style="width: 10% !important;">Comprobado</th>
                                 <th style="width: 10% !important;">Aprobado</th>
                                 <th style="width: 10% !important;">Por Comprobar o devolver</th>
-                                <th style="width: 10% !important;">Gasto de más</th>
+                                <!-- <th style="width: 10% !important;">Gasto de más</th> -->
+                                <th style="width: 10% !important;">Gasto de más solicitado</th>
                                 <!-- <th style="width: 5% !important;"></th> -->
                                 <th width="10px"></th>
                                 <!-- <th width="10px"></th> -->
@@ -319,7 +320,8 @@
                                 <td>{{concepto.importeSolicitado | currency }}</td>
                                 <td>{{concepto.importeComprobado | currency }}</td>
                                 <td>{{concepto.importeAprobado | currency }}</td>
-                                <td>{{(concepto.importeSolicitado - concepto.importeComprobado) > 0 ?concepto.importeSolicitado - concepto.importeComprobado : 0 | currency }}</td>
+                                <td>{{(concepto.importeSolicitado - concepto.importeComprobado) > 0 ? concepto.importeSolicitado - concepto.importeComprobado : 0 | currency }}</td>
+                                <!-- <td>{{(concepto.importeComprobado-concepto.importeSolicitado) > 0 ? (concepto.importeComprobado-concepto.importeSolicitado) : 0 | currency }}</td> -->
                                 <td>{{(concepto.importeAprobado - concepto.importeComprobado) > 0 ? concepto.importeAprobado - concepto.importeComprobado: 0 | currency }}</td>
                                 <!-- <td>
                                     <div ng-show="tramite.idEstatus === 7">
@@ -369,6 +371,7 @@
                             <td>{{ conceptosSolicitud.length > 0 ? sumComprobado() : 0 | currency  }}</td>
                             <td>{{ conceptosSolicitud.length > 0 ? sumAprobado() : 0 | currency  }}</td>
                             <td>{{ conceptosSolicitud.length > 0 ? sumPorComprobar() : 0 | currency  }}</td>
+                            <!-- <td>{{ conceptosSolicitud.length > 0 ? sumPorComprobar() : 0 | currency  }}</td> -->
                             <td>{{ conceptosSolicitud.length > 0 ? sumGastoMas() : 0 | currency  }}</td>
                             <td></td>
                         </footer>
@@ -434,9 +437,9 @@
                                         
                                         <button ng-disabled="(!archivo.activaApro) || (archivo.estatusNotificacionDeMas == 2)" 
                                                 ng-show= "archivo.total != 0 && usuario.idRol != 10 && (archivo.estatusNotificacionDeMas == 0 || (archivo.estatusNotificacionDeMas == 3 || archivo.estatusNotificacionDeMas == 2 || archivo.estatusNotificacionDeMas == 4))" class="btn btn-circle" data-toggle="tooltip" data-placement="top"
-                                        title="{{ (archivo.estatusNotificacionDeMas == 2) ? 'Gasto de Mas pendiente de Autorización' : 'Aprobar' }}"
-                                            ng-click="aprobarRechazarArchivo(archivo, 9, 0)">
-                                            <i class="fa fa-thumbs-o-up " aria-hidden="true"></i>
+                                                title="{{ (archivo.estatusNotificacionDeMas == 2) ? 'Gasto de Mas pendiente de Autorización' : 'Aprobar' }}"
+                                                ng-click="aprobarRechazarArchivo(archivo, 9, 0)">
+                                                <i class="fa fa-thumbs-o-up " aria-hidden="true"></i>
                                         </button>
                                         <!-- <button ng-disabled="!archivo.activaApro" ng-show= "usuario.idRol != 10 && archivo.NoAutorizada" class="btn btn-circle" data-toggle="tooltip" data-placement="top"
                                             ng-show="archivo.total != 0" title="Aprobar No Autorizado"

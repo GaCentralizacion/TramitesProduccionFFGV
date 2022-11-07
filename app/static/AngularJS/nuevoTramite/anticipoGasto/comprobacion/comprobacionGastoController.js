@@ -79,6 +79,8 @@
     $scope.disabledMonto = true;
     $scope.distancia = 50;
     $scope.hiddenOrdenCompra = true
+    $scope.totalGastoMasTramite = 0
+    $scope.totalGastoMasSolicitado = 0
 
     $scope.init = () => {
         //$('#spinner-loading').modal('show');
@@ -354,6 +356,12 @@
             swal('Comprobación de gastos', 'Es obligatorio subir el vale firmado', 'warning');
             return;
         }
+
+        if($scope.totalGastoMasSolicitado != $scope.totalGastoMasTramite){
+            swal('Aviso', 'El gasto de más del trámite, debe ser igual al gasto de más solicitado', 'warning')
+            return
+        } 
+
         //if ($scope.accionEnviar) {
         $('#spinner-loading').modal('show');
         anticipoGastoRepository.actualizaEstatusTramite($scope.tramite.idSolicitud, $scope.idTipoProceso).then((res) => {
@@ -2149,6 +2157,7 @@
                     $scope.actualizaEstatusNotificacionDeMas(resf.idConceptoArchivo,2, resf.ExcedeMonto);
                     $scope.getArchivosPorConceptoNoti(resf.idReferencia)
                     $("#loading").modal("hide");
+                    $scope.conceptosGastoPorSolicitud(3)
                 } else {
                     swal("Atencion!", "Servicio no disponible por el momento ...", "warning");
                     $("#loading").modal("hide");
@@ -2415,6 +2424,24 @@
             total = total+element 
             
         }
+
+        $scope.totalGastoMasSolicitado = total.toFixed(2)
+
+        return total
+     }
+
+     $scope.sumGastoMasTramite = function(){
+        let total = 0
+
+            for (let i = 0; i < $scope.conceptosSolicitud.length; i++) {
+                const element = ($scope.conceptosSolicitud[i].importeAprobado - $scope.conceptosSolicitud[i].importeSolicitado) > 0 ? $scope.conceptosSolicitud[i].importeAprobado - $scope.conceptosSolicitud[i].importeSolicitado : 0 ;
+                total = total+element 
+                
+            }
+
+
+        $scope.totalGastoMasTramite = total.toFixed(2)
+        
 
         return total
      }
