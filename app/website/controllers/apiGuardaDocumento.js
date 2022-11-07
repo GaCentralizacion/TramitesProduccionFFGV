@@ -24,6 +24,8 @@ apiGuardaDocumento.prototype.post_GuardaFactura = function(req, res, next) {
     var self = this;
     var data = JSON.parse(req.query.data);
 
+    var filePDF = data.file1.toString().replace('C:','E:')
+    var fileXML = data.file2.toString().replace('C:','E:')
 
     var guarda = unirest('POST', 'http://192.168.20.123:4400/api/fileUpload/files/')
     .headers({'Accept': 'application/json','Content-Type': 'multipart/form-data'})
@@ -41,13 +43,62 @@ apiGuardaDocumento.prototype.post_GuardaFactura = function(req, res, next) {
     .field('rfcProvider', data.rfcProvider)
     .field('fechaOC', data.fechaOC)
     .field('tipoDocumento', '1')
-    .attach('file[]', fs.createReadStream(data.file1.toString().replace('C:','E:')))
-    .attach('file[]', fs.createReadStream(data.file2.toString().replace('C:','E:')))
+    .attach('file[]', fs.createReadStream(filePDF))
+    .attach('file[]', fs.createReadStream(fileXML))
     .then((response) => {
         console.log(response.body)
+        let respuesta  = response.body.msg[0]
+        console.log('respuesta: ',respuesta);
+        if(respuesta === 'Proceso terminado.'){
+            //**Borramos archivo */
+            fs.unlinkSync(filePDF)
+            fs.unlinkSync(fileXML)
+        }
+
         self.view.expositor(res, {result: response.body})
       })
 }
+
+apiGuardaDocumento.prototype.post_GuardaPDFVale = function(req, res, next) { 
+    var self = this;
+
+    /**
+     * "{
+     * url:string,
+     * namefile: string,
+     * file: base64
+     * }"
+     */
+    var data = JSON.parse(req.query.data)
+
+    var guarda = unirest('POST','http://192.168.20.92/ApiDocumentos/api/Files/saveDocument')
+    .headers({'Content-Type': 'application/json'})
+    .send(JSON.stringify(data))
+    .end( function(res){
+        if(res.error) throw new Error(res.error)
+        console.log(res.raw_body)
+    })
+}
+
+apiGuardaDocumento.prototype.post_RecuperaDocumento = function(req, res, next) {
+
+    var self = this;
+    /**
+     * "{
+     * url:string
+     *  }"
+     */
+    var data = JSON.parse(req.query.data)
+
+    var guarda = unirest('GET','http://192.168.20.92/ApiDocumentos/api/Files/getDocument')
+    .headers({'Content-Type': 'application/json'})
+    .send(JSON.stringify(data))
+    .end( function(res){
+        if(res.error) throw new Error(res.error)
+        console.log(res.raw_body)
+    })
+ }
+
 
 apiGuardaDocumento.prototype.get_InsertaLogDocumento = function(req, res, next) {
     
@@ -56,7 +107,6 @@ apiGuardaDocumento.prototype.get_InsertaLogDocumento = function(req, res, next) 
     var idVale	  =  req.query.idVale;
     var jsonDatos =  req.query.jsonDatos;
     var respuesta =  req.query.respuesta;
-
 
     var params = [
         { name: 'idPertra',  value: idPertra,  type: self.model.types.INT },

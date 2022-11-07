@@ -219,6 +219,7 @@
                             <th style="width: 10% !important;">Aprobado</th>
                             <th style="width: 10% !important;">Por Comprobar o devolver</th>
                             <th style="width: 10% !important;">Gasto de más</th>
+                            <th style="width: 10% !important;">Gasto de más solicitado</th>
                             <th style="width: 10% !important;"></th>
                             <th style="width: 7% !important;"></th>
                         </tr>
@@ -230,6 +231,7 @@
                             <td>{{concepto.importeComprobado | currency }}</td>
                             <td>{{concepto.importeAprobado | currency }}</td>
                             <td>{{(concepto.importeSolicitado - concepto.importeComprobado) > 0 ?concepto.importeSolicitado - concepto.importeComprobado : 0 | currency }}</td>
+                            <td>{{(concepto.importeAprobado - concepto.importeSolicitado) > 0 ?concepto.importeAprobado - concepto.importeSolicitado : 0 | currency }}</td>
                             <td>{{(concepto.importeAprobado - concepto.importeComprobado) > 0 ? concepto.importeAprobado - concepto.importeComprobado: 0 | currency }}</td>
                             <td>
                                 <!-- <div ng-show="tramite.idEstatus === 7 || tramite.idEstatus === 8" -->
@@ -267,6 +269,7 @@
                         <td>{{ conceptosSolicitud.length > 0 ? sumComprobado() : 0 | currency  }}</td>
                         <td>{{ conceptosSolicitud.length > 0 ? sumAprobado() : 0 | currency  }}</td>
                         <td> {{ conceptosSolicitud.length > 0 ? sumPorComprobar() : 0 | currency  }}</td>
+                        <td> {{ conceptosSolicitud.length > 0 ? sumGastoMasTramite() : 0 | currency  }}</td>
                         <td>{{ conceptosSolicitud.length > 0 ? sumGastoMas() : 0 | currency  }}</td>
                         <td></td>
                         <td></td>

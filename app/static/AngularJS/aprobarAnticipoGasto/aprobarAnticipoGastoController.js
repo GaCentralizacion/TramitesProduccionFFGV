@@ -58,6 +58,7 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
     $scope.distancia = 50;
 
     $scope.apiJson = structuredClone(apiJsonBPRO2detalles)
+    $scope.hayExcedente = false
 
     $scope.init = () => {
         if (getParameterByName('idSolicitud') != '') {    
@@ -266,6 +267,7 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                         }
                         else{
                             list["Excede"] = 1;
+                            $scope.hayExcedente = true
                             var excedente = $scope.sumatoriaFinal - list.importe;
                             if( excedente >= list.total ){
                                 
