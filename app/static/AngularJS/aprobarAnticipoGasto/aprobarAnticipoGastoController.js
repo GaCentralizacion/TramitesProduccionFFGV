@@ -1225,10 +1225,10 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                             "file2": $scope.archivo.rutaFisicaXML
                         }
 
-                        if($scope.archivo.esFactura[0] == 1){
+                        if($scope.archivo.esFactura[0] == 1 || $scope.archivo.esFactura == 1){
                             let respFactura = await promiseGuardaFactura(dataDocuemento)
 
-                            let respLogDocumento = await promiseLogGuardaFactura($scope.tramite.idSolicitud, '', JSON.stringify(dataDocuemento), JSON.stringify(respFactura.data))
+                            let respLogDocumento = await promiseLogGuardaFactura($scope.tramite.idSolicitud, $scope.archivo.idComprobacionConcepto, JSON.stringify(dataDocuemento), JSON.stringify(respFactura.data), datalog.ordenCompra)
                         }
                          
 
@@ -1287,9 +1287,9 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
         })
     }
 
-    function promiseLogGuardaFactura(idPertra,idVale,jsonDatos,respuesta){
+    function promiseLogGuardaFactura(idPertra,idVale,jsonDatos,respuesta,oc){
         return new Promise((resolve, reject) => {
-            apiBproRepository.InsertaLogDocumento(idPertra,idVale,jsonDatos,respuesta).then(resp => {
+            apiBproRepository.InsertaLogDocumento(idPertra,idVale,jsonDatos,respuesta, oc).then(resp => {
                 console.log('respuesta log: ',resp);
                 resolve(resp)
             }).catch(error=>{
@@ -1479,7 +1479,29 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
         $scope.errorMensaje = '';
     };
 
-    $scope.verArchivo = function (archivo) {
+    $scope.verArchivo = async function (archivo) {
+
+        if(archivo.idEstatus == 9){
+
+            let url = ''
+            url = await URLRecuperaArchivo(archivo.ordenCompra)
+
+            let archivoRecuperado = await RecuperaArchivo(url.ruta)
+            console.log(archivoRecuperado);
+
+            const blob = b64toBlob(archivoRecuperado.file, 'application/pdf');
+            const blobUrl = URL.createObjectURL(blob);
+            
+            $('#pdfReferenceContent object').remove();
+            $("#mostrarPdf").modal("show");
+            $("<object class='lineaCaptura' data='" + blobUrl + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
+            $('#mostrarPdf').insertAfter($('body'));
+            $("#mostrarPdf").modal("show");
+
+           return
+
+        }
+
         if(archivo.tipoNotificacion == 1)
         {
             if(archivo.estatusNotificacion == 1 || archivo.estatusNotificacion == 2  || archivo.estatusNotificacion == 5)
@@ -2695,5 +2717,41 @@ return x;
             })
         })
     }
+
+    async function RecuperaArchivo(url){
+        return new Promise((resolve, reject) =>{
+            apiBproRepository.RecuperaDocumento(url).then(resp =>{
+                resolve(JSON.parse(resp.data))
+            })
+        })
+    }
+
+    async function URLRecuperaArchivo(oc){
+        return new Promise((resolve, reject) =>{
+            apiBproRepository.UrlRecuperaDocumento(oc).then(resp =>{
+                resolve(resp.data[0])
+            })
+        })
+    }
+
+    const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
+        const byteCharacters = atob(b64Data);
+        const byteArrays = [];
+      
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+          const slice = byteCharacters.slice(offset, offset + sliceSize);
+      
+          const byteNumbers = new Array(slice.length);
+          for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+          }
+      
+          const byteArray = new Uint8Array(byteNumbers);
+          byteArrays.push(byteArray);
+        }
+      
+        const blob = new Blob(byteArrays, {type: contentType});
+        return blob;
+      }
 
 });

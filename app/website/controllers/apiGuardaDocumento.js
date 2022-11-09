@@ -24,8 +24,8 @@ apiGuardaDocumento.prototype.post_GuardaFactura = function(req, res, next) {
     var self = this;
     var data = JSON.parse(req.query.data);
 
-    var filePDF = data.file1.toString().replace('C:','E:')
-    var fileXML = data.file2.toString().replace('C:','E:')
+    var filePDF = data.file1.toString()
+    var fileXML = data.file2.toString()
 
     var guarda = unirest('POST', 'http://192.168.20.123:4400/api/fileUpload/files/')
     .headers({'Accept': 'application/json','Content-Type': 'multipart/form-data'})
@@ -80,22 +80,25 @@ apiGuardaDocumento.prototype.post_GuardaPDFVale = function(req, res, next) {
     })
 }
 
-apiGuardaDocumento.prototype.post_RecuperaDocumento = function(req, res, next) {
+apiGuardaDocumento.prototype.get_RecuperaDocumento = function(req, res, next) {
 
     var self = this;
-    /**
-     * "{
-     * url:string
-     *  }"
-     */
-    var data = JSON.parse(req.query.data)
+
+    var data = {
+        url:''
+    } 
+
+    data.url = `E:\\GA_Centralizacion\\FacturasProveedores${req.query.url}.pdf` 
+
+    console.log(JSON.stringify(data)); 
 
     var guarda = unirest('GET','http://192.168.20.92/ApiDocumentos/api/Files/getDocument')
     .headers({'Content-Type': 'application/json'})
     .send(JSON.stringify(data))
-    .end( function(res){
-        if(res.error) throw new Error(res.error)
-        console.log(res.raw_body)
+    .end( function(resp){
+        if(resp.error) throw new Error(resp.error)
+        console.log(resp.raw_body)
+        self.view.expositor(res, {result: resp.raw_body})
     })
  }
 
@@ -107,12 +110,14 @@ apiGuardaDocumento.prototype.get_InsertaLogDocumento = function(req, res, next) 
     var idVale	  =  req.query.idVale;
     var jsonDatos =  req.query.jsonDatos;
     var respuesta =  req.query.respuesta;
+    var oc        =  req.query.oc
 
     var params = [
         { name: 'idPertra',  value: idPertra,  type: self.model.types.INT },
         { name: 'idVale',    value: idVale,    type: self.model.types.STRING },
         { name: 'jsonDatos', value: jsonDatos, type: self.model.types.STRING },
-        { name: 'respuesta', value: respuesta, type: self.model.types.STRING }
+        { name: 'respuesta', value: respuesta, type: self.model.types.STRING },
+        { name: 'oc',        value: oc,        type: self.model.types.STRING}
     ];
     this.model.query('INSERTA_LOG_API_DOCUMENTO', params, function(error, result) {
         self.view.expositor(res, {
@@ -121,5 +126,21 @@ apiGuardaDocumento.prototype.get_InsertaLogDocumento = function(req, res, next) 
         });
     });
 };
+
+apiGuardaDocumento.prototype.get_UrlRecuperaDocumento = function(req, res, next){
+    var self = this;
+    
+    var ordenCompra = req.query.oc
+    var params = [
+        {name:'OC', value: ordenCompra, type: self.model.types.STRING}
+    ]
+
+    this.model.query('Centralizacionv2.dbo.SEL_DOCUMENTO_PROVEEDORES_RUTA_SP', params, function(error, result){
+        self.view.expositor(res,{
+            error: error,
+            result:result
+        })
+    })
+}
 
    module.exports = apiGuardaDocumento;
