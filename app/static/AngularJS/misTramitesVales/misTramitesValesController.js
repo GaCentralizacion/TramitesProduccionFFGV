@@ -1,4 +1,4 @@
-﻿registrationModule.controller('misTramitesValesController', function ($scope, $rootScope, $location, localStorageService, misTramitesValesRepository,fondoFijoRepository,devolucionesRepository, anticipoGastoRepository,clientesRepository, aprobarDevRepository) {
+﻿registrationModule.controller('misTramitesValesController', function ($scope, $rootScope, $location, localStorageService, misTramitesValesRepository,fondoFijoRepository,devolucionesRepository, anticipoGastoRepository,clientesRepository, aprobarDevRepository, apiBproRepository) {
     $scope.tramites = [];
     $scope.frmVale = false;
     $scope.frmComprovarVale = false;
@@ -1240,8 +1240,27 @@
         var pdf = item.evidencia;
         if(item.tipoGasto == 2)
         {
+            if(item.esFactura == 'S' && item.evidenciaAPI != null)
+            {
+                apiBproRepository.RecuperaDocumento(item.evidenciaAPI).then((res) => {
+                    if (res.data) {
+                       const blob = b64toBlob(res.data.file, 'application/pdf');
+                       const blobUrl = URL.createObjectURL(blob);
+                       $("<object class='lineaCaptura' data='" + blobUrl + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
+                       $("#mostrarPdf").modal("show");
+        
+                   } else {
+                        swal('Alto', 'Ocurrio un error al mostrar el proceso, intento mas tarde', 'warning');
+                    }
+                });
+            }
+            else
+            {  
             $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
             $("#mostrarPdf").modal("show");
+            }
+            // $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
+            // $("#mostrarPdf").modal("show");
         }
         else
         {
