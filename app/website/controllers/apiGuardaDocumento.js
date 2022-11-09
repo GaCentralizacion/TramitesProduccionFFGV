@@ -24,8 +24,8 @@ apiGuardaDocumento.prototype.post_GuardaFactura = function(req, res, next) {
     var self = this;
     var data = JSON.parse(req.query.data);
 
-    var filePDF = data.file1.toString()
-    var fileXML = data.file2.toString()
+    var filePDF = data.file1.toString();
+    var fileXML = data.file2.toString();
 
     var guarda = unirest('POST', 'http://192.168.20.123:4400/api/fileUpload/files/')
     .headers({'Accept': 'application/json','Content-Type': 'multipart/form-data'})
@@ -83,23 +83,25 @@ apiGuardaDocumento.prototype.post_GuardaPDFVale = function(req, res, next) {
 apiGuardaDocumento.prototype.get_RecuperaDocumento = function(req, res, next) {
 
     var self = this;
+    var url =  req.query.url;
 
-    var data = {
-        url:''
-    } 
+    var request = require('request');
+    var options = {
+      'method': 'GET',
+      'url': 'http://192.168.20.92/ApiDocumentos/api/Files/getDocument',
+      'headers': {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({"url": url})
+    
+    };
+    request(options, function (error, response) {
+      if (error) throw new Error(error);
+      self.view.expositor(res, {
+        result: JSON.parse(response.body)
+        });
+    });
 
-    data.url = `E:\\GA_Centralizacion\\FacturasProveedores${req.query.url}.pdf` 
-
-    console.log(JSON.stringify(data)); 
-
-    var guarda = unirest('GET','http://192.168.20.92/ApiDocumentos/api/Files/getDocument')
-    .headers({'Content-Type': 'application/json'})
-    .send(JSON.stringify(data))
-    .end( function(resp){
-        if(resp.error) throw new Error(resp.error)
-        console.log(resp.raw_body)
-        self.view.expositor(res, {result: resp.raw_body})
-    })
  }
 
 

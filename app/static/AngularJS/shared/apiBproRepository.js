@@ -92,6 +92,18 @@ registrationModule.factory('apiBproRepository', function ($http) {
                 params:{oc},
                 headers:{'Content-Type': 'application/json'}
             })
-        }
+        },
+        RecuperaDocumento: (url) => {
+            return $http({
+                url: apiGurdaDocumento + 'RecuperaDocumento/',
+                method: "GET",
+                params:{
+                    url: url
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        },
     };
 });                                                                                                                    

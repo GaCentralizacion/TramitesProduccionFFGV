@@ -1839,8 +1839,27 @@ $scope.verPdfVale = function(item) {
     var pdf = item.evidencia;
     if(item.tipoGasto == 2)
     {
-    $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
-    $("#mostrarPdf").modal("show");
+        if(item.esFactura == 'S' && item.evidenciaAPI != null)
+        {
+            apiBproRepository.RecuperaDocumento(item.evidenciaAPI).then((res) => {
+                if (res.data) {
+                   const blob = b64toBlob(res.data.file, 'application/pdf');
+                   const blobUrl = URL.createObjectURL(blob);
+                   $("<object class='lineaCaptura' data='" + blobUrl + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
+                   $("#mostrarPdf").modal("show");
+    
+               } else {
+                    swal('Alto', 'Ocurrio un error al mostrar el proceso, intento mas tarde', 'warning');
+                }
+            });
+        }
+        else
+        {  
+        $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
+        $("#mostrarPdf").modal("show");
+        }
+
+ 
     }
     else
     {
@@ -3741,7 +3760,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
             }
             let respFactura = await  subirFacturaAPI(sendData);
 
-            let respLogDocumento = await promiseLogGuardaFactura(0, $scope.datoPoliza.idComprobacionVale , JSON.stringify(sendData), JSON.stringify(respFactura.data))
+            let respLogDocumento = await promiseLogGuardaFactura(0, $scope.datoPoliza.idComprobacionVale , JSON.stringify(sendData), JSON.stringify(respFactura.data), $scope.ordenCompraAVFF)
 
             }
 
@@ -4755,9 +4774,9 @@ async function subirFacturaAPI (data) {
 });
 }
 
-function promiseLogGuardaFactura(idPertra,idVale,jsonDatos,respuesta){
+function promiseLogGuardaFactura(idPertra,idVale,jsonDatos,respuesta,oc){
     return new Promise((resolve, reject) => {
-        apiBproRepository.InsertaLogDocumento(idPertra,idVale,jsonDatos,respuesta).then(resp => {
+        apiBproRepository.InsertaLogDocumento(idPertra,idVale,jsonDatos,respuesta,oc).then(resp => {
             console.log('respuesta log: ',resp);
             resolve(resp)
         }).catch(error=>{

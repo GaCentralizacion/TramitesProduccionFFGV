@@ -1,4 +1,4 @@
-registrationModule.controller('reembolsoFondoFijoController', function ($scope, $routeParams, $rootScope, $location, localStorageService, aprobarFondoRepository,fondoFijoRepository,clientesRepository, aprobarDevRepository,devolucionesRepository, aprobarRepository, ordenDePagoFFAGRepository) {
+registrationModule.controller('reembolsoFondoFijoController', function ($scope, $routeParams, $rootScope, $location, localStorageService, aprobarFondoRepository,fondoFijoRepository,clientesRepository, aprobarDevRepository,devolucionesRepository, aprobarRepository, ordenDePagoFFAGRepository, apiBproRepository) {
     $scope.areaUser;
     $scope.activarAprobar = true;
     $scope.razonesRechazo = '';  
@@ -236,9 +236,30 @@ registrationModule.controller('reembolsoFondoFijoController', function ($scope, 
         //$scope.modalTitle = doc.doc_nomDocumento;
         if(item.tipoGasto == 'Gasto')
         {
-            $("#mostrarPdf").modal("show");
-            $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='500px' <iframe src='https://docs.google.com/viewer?url=" + pdf + "'&embedded=true' > >").appendTo('#pdfReferenceContent');
-            $('#mostrarPdf').insertAfter($('body'));
+            if(item.esFactura == 'S' && item.evidenciaAPI != null)
+            {
+                apiBproRepository.RecuperaDocumento(item.evidenciaAPI).then((res) => {
+                    if (res.data) {
+                       const blob = b64toBlob(res.data.file, 'application/pdf');
+                       const blobUrl = URL.createObjectURL(blob);
+                       $("<object class='lineaCaptura' data='" + blobUrl + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
+                       $("#mostrarPdf").modal("show");
+                       $('#mostrarPdf').insertAfter($('body'));
+        
+                   } else {
+                        swal('Alto', 'Ocurrio un error al mostrar el proceso, intento mas tarde', 'warning');
+                    }
+                });
+            }
+            else
+            {  
+             $("#mostrarPdf").modal("show");
+             $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='500px' <iframe src='https://docs.google.com/viewer?url=" + pdf + "'&embedded=true' > >").appendTo('#pdfReferenceContent');
+             $('#mostrarPdf').insertAfter($('body'));
+            }
+            // $("#mostrarPdf").modal("show");
+            // $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='500px' <iframe src='https://docs.google.com/viewer?url=" + pdf + "'&embedded=true' > >").appendTo('#pdfReferenceContent');
+            // $('#mostrarPdf').insertAfter($('body'));
         }
         else{
             fondoFijoRepository.verFacturaAPIBack(item.evidenciaAPI).then((res) => {
