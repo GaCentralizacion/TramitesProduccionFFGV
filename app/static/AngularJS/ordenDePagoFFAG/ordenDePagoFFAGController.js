@@ -399,6 +399,44 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
     $scope.saveDocumentosFA = (documento) => {
         $("#loading").modal("show");
         if (documento.archivo != undefined) {
+
+            /**  */
+            if($scope.idTramite == 10)
+            {
+                $scope.getDataOrdenPagoFF();
+                $scope.insertaPolizaFF();
+                $scope.nombreTramite ='FONDO FIJO'
+                // $scope.avanzaReembolso();
+            }
+            if($scope.idTramite == 9)
+            {
+                if($scope.EsTGM == 1){
+                    $scope.sendPoliza();
+                    $scope.nombreTramite ='GASTOS DE MAS'
+                }
+                else{
+                    $scope.getDataOrdenPagoGV();
+                    $scope.insertaPolizaGV(documento);
+                    $scope.nombreTramite ='ANTICIPO DE GASTOS'
+                }
+            }
+            if($scope.idTramite == 16)
+            {
+                $scope.getDataOrdenPagoFFTramite();
+                $scope.insertaPolizaFF();
+                $scope.nombreTramite ='FONDO FIJO'
+                $scope.avanzaReembolso();
+            }
+
+        } else {
+            $("#loading").modal("hide");
+            swal( 'Alto', `Carga el documento  "${ documento.nombreDoc }" para poder guardar.`, 'warning' );
+        }
+
+    }
+
+    function GuardarDocumento(documento){
+        return new Promise((resolve, reject) => {
             sendData = {
                 idDocumento: documento.id_documento,
                 idTramite: documento.id_tramite,
@@ -413,20 +451,16 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             setTimeout(() => {
                 ordenDePagoFFAGRepository.saveDocumentosFA(sendData).then((res) => {
                     if (res.data[0].success == 1) {
-                        $scope.getComprobanteFA();
-                        swal( 'Listo', ` Se guardo el documento "${ documento.nombreDoc }"`, 'success' );
-                        $("#loading").modal("hide");
+                        resolve(true)
+                        
+                        
                     } else {
+                        resolve(false)
                         swal( 'Alto', 'Error al guardar el documento, intentelo mas tarde', 'error' );
-                        $("#loading").modal("hide");
                     }
                 });
             }, 500);
-        } else {
-            $("#loading").modal("hide");
-            swal( 'Alto', `Guarda el documento  "${ documento.nombreDoc }" para poder guardar.`, 'warning' );
-        }
-
+        })
     }
 
     $scope.saveDocumentosFATramite = (documento) => {
@@ -473,59 +507,36 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
 
     }
 
-    $scope.changeEstatus = function(){
-        //TODO: changeEstatusFA SE IMPLEMENTARA CUANDO SE EJECUTE CORRECTAMENTE EL API DE BPRO
-       
-        // $('#loading').modal('show');
-       // ordenDePagoFFAGRepository.changeEstatusFA($scope.idPerTra,$scope.tipoTramite, $scope.consecutivoTramite).then((res)=>{
-        //    if( res.data[0].success == 1 ){
-        //        $('#loading').modal('hide');
-        //        swal( 'Listo', 'Se compro la orden de pago', 'success' );
+    // $scope.changeEstatus = function(){
         
-                if($scope.idTramite == 10)
-                {
-                    $scope.getDataOrdenPagoFF();
-                    $scope.insertaPolizaFF();
-                    $scope.nombreTramite ='FONDO FIJO'
-                    // $scope.avanzaReembolso();
-                }
-                if($scope.idTramite == 9)
-                {
-                    if($scope.EsTGM == 1){
-                        $scope.sendPoliza();
-                        $scope.nombreTramite ='GASTOS DE MAS'
-                    }
-                    else{
-                        $scope.getDataOrdenPagoGV();
-                        $scope.insertaPolizaGV();
-                        $scope.nombreTramite ='ANTICIPO DE GASTOS'
-                    }
-                }
-                if($scope.idTramite == 16)
-                {
-                    $scope.getDataOrdenPagoFFTramite();
-                    $scope.insertaPolizaFF();
-                    $scope.nombreTramite ='FONDO FIJO'
-                    $scope.avanzaReembolso();
-                }
-    //TODO SE DEBE DE EJECUTAR SI FALLA BPRO
-            // }else{
-            //     $('#loading').modal('hide');
-            //     swal( 'Alto', 'Error al compar la orden de pago', 'error' );
+    //             if($scope.idTramite == 10)
+    //             {
+    //                 $scope.getDataOrdenPagoFF();
+    //                 $scope.insertaPolizaFF();
+    //                 $scope.nombreTramite ='FONDO FIJO'
+    //                 // $scope.avanzaReembolso();
+    //             }
+    //             if($scope.idTramite == 9)
+    //             {
+    //                 if($scope.EsTGM == 1){
+    //                     $scope.sendPoliza();
+    //                     $scope.nombreTramite ='GASTOS DE MAS'
+    //                 }
+    //                 else{
+    //                     $scope.getDataOrdenPagoGV();
+    //                     $scope.insertaPolizaGV();
+    //                     $scope.nombreTramite ='ANTICIPO DE GASTOS'
+    //                 }
+    //             }
+    //             if($scope.idTramite == 16)
+    //             {
+    //                 $scope.getDataOrdenPagoFFTramite();
+    //                 $scope.insertaPolizaFF();
+    //                 $scope.nombreTramite ='FONDO FIJO'
+    //                 $scope.avanzaReembolso();
+    //             }
 
-            //     if($scope.idTramite == 10)
-            //     {
-            //         $scope.getDataOrdenPagoFF();
-            //         $scope.nombreTramite ='FONDO FIJO'
-            //     }
-            //     if($scope.idTramite == 9)
-            //     {
-            //         $scope.getDataOrdenPagoGV();
-            //         $scope.nombreTramite ='ANTICIPO DE GASTOS'
-            //     }
-            // };
-        //});
-    };
+    // };
 
     $scope.avanzaReembolso = function () {
         fondoFijoRepository.cambiaEstatusReembolso($scope.idPerTra).then((res) => {
@@ -621,10 +632,11 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
 
     }
 
-    $scope.insertaPolizaGV = async function () {
+    $scope.insertaPolizaGV = async function (documento) {
         let banco = zeroDelete($scope.cuentaContableSalida);
         let respGVOP
         let respGVTE
+        let respDocument
         let AG = `AG-${$scope.emp_nombrecto}-${$scope.suc_nombrecto}-${$scope.dep_nombrecto}-${$scope.idPerTra}-${$scope.incremental}`
 
         let existePoliza = await ValidaPolizaGV($scope.idSucursal,$scope.idPerTra,'GVOP',AG,$scope.monto)
@@ -634,9 +646,14 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             respGVOP = await AplicaPolizaGVOP(AG)
             if(respGVOP == true){
                 respGVTE = await AplicaPolizaGVTE()
-            }
-        }
 
+                if(respGVTE == true){
+                    respDocument = await GuardarDocumento(documento)
+                    $scope.getComprobanteFA();
+                }
+            }        
+        }
+    
         /** Si success == 2 la poliza existe y esta procesada */
        if(existePoliza.success == 2 ){
 
@@ -645,6 +662,11 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
 
             if(existePoliza.success == 1){
                 respGVTE = await AplicaPolizaGVTE()
+                
+                if(respGVTE == true){
+                    respDocument = await GuardarDocumento(documento)
+                    $scope.getComprobanteFA();
+                }
             }
 
             if(existePoliza.success == 2 ){
@@ -748,23 +770,23 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
     }
 
 
-function zeroDelete (item)
-{
-    var x = '';
-    var values = item.split('-');
-    values.forEach(f => {
-        if(values[0] == f)
-        {  var str = f;
-            var res = str.split("0");
-            res.forEach(t => {
-                if(t != "")
-                { x+= t}
-             });
-           }
-        else
-        {x+='-' +parseFloat(f).toFixed(0)}
-     });
-     return x;
+    function zeroDelete (item)
+    {
+        var x = '';
+        var values = item.split('-');
+        values.forEach(f => {
+            if(values[0] == f)
+            {  var str = f;
+                var res = str.split("0");
+                res.forEach(t => {
+                    if(t != "")
+                    { x+= t}
+                });
+            }
+            else
+            {x+='-' +parseFloat(f).toFixed(0)}
+        });
+        return x;
     }
 
     function zfill(number, width) {
@@ -774,9 +796,9 @@ function zeroDelete (item)
         
         if (width <= length) {
             if (number < 0) {
-                 return ("-" + numberOutput.toString()); 
+                    return ("-" + numberOutput.toString()); 
             } else {
-                 return numberOutput.toString(); 
+                    return numberOutput.toString(); 
             }
         } else {
             if (number < 0) {
@@ -959,6 +981,7 @@ function zeroDelete (item)
         //     $scope.getDataOrdenPagoGV();
         // });
     }
+
     function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
         try {
           decimalCount = Math.abs(decimalCount);

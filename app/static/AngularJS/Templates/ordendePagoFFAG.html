@@ -14,7 +14,7 @@
 </div>
 
 <div class="col-md-12">
-    <div class="divPrincipal col-md-10">
+    <div class="divPrincipal col-md-11">
         <div class="middle-box">
             <div class="row">
                 <div class="col-md-12" style="text-align: center;">
@@ -74,12 +74,12 @@
             </div><br>
             <div class="row">
                 <div class="col-md-2"></div>
-                <div class="col-md-8" style="text-align: center;">
-                    <button ng-show="estatus < 3" class="btn btnNuevos" ng-disabled="rechazoDeDocs"
-                        ng-click="changeEstatus()"> Orden de pago
-                        comprada </button>
-                    <button class="btn btnNuevos" ng-click="goHome()"> Salir </button>
-                </div>
+                <!-- <div class="col-md-8" style="text-align: center;"> -->
+                    <!-- <button ng-show="estatus < 3" class="btn btnNuevos" ng-disabled="rechazoDeDocs"
+                        ng-click="changeEstatus()"> Orden de pago comprada 
+                    </button> -->
+                    <!-- <button class="btn btnNuevos" ng-click="goHome()"> Salir </button> -->
+                <!-- </div> -->
                 <div class="col-md-2"></div>
             </div>
             <br><br>
@@ -131,7 +131,7 @@
                                         {{documento.nombreDoc}}
                                     </label>
                                 </div>
-                                <div class="col-md-2 picture-container" ng-if="documento.existe > 0">
+                                <div class="col-md-1 picture-container" ng-if="documento.existe > 0">
                                     <div class="picture">
                                         <img style="width: 100%" src="../images/autorizacion@2x.png"
                                             title="Documento aprobado"
@@ -144,7 +144,7 @@
                                             accept="{{documento.ext_nombre == 'pdf' ? 'application/pdf': 'image/'+ documento.ext_nombre  }}">
                                     </div>
                                 </div>
-                                <div class="col-md-2 picture-container" ng-if="documento.existe == 0">
+                                <div class="col-md-1 picture-container" ng-if="documento.existe == 0">
                                     <div class="picture">
                                         <img style="width: 100%" src="../images/autorizacion@2x.png"
                                             title="Documento Adjuntado" ng-show="documento.archivo == ''" />
@@ -156,15 +156,17 @@
                                             accept="{{documento.ext_nombre == 'pdf' ? 'application/pdf': 'image/'+ documento.ext_nombre  }}">
                                     </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <button ng-show="idTramite == 10 ||idTramite == 9" class="btn btnNuevos" ng-click="saveDocumentosFA(documento)">
-                                        <label ng-if="documento.existe == 0">Guardar Documento</label>
+                                <div align-content: space-between;>
+                                    <button ng-show="idTramite == 10 ||idTramite == 9" class="btn btnNuevos" ng-click="saveDocumentosFA(documento)" style="width: fit-content;">
+                                        <label ng-if="documento.existe == 0">Subir orden de pago comprada</label>
                                         <label ng-if="documento.existe > 0">Actualizar Documento</label>
                                     </button>
                                     <button ng-show="idTramite == 16" class="btn btnNuevos" ng-click="saveDocumentosFATramite(documento)">
                                         <label ng-if="documento.existe == 0">Guardar Documento</label>
                                         <label ng-if="documento.existe > 0">Actualizar Documento</label>
                                     </button>
+                                    <button class="btn btnNuevos" ng-click="goHome()" style="width: 160px;"> Salir </button>
+                                    
                                 </div>
                             </div>
                         </div>
