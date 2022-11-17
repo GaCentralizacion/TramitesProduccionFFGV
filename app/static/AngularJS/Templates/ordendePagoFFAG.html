@@ -159,11 +159,11 @@
                                 <div align-content: space-between;>
                                     <button ng-show="idTramite == 10 ||idTramite == 9" class="btn btnNuevos" ng-click="saveDocumentosFA(documento)" style="width: fit-content;">
                                         <label ng-if="documento.existe == 0">Subir orden de pago</label>
-                                        <label ng-if="documento.existe > 0">Actualizar Documento</label>
+                                        <label ng-if="documento.existe > 0">Actualiza Documento</label>
                                     </button>
-                                    <button ng-show="idTramite == 16" class="btn btnNuevos" ng-click="saveDocumentosFATramite(documento)">
-                                        <label ng-if="documento.existe == 0">Guardar Documento</label>
-                                        <label ng-if="documento.existe > 0">Actualizar Documento</label>
+                                    <button ng-show="idTramite == 16" class="btn btnNuevos" ng-click="saveDocumentosFATramite(documento)" style="width: fit-content;">
+                                        <label ng-if="documento.existe == 0">Subir orden de pago</label>
+                                        <label ng-if="documento.existe > 0">Actualiza Documento</label>
                                     </button>
                                     <button class="btn btnNuevos" ng-click="goHome()" style="width: 100px;"> Salir </button>
                                     

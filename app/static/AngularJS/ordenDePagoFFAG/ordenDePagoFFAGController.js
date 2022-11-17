@@ -418,6 +418,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                     $scope.getDataOrdenPagoGV();
                     $scope.insertaPolizaGV(documento);
                     $scope.nombreTramite ='ANTICIPO DE GASTOS'
+                    
                 }
             }
             if($scope.idTramite == 16)
@@ -650,8 +651,17 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                 if(respGVTE == true){
                     respDocument = await GuardarDocumento(documento)
                     $scope.getComprobanteFA();
+
+                    /** Generamos la notificacion al solicitante */
+                    
+
+                    let body = 'La orden de pago esta lista para ser descargada, puedes consultarla en la pantalla de comprobaciones'
+                    SendNotificacionSolicitantePromise('Orden de pago lista', body,6)
+
                 }
-            }        
+
+            }     
+  
         }
     
         /** Si success == 2 la poliza existe y esta procesada */
@@ -682,15 +692,6 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
        if(existePoliza.success == 3){
         swal('Aviso',existePoliza.msg, 'info')
        }
-
-
-
-        //var tipoProceso = true;
-        // tipoProceso = await promiseInsertaDatos($rootScope.user.usu_idusuario, $scope.idSucursal, 15,'AG', $scope.monto,'AC', $scope.nombreDep, $scope.idPerTra,banco,'');
-        // tipoProceso = await promiseInsertaDatos($rootScope.user.usu_idusuario, $scope.idSucursal, 16,'AG', $scope.monto,'AC', $scope.nombreDep, $scope.idPerTra,banco,'');
-                
-        // if(!tipoProceso)
-        // {   swal('Alto', 'Ocurrio un error al crear la poliza', 'warning');}
     
     }
 
@@ -1038,7 +1039,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             let resPoliza
             let respUpdate
 
-            $('#loading').modal('show');
+            //$('#loading').modal('show');
 
             let apiJson1Detalle = structuredClone(apiJsonBPRO1detalle)
     
@@ -1146,7 +1147,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                 
             }else{
 
-                $('#loading').modal('hide');
+                //$('#loading').modal('hide');
 
 
                 datalog.jsonRespuesta = JSON.stringify(resPoliza)
@@ -1195,7 +1196,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             let resPoliza
             let respUpdate
 
-            $('#loading').modal('show');
+            // $('#loading').modal('show');
 
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `GVOP${$scope.complementoPolizas}`
             $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = AG
@@ -1293,7 +1294,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                 $scope.getDataOrdenPagoGV();
                 $scope.nombreTramite ='ANTICIPO DE GASTOS'
 
-                $('#loading').modal('hide');
+                // $('#loading').modal('hide');
 
                 swal({
                     title:"Aviso",
@@ -1315,7 +1316,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                 
             }else{
 
-                $('#loading').modal('hide');
+                // $('#loading').modal('hide');
 
 
                 datalog.jsonRespuesta = JSON.stringify(resPoliza)
@@ -1733,6 +1734,87 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             }
         });
     });
+    }
+
+    function SendNotificacionSolicitantePromise(asunto, body, tipoNot,correo='',idUsuarioAux= 0, nombre= ''){
+        return new Promise((resolve, reject) =>{
+
+            var usuario
+            var nombreSol
+            var descripcion
+            let correoSolicitante 
+
+               
+            if(tipoNot == 5){
+                usuario = idUsuarioAux
+                correoSolicitante = correo
+                nombreSol = nombre
+                descripcion = body
+            }
+
+
+            $scope.dominioCorreoValido = false;
+    
+            for(let i = 0 ; i < $scope.dominiosValidos.length ; i++){
+    
+                if(correoSolicitante.includes($scope.dominiosValidos[i].dominio)){
+                    $scope.dominioCorreoValido = true;
+                }
+            }
+    
+            if(!$scope.dominioCorreoValido){
+                swal('Aviso','El correo no pertenece a Grupo Andrade, es necesario levantar un ticket y solicitar su cuenta de correo institucional para poder solicitar sus gastos', 'warning');
+                return;
+            }
+
+            var notG = {
+                "identificador": parseInt($scope.idSolicitud),
+                "descripcion": descripcion, //"El usuario " + nombreSol + " a solicitado un anticipo de gasto ",
+                //" por la cantidad de $" + $scope.monto.toFixed(2) + " pesos.",
+                "idSolicitante":  usuario,
+                "idTipoNotificacion": tipoNot,
+                "linkBPRO": '',//global_settings.urlCORS + "aprobarAnticipoGasto?idSolicitud=" + $scope.idSolicitud,
+                "notAdjunto": "",
+                "notAdjuntoTipo": "",
+                "idEmpresa": $scope.selEmpresa,
+                "idSucursal": $scope.selSucursal,
+                "departamentoId":  $scope.selDepartamento
+            };
+
+            $scope.sendMail(correoSolicitante, asunto, body);            
+            $scope.guardarBitacoraProceso(usuario, localStorage.getItem('id_perTra'), 0, JSON.stringify(notG), 1, 1);
+
+            anticipoGastoRepository.notificaInformaGV(notG).then(function (result) {
+                if (result.data[0].success == true) {
+
+                    resolve(true)
+                } else {
+                    swal("Atencion!", "No fue posible generar la notificación ...", "warning");
+                    resolve(false)
+                }
+            });
+
+        })
+    }
+
+     function DominiosGA(){
+        return new Promise((resolve, reject)  => {
+            anticipoGastoRepository.DominiosGA().then(res => {
+                resolve(res.data)
+            });
+        })
+    }
+
+    $scope.guardarBitacoraProceso = function (idUsuario,id_perTra,idEstatus,accion,bitacora, proceso) {
+        dataSave = {
+            idUsuario:  idUsuario,
+            id_perTra: id_perTra,
+            idEstatus : idEstatus,
+            accion : accion,
+            bitacora : bitacora,
+            proceso : proceso}
+        fondoFijoRepository.saveBitProceso(dataSave).then((res) => {
+        });
     }
 
 });
