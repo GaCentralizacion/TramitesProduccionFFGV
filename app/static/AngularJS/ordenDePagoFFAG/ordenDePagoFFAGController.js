@@ -642,7 +642,16 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             }) 
             if(validaRFOP[0].msg == 'La poliza se encuentra procesada')
             {
-                let respuetaDoc = await GuardarDocumentoReembolso(documento)
+                let respuetaDoc = false;
+
+                if($scope.idTramite == 16)
+                {
+                    respuetaDoc = await GuardarDocumentoReembolso(documento)
+                }
+                else{
+                    respuetaDoc = await GuardarDocumento(documento)
+                }
+                
                 if(respuetaDoc == true)
                 {
                 $scope.avanzaReembolso();
@@ -651,7 +660,8 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
 
                     }
                 });
-               
+                $("#loading").modal("hide");
+
                 $scope.nombreTramite ='REEMBOLSO ORDEN PAGO RFOP'
                 html = $scope.html1 + 'Se Proceso el Reembolso al fondo fijo:  ' + $scope.idFondoFijo +' ' + "<br><br> Se realizó reembolso por orden de pago por el monto de:  $"+ formatMoney($scope.monto) + "  " + $scope.html2;
                 //$scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', $scope.nombreTramite, html);
@@ -1506,7 +1516,16 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                 datalog.resuelto = 1
 
                 //respUpdate = await promiseActualizaTramite($scope.idPerTra,'GVOP', AG, $scope.consecutivoTramite,'',datalog.consPol,datalog.mesPol,datalog.anioPol)
-                let respuetaDoc = await GuardarDocumentoReembolso(documento)
+                //let respuetaDoc = await GuardarDocumentoReembolso(documento)
+                let respuetaDoc = false;
+                if($scope.idTramite == 16)
+                {
+                    respuetaDoc = await GuardarDocumentoReembolso(documento)
+                }
+                else{
+                    respuetaDoc = await GuardarDocumento(documento)
+                }
+
                 if(respuetaDoc == true)
                 {
                 $scope.avanzaReembolso();
