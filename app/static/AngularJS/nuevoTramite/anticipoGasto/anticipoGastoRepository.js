@@ -1031,7 +1031,7 @@ registrationModule.factory('anticipoGastoRepository', function ($http) {
                     "idTipoNotificacion": not.idTipoNotificacion,
                     "linkBPRO": not.linkBPRO,
                     "notAdjunto": not.notAdjunto,
-                    "notAdjuntoTipo": "",
+                    "notAdjuntoTipo": not.notAdjuntoTipo,
                     "idEmpresa": not.idEmpresa,
                     "idSucursal": not.idSucursal,
                     "departamentoId": not.departamentoId
@@ -1375,6 +1375,35 @@ registrationModule.factory('anticipoGastoRepository', function ($http) {
                     ,documento
                     ,importe
                 },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+
+            });
+        },
+        notificaInformaGV: function(not) {
+            var headers = {
+                'Content-Type': 'application/json'
+            };
+            return $http.post(anticipoGasto + "CreateNotificationInformaGV/", {
+                    "identificador": not.identificador,
+                    "descripcion": not.descripcion,
+                    "idSolicitante": not.idSolicitante,
+                    "idTipoNotificacion": not.idTipoNotificacion,
+                    "linkBPRO": not.linkBPRO,
+                    "notAdjunto": not.notAdjunto,
+                    "notAdjuntoTipo": "",
+                    "idEmpresa": not.idEmpresa,
+                    "idSucursal": not.idSucursal,
+                    "departamentoId": not.departamentoId
+                }
+                , headers);
+        },
+        usuariosTesoreria: () => {
+            return $http({
+                url: anticipoGasto + 'UsuariosTesoreria/',
+                method: "GET",
+                params: {},
                 headers: {
                     'Content-Type': 'application/json'
                 }

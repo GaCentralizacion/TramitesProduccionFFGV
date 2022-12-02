@@ -53,7 +53,7 @@
     $scope.idtipoViaje = -1
     $scope.disabledTipoViaje = true;
     $scope.selUsuario = 0
-    var html1 = "<div style=\"width:310px;height:140px\"><center><img style=\"width: 100% \" src=\"https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png\" alt=\"GrupoAndrade\" />" +
+    var html1 = "<div style=\"width:310px;height:140px\"><center><img style=\"width: 30% \" src=\"https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png\" alt=\"GrupoAndrade\" />" +
     "</center></div><div><p><br>";
     var html2 = "</p></div>";
     $scope.archivoDevolucion = { nombreArchivo: '', archivo: null };
@@ -119,6 +119,7 @@
                 $scope.asunto = res.data[0].asunto;
                 $scope.nombreUsuario = res.data[0].nombreUsuario;
                 $scope.correoAutorizador = res.data[0].correoAutorizador;
+                $scope.idUsuarioAutorizador = res.data[0].idUsuario
             } 
         });
     };
@@ -148,7 +149,11 @@
                     salidaEfectivo: (res.data[0].Comprobar == 1),
                     idPersona:  res.data[0].PER_IDPERSONA,
                     idPersonaAdicional: res.data[0].idUsuarioAdicional,
-                    montoMaximoFactura: res.data[0].montoMaximoFactura
+                    montoMaximoFactura: res.data[0].montoMaximoFactura,
+                    usuarioSolicitante: res.data[0].usuario,
+                    correoSolicitante: res.data[0].correoSolicitante,
+                    idUsuarioSolicitante: res.data[0].idUsuarioSolicitante,
+                    nombreusuarioSolicitante: res.data[0].usuario
                 };
 
                 $scope.amountAG = $scope.tramite.montoMaximoFactura
@@ -364,15 +369,27 @@
 
         //if ($scope.accionEnviar) {
         $('#spinner-loading').modal('show');
-        anticipoGastoRepository.actualizaEstatusTramite($scope.tramite.idSolicitud, $scope.idTipoProceso).then((res) => {
+        anticipoGastoRepository.actualizaEstatusTramite($scope.tramite.idSolicitud, $scope.idTipoProceso).then(async (res) => {
             if (res != null && res.data != null && res.data.respuesta != 0) {
                 if (res.data.idRegistro == 1) {
                     $('#spinner-loading').modal('hide');
                     swal('Comprobación de gastos', 'Se envió  la comprobacion para su aprobación', 'success');
                     var html = html1 + 
                     '<p>Estimado(a) '+$scope.nombreUsuario+ ' favor de autorizar la comprobación de anticipo de gastos. Solicitud: ' + $scope.tramite.idSolicitud +'</p>' + html2;
-                    $scope.sendMail($scope.correoAutorizador, $scope.asunto, html);
+                    
+                    /** AQUI VA LA NOTIFICACION */
+                    let respuesta = await SendNotificacionSolicitantePromise(`Revición de comprobaciones de gastos de viaje tramite ${$scope.tramite.idSolicitud }`,html,7,$scope.correoAutorizador, $scope.idUsuarioAutorizador, $scope.nombreUsuario )
+
+                    if(respuesta == true){
+
+                        html = html1 + 
+                        '<p>Se solicito la revisión de comprobaciones de gastos de viaje a '+$scope.nombreUsuario+ '. Tramite: ' + $scope.tramite.idSolicitud +'</p>' + html2;
+                        respuesta = await SendNotificacionSolicitantePromise(`Solicitud de revisión de comprobaciones gastos de viaje tramite ${$scope.tramite.idSolicitud}`,html,7, $scope.tramite.correoSolicitante, $scope.tramite.idUsuarioSolicitante, $scope.tramite.nombreusuarioSolicitante )
+                    }
+                    //$scope.sendMail($scope.correoAutorizador, $scope.asunto, html);
                     $location.path('/misTramites');
+
+
                 } else if (res.data.idRegistro == -4) {
                     $('#spinner-loading').modal('hide');
                     swal('Comprobación', 'Asegurate de enviar a aprobación todos los gasto de más antes de enviar toda la comprobación.', 'info');
@@ -2134,26 +2151,34 @@
                 "idSolicitante": usuario,
                 "idTipoNotificacion": tipoNot,
                 "linkBPRO": global_settings.urlCORS + "aprobargastosdemas?employee=65&idSolicitud="+ $scope.idSolicitud +"&idConceptoGasto=" + resf.idReferencia+ "&idConceptoArchivo=" + resf.idConceptoArchivo+"&m=" + btoa(resf.ExcedeMonto),
-                "notAdjunto": "",
-                "notAdjuntoTipo": "",
+                "notAdjunto": "" ,
+                "notAdjuntoTipo": $scope.idSolicitud.toString(),
                 "idEmpresa": $scope.selEmpresa,
                 "idSucursal": $scope.selSucursal,
                 "departamentoId":  $scope.selDepartamento
             };
+
+
+            $scope.guardarBitacoraProceso(usuario, localStorage.getItem('id_perTra'), 0, JSON.stringify(notG), 1, 1);
             
-            anticipoGastoRepository.notGerente(notG).then(function (result) {
+            anticipoGastoRepository.notGerente(notG).then(async function (result) {
                 console.log("$scope.CorreoFinanzas", $scope.CorreoFinanzas)
                 if (result.data[0].success == true) {
                     //let link = global_settings.urlApiNoty + 'api/notification/approveNotificationMail/?idAprobacion=' + result.data[0].apr_id + '&identificador=' + result.data[0].not_id + '&respuesta=';
                     let link = `${global_settings.urlApiNoty}api/notification/approveNotificationMailJerarquizado/?idAprobacion=${ result.data[0].apr_id}&identificador=${result.data[0].not_id}&idUsuario=${result.data[0].idUsuario}&respuesta=`
                     let linkCiereNoti = btoa(link);
                     let RevisarComprobacion = notG.linkBPRO + '&n=' + linkCiereNoti + '&ac=';
-                    html = ` ${html1} Solicitud de Aprobación de gastos de más<br><br> ${html2}
+                    html = `Solicitud de Aprobación de gastos de más<br><br> ${html2}
                     ${datosSolicitud}
-                    <p><a href=' ${RevisarComprobacion}0' target="_blank">Revisar Comprobación</a></p>
-                    <p><a href=" ${RevisarComprobacion}1" target="_blank">Aprobar</a></p> 
-                    <p><a href=" ${link} 0" target="_blank">Rechazar</a></p>`;
-                    $scope.sendMail($scope.CorreoFinanzas, 'PRUEBAS - Solicitud de Aprobación de gastos de más', html);
+                    <p><a href=' ${RevisarComprobacion}0' target="_blank">Revisar Comprobación</a></p>`;
+                    $scope.sendMail($scope.CorreoFinanzas, 'Solicitud de Aprobación de gastos de más', html);
+
+                    html = `Solicitud de Aprobación de gastos de más<br><br> ${html2}
+                    ${datosSolicitud}
+                    `;
+
+                    respuesta = await SendNotificacionSolicitantePromise(`Solicitud autorización gasto de más `,html,9, $scope.tramite.correoSolicitante, $scope.tramite.idUsuarioSolicitante, $scope.tramite.nombreusuarioSolicitante )
+                    
                     $scope.actualizaEstatusNotificacionDeMas(resf.idConceptoArchivo,2, resf.ExcedeMonto);
                     $scope.getArchivosPorConceptoNoti(resf.idReferencia)
                     $("#loading").modal("hide");
@@ -2494,5 +2519,50 @@
 
         })
      }
+
+     function SendNotificacionSolicitantePromise(asunto, body, tipoNot,correo='',idUsuarioAux= 0, nombre= ''){
+        return new Promise((resolve, reject) =>{
+
+            var usuario
+            var nombreSol
+            var descripcion
+            let correoSolicitante 
+      
+            if(tipoNot == 7 || tipoNot == 9){
+                usuario = idUsuarioAux
+                correoSolicitante = correo
+                nombreSol = nombre
+                descripcion = body
+            }
+
+            var notG = {
+                "identificador": parseInt($scope.tramite.idSolicitud ),
+                "descripcion": descripcion, //"El usuario " + nombreSol + " a solicitado un anticipo de gasto ",
+                //" por la cantidad de $" + $scope.monto.toFixed(2) + " pesos.",
+                "idSolicitante":  usuario,
+                "idTipoNotificacion": tipoNot,
+                "linkBPRO": '',//global_settings.urlCORS + "aprobarAnticipoGasto?idSolicitud=" + $scope.idSolicitud,
+                "notAdjunto": "",
+                "notAdjuntoTipo": "",
+                "idEmpresa": $scope.tramite.idCompania,
+                "idSucursal": $scope.tramite.idSucursal,
+                "departamentoId":  $scope.tramite.idDepartamento
+            };
+
+            $scope.sendMail(correoSolicitante, asunto+` tramite: ${$scope.tramite.idSolicitud }`, body);            
+            $scope.guardarBitacoraProceso(usuario, localStorage.getItem('id_perTra'), 0, JSON.stringify(notG), 1, 1);
+
+            anticipoGastoRepository.notificaInformaGV(notG).then(function (result) {
+                if (result.data[0].success == true) {
+
+                    resolve(true)
+                } else {
+                    swal("Atencion!", "No fue posible generar la notificación ...", "warning");
+                    resolve(false)
+                }
+            });
+
+        })
+    }
 
 });                                                                                                                    

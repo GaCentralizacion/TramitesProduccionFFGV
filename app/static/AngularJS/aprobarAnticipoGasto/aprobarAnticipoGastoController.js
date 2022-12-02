@@ -134,7 +134,10 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                     departamentoArea:res.data[0].departamentoArea,
                     complementoPoliza: res.data[0].complementoPoliza,
                     documentoConcepto: res.data[0].documentoConcepto,
-                    cuentaEnvio : res.data[0].cuentaEnvio
+                    cuentaEnvio : res.data[0].cuentaEnvio,
+                    nombreFinanzas:res.data[0].nombreFinanzas,
+                    idUsuarioFinanzas:res.data[0].idUsuarioFinanzas
+
                 };
                 $scope.concepto.idEstatus = $scope.tramite.idEstatus;
                 $scope.correoTesoreria = res.data[0].correoTesoreria;
@@ -417,6 +420,9 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
 
     $scope.confirmarSalida  = async function () {
         document.getElementById("confirmaSalida").disabled = true;
+        $("#loading").modal("show");
+
+        $scope.dominiosValidos = await DominiosGA()
 
         var idUsuario = $scope.tramite.idUsuarioSolicitante //$rootScope.usuario.usu_idusuario;
         var idSucursal = $scope.tramite.idSucursal;
@@ -475,12 +481,15 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
             {
                 let beneficiario = $scope.empleados === undefined || $scope.empleados.length < 1 ? $scope.tramite.usuario: $scope.empleados[0].nombreEmpleado;
                 let monto = formatMoney(ventaUnitario);
+                let correosTesoreria = await ObtieneUsuariosTesoreria()
 
-                if(bs != null || bs != undefined)
-                {
-                $("#modalSalidaEfectivo").modal("hide");
+                if(correosTesoreria.length < 1){
+                    swal('Aviso','No es posible notificarle al equipo de Tesoreria, Favor de intentar mas tarde', 'warning')
+                    return
+                }
+
+                let respuesta
                 let body = `
-                <div style="width: 310px; height: 140px;"><center><img style="width: 80%;" src="https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png" alt="GrupoAndrade" /></center></div>
                 <div>
                     <h3>Se solicito el siguiente Anticipo de Gasto por Orden de Pago</h3>
                     <table>
@@ -519,22 +528,35 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                          </tbody>
                      </table>
                 </div>
-                `
+                ` 
+
+                body = body.replace(/[\r\n\t]/gm, '').trim().replace(/(\r\n|\n|\r)/g,"").replace(/\s{2,}/g, ' ')
+
+                /**  GENERAMOS LA NOTIFICACION AL EQUIPO DE TESORERIA */
+                for (let i = 0; i < correosTesoreria.length; i++) {
+                    const usuarioTesoreria = correosTesoreria[i];
 
 
-                // '<div style=\"width:310px;height:140px\"><center><img style=\"width: 100% \" src=\"https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png\" alt=\"GrupoAndrade\" /></center></div><br>' +
-                //  '<p>Se solicito el siguiente Anticipo de Gasto por Orden de Pago</p>' +
-                //  '<p>Anticipo de Gastos N°: '+ idSolicitud+ '</p>' +
-                //  '<p>Banco Salida</p>' +
-                //  '<p>Banco: '+ bs.Nombre+ '</p>' +
-                //  '<p>Número Cuenta: '+ bs.cuentaContable+ '</p>' +
-                //  '<p>Cantidad: $'+  formatMoney(ventaUnitario) + '</p>';  
+                    
+                    respuesta  = await SendNotificacionSolicitantePromise('Salida de Efectivo por Orden de Pago, Anticipo de Gasto N°' + idSolicitud, body,5,usuarioTesoreria.correo,usuarioTesoreria.idUsuario,usuarioTesoreria.nombre)
 
-                 $scope.sendMail($scope.correoTesoreria, 'Salida de Efectivo por Orden de Pago, Anticipo de Gasto N°' + idSolicitud, body);
-                // //tipoProceso = await promiseInsertaDatosOrden($scope.tramite.idCompania, idSucursal, 'GVOP', concepto, ventaUnitario,idSolicitud)
+                }
+
+                if(respuesta === true){
+                    respuesta = await SendNotificacionSolicitantePromise('Salida de Efectivo por Orden de Pago, Anticipo de Gasto N°' + idSolicitud, body,5,$scope.tramite.correoSolicitante,idUsuario,beneficiario)
+                }
+
+                if(respuesta === false){
+                    $("#loading").modal("hide");
+                    return
+                }
+
+                if(bs != null || bs != undefined)
+                {
+                $("#modalSalidaEfectivo").modal("hide");
+ 
                 let banco = zeroDelete(cuentaContableSalida);
-                //tipoProceso = await promiseInsertaDatos(idUsuario,idSucursal,15,'AG-' +concepto,ventaUnitario,'AC',nombrecto,idSolicitud,banco,'');
-                // tipoProceso = await promiseInsertaDatos(idUsuario,idSucursal,16,'AG-' +concepto,ventaUnitario,'AC',nombrecto,idSolicitud,banco,'');
+
                 }
                 else{
                     swal('Atencion', 'No se selecciono el Banco Salida', 'warning');
@@ -876,20 +898,6 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
         }																		
     };
 
-    // $scope.OrdenMasivaSalidaAnticipo = function( parametros ){
-    //     anticipoGastoRepository.OrdenMasivaCabecero(parametros).then( (result) =>{
-    //         if( result.data[0].resultado == 0 ){
-    //             swal("Orden de Anticipo de Gasto","Ocurrio un problema al intentar guardar la order de anticipo, intenta de nuevo mas tarde.","warning");
-    //         }
-    //         else if( result.data[0].resultado == -1 ){
-    //             swal("Orden de Anticipo de Gasto","Ya existe una orden de compra para este trámite, favor de validar.","warning");
-    //         }
-    //         else{
-    //             swal("Orden de Anticipo de Gasto","Se ha creado la Orden de compra con Anticipo para Gasto de Viaje de forma satisfactoria.","success");
-    //         }
-    //     });
-    // }
-
 
     $scope.actualizaImporteConcepto = function () {
         $('#spinner-loading').modal('show');
@@ -1201,6 +1209,34 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                 
                                 //$scope.creacionTramiteEntregaEfectivo( parametros );
                                let gdm = await creacionTramiteEntregaEfectivo(parametros)
+
+                               if(gdm == true){
+
+                                    var parametrosEmail = {
+                                        empresa: $scope.tramite.empresa,
+                                        sucursal: $scope.tramite.sucursal,
+                                        departamento: $scope.tramite.departamento,
+                                        viaje: $scope.tramite.concepto,
+                                        motivo: $scope.tramite.motivo,
+                                        fecha: $scope.tramite.fechaInicio + ' al ' + $scope.tramite.fechaFin,
+                                        concepto: $scope.conceptosSolicitud[0].concepto,
+                                        aprobacion: $scope.tramite.importe,
+                                        comp_aprobado: $scope.archivos[0].total,
+                                        importe: $scope.archivo.ExcedeMonto,
+                                        solicitante: $scope.empleados !== undefined && $scope.empleados.length > 0 ? $scope.empleados[0].nombreEmpleado : $scope.tramite.usuario
+                                    }
+                                    $scope.dominiosValidos = await DominiosGA()
+                                    html = $scope.bodyTramitesCuenta($scope.idSolicitud, parametrosEmail);
+                                    //$scope.sendMail($scope.tramite.correosFinanzas, "Gastos de Viaje - Entrega de efectivo de gastos de más aprobados");
+
+                                    let respNot = await SendNotificacionSolicitantePromise('Gastos de Viaje - Entrega de efectivo de gastos de más aprobados',html,4,$scope.tramite.correosFinanzas,$scope.tramite.idUsuarioFinanzas, $scope.tramite.nombreFinanzas )
+
+                                    if(respNot  == true){
+                                        /**Se crea notificion al solicitante */
+                                        let respNot = await SendNotificacionSolicitantePromise('Gastos de Viaje - Entrega de efectivo de gastos de más aprobados',html,4,$scope.tramite.correoSolicitante,$scope.tramite.idUsuarioSolicitante, $scope.tramite.usuario)
+                                    }
+                               }
+
                             }
                         }
                         catch( e ){
@@ -1389,23 +1425,6 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
         return new Promise((resolve) => {
             anticipoGastoRepository.creacionTramiteEntregaEfectivo( parameros ).then( response =>{
                 console.log( "Respuesta de la creacion del tramite", response.data[0].id_perTra );
-    
-                var parametrosEmail = {
-                    empresa: $scope.tramite.empresa,
-                    sucursal: $scope.tramite.sucursal,
-                    departamento: $scope.tramite.departamento,
-                    viaje: $scope.tramite.concepto,
-                    motivo: $scope.tramite.motivo,
-                    fecha: $scope.tramite.fechaInicio + ' al ' + $scope.tramite.fechaFin,
-                    concepto: $scope.conceptosSolicitud[0].concepto,
-                    aprobacion: $scope.tramite.importe,
-                    comp_aprobado: $scope.archivos[0].total,
-                    importe: $scope.archivo.ExcedeMonto,
-                    solicitante: $scope.empleados !== undefined && $scope.empleados.length > 0 ? $scope.empleados[0].nombreEmpleado : $scope.tramite.usuario
-                }
-                
-                html = $scope.bodyTramitesCuenta( response.data[0].id_perTra, parametrosEmail );
-                $scope.sendMail($scope.tramite.correosFinanzas, "Gastos de Viaje - Entrega de efectivo de gastos de más aprobados", html);
                 resolve(true)
             });
         })
@@ -2406,17 +2425,34 @@ return x;
         $scope.sendMail($scope.tramite.correoSolicitante, 'Presupuesto autorizado pendiente de subir, Anticipo de Gasto', html1);
     }
 
-    function EnviaCorreoRechazoComprobacion(){
+    async function EnviaCorreoRechazoComprobacion(){
+        $scope.dominiosValidos = await DominiosGA()
+        var data = {
+            idConceptoArchivo: $scope.archivo.idConceptoArchivo,
+            importe: $scope.archivo.total,
+            idEstatus: $scope.idEstatusConcepto,
+            idUsuario: $rootScope.usuario.usu_idusuario,
+            idTramiteConcepto: $scope.archivo.idReferencia,
+            idTipoProceso: $scope.idTipoProceso,
+            comentario: $scope.archivo.comentario,
+            idSolicitud: $scope.idSolicitud,
+            compNoAutorizado: $scope.compNoAutorizada
+        };
 
         let usuarioSolicitante = $scope.empleadoSolicitante;
-        let concepto = $scope.conceptosSolicitud.filter(x=>x.idConceptoContable === $scope.archivos[0].idConceptoContable)[0]
+        let concepto = $scope.conceptosSolicitud.filter(x=>x.idConceptoContable === $scope.archivos[0].idConceptoContable.toString())[0]
 
-        let html1= ` <div style="width: 310px; height: 140px;"><center><img style="width: 80%;" src="https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png" alt="GrupoAndrade" /></center></div>
-        <div>
+        let html1= `<div>
             Estimado usuario(a)  ${$scope.empleadoSolicitante}:  
             <p>La comprobación para el concepto ${concepto.concepto} con un importe comprobado por $${formatMoney($scope.archivos[0].total)} ha sido rechazada, es necesario que vuelva a hacer la comprobación.</p>
         </div>`;
-        $scope.sendMail($scope.tramite.correoSolicitante, 'Comprobación gastos de viaje rechazada', html1);
+       // $scope.sendMail($scope.tramite.correoSolicitante, 'Comprobación gastos de viaje rechazada', html1);
+
+        let respuesta = await SendNotificacionSolicitantePromise(`Comprobación rechazada gasto de viaje tramite: ${$scope.tramite.idSolicitud}`,html1,8,$scope.tramite.correoSolicitante, $scope.tramite.idUsuarioSolicitante, $scope.tramite.usuario )
+
+        let est = await aprobarRechazarArchivo(data)
+
+        $('#spinner-loading').modal('hide');
     }
 
     $scope.OrdenMasivaSalidaAnticipo = function( parametros ){
@@ -2444,8 +2480,7 @@ return x;
     }
 
     $scope.bodyTramitesCuenta = function( tramite, data ){
-        var html = `<div style="width: 310px; height: 140px;"><center><img style="width: 80%;" src="https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png" alt="GrupoAndrade" /></center></div>
-                    <div>
+        var html = `<div>
                         <h3>Salida de efectivo de gastos de más</h3>
                         <table>
                             <tbody>
@@ -2753,5 +2788,95 @@ return x;
         const blob = new Blob(byteArrays, {type: contentType});
         return blob;
       }
+
+
+      function ObtieneUsuariosTesoreria(){
+        return new Promise((resolve, reject) => {
+            anticipoGastoRepository.usuariosTesoreria().then(resp =>{
+                resolve(resp.data)
+            })
+        })
+      }
+
+      function SendNotificacionSolicitantePromise(asunto, body, tipoNot,correo='',idUsuarioAux= 0, nombre= ''){
+        return new Promise((resolve, reject) =>{
+
+            var usuario
+            var nombreSol
+            var descripcion
+            let correoSolicitante 
+
+               
+            if(tipoNot == 4 || tipoNot == 5 || tipoNot == 8){
+                usuario = idUsuarioAux
+                correoSolicitante = correo
+                nombreSol = nombre
+                descripcion = body
+            }
+
+
+            $scope.dominioCorreoValido = false;
+    
+            for(let i = 0 ; i < $scope.dominiosValidos.length ; i++){
+    
+                if(correoSolicitante.includes($scope.dominiosValidos[i].dominio)){
+                    $scope.dominioCorreoValido = true;
+                }
+            }
+    
+            if(!$scope.dominioCorreoValido){
+                swal('Aviso','El correo no pertenece a Grupo Andrade, es necesario levantar un ticket y solicitar su cuenta de correo institucional para poder solicitar sus gastos', 'warning');
+                return;
+            }
+
+            var notG = {
+                "identificador": parseInt($scope.idSolicitud),
+                "descripcion": descripcion, //"El usuario " + nombreSol + " a solicitado un anticipo de gasto ",
+                //" por la cantidad de $" + $scope.monto.toFixed(2) + " pesos.",
+                "idSolicitante":  usuario,
+                "idTipoNotificacion": tipoNot,
+                "linkBPRO": '',//global_settings.urlCORS + "aprobarAnticipoGasto?idSolicitud=" + $scope.idSolicitud,
+                "notAdjunto": "",
+                "notAdjuntoTipo": "",
+                "idEmpresa": $scope.selEmpresa,
+                "idSucursal": $scope.selSucursal,
+                "departamentoId":  $scope.selDepartamento
+            };
+
+            $scope.sendMail(correoSolicitante, asunto, body);            
+            $scope.guardarBitacoraProceso(usuario, localStorage.getItem('id_perTra'), 0, JSON.stringify(notG), 1, 1);
+
+            anticipoGastoRepository.notificaInformaGV(notG).then(function (result) {
+                if (result.data[0].success == true) {
+
+                    resolve(true)
+                } else {
+                    swal("Atencion!", "No fue posible generar la notificación ...", "warning");
+                    resolve(false)
+                }
+            });
+
+        })
+    }
+
+     function DominiosGA(){
+        return new Promise((resolve, reject)  => {
+            anticipoGastoRepository.DominiosGA().then(res => {
+                resolve(res.data)
+            });
+        })
+    }
+
+    $scope.guardarBitacoraProceso = function (idUsuario,id_perTra,idEstatus,accion,bitacora, proceso) {
+        dataSave = {
+            idUsuario:  idUsuario,
+            id_perTra: id_perTra,
+            idEstatus : idEstatus,
+            accion : accion,
+            bitacora : bitacora,
+            proceso : proceso}
+        fondoFijoRepository.saveBitProceso(dataSave).then((res) => {
+        });
+    }
 
 });

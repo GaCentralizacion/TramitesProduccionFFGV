@@ -223,6 +223,8 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             $scope.documentoConcepto = res.data[0].documentoConcepto
             $scope.idPersonaRFC = res.data[0].idPersonaRFC
             $scope.cuentaEnvio = res.data[0].cuentaEnvio
+            $scope.usuarioGV = res.data[0].idUsuArioGV
+            $scope.correoSolicitante = res.data[0].correo
             //----------------------------------------------------
 
             $scope.DatosPolizaOP( res.data[0].id_cuenta );
@@ -702,14 +704,14 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
 
                 if(respGVTE == true){
                     respDocument = await GuardarDocumento(documento)
-                    $scope.getComprobanteFA();
+                  
+                    $scope.idPerTra = localStorage.getItem('id_perTra')
 
                     /** Generamos la notificacion al solicitante */
-                    
-
                     let body = 'La orden de pago esta lista para ser descargada, puedes consultarla en la pantalla de comprobaciones'
-                    SendNotificacionSolicitantePromise('Orden de pago lista', body,6)
+                    let respuesta = await SendNotificacionSolicitantePromise('Orden de pago lista', body,6, $scope.correoSolicitante,$scope.usuarioGV , $scope.nombreCliente)
 
+                    $scope.getComprobanteFA();
                 }
 
             }     
@@ -1798,32 +1800,16 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             var nombreSol
             var descripcion
             let correoSolicitante 
-
-               
-            if(tipoNot == 5){
+      
+            if(tipoNot == 6){
                 usuario = idUsuarioAux
                 correoSolicitante = correo
                 nombreSol = nombre
                 descripcion = body
             }
 
-
-            $scope.dominioCorreoValido = false;
-    
-            for(let i = 0 ; i < $scope.dominiosValidos.length ; i++){
-    
-                if(correoSolicitante.includes($scope.dominiosValidos[i].dominio)){
-                    $scope.dominioCorreoValido = true;
-                }
-            }
-    
-            if(!$scope.dominioCorreoValido){
-                swal('Aviso','El correo no pertenece a Grupo Andrade, es necesario levantar un ticket y solicitar su cuenta de correo institucional para poder solicitar sus gastos', 'warning');
-                return;
-            }
-
             var notG = {
-                "identificador": parseInt($scope.idSolicitud),
+                "identificador": parseInt($scope.idPerTra),
                 "descripcion": descripcion, //"El usuario " + nombreSol + " a solicitado un anticipo de gasto ",
                 //" por la cantidad de $" + $scope.monto.toFixed(2) + " pesos.",
                 "idSolicitante":  usuario,
@@ -1831,12 +1817,12 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                 "linkBPRO": '',//global_settings.urlCORS + "aprobarAnticipoGasto?idSolicitud=" + $scope.idSolicitud,
                 "notAdjunto": "",
                 "notAdjuntoTipo": "",
-                "idEmpresa": $scope.selEmpresa,
-                "idSucursal": $scope.selSucursal,
-                "departamentoId":  $scope.selDepartamento
+                "idEmpresa": $scope.idEmpresa,
+                "idSucursal": $scope.idSucursal,
+                "departamentoId":  $scope.idDepartamento
             };
 
-            $scope.sendMail(correoSolicitante, asunto, body);            
+            $scope.sendMail(correoSolicitante, asunto+` tramite: ${$scope.idPerTra}`, body);            
             $scope.guardarBitacoraProceso(usuario, localStorage.getItem('id_perTra'), 0, JSON.stringify(notG), 1, 1);
 
             anticipoGastoRepository.notificaInformaGV(notG).then(function (result) {

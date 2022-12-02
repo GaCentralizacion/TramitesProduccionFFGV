@@ -2172,4 +2172,54 @@ anticipoGasto.prototype.get_BuscaPolizaGV = function(req, res, next) {
     });
 };
 
+anticipoGasto.prototype.post_CreateNotificationInformaGV = function(req, res, next){
+    var self = this;
+
+    var identificador = req.body.identificador
+    var descripcion = req.body.descripcion
+    var idSolicitante = req.body.idSolicitante
+    var idTipoNotificacion = req.body.idTipoNotificacion
+    var linkBPRO = req.body.linkBPRO
+    var notAdjunto = req.body.notAdjunto
+    var notAdjuntoTipo = req.body.notAdjuntoTipo
+    var idEmpresa = req.body.idEmpresa
+    var idSucursal = req.body.idSucursal
+    var departamentoId = req.body.departamentoId
+
+    var params = [
+        {name: 'identificador', value: identificador, type: self.model.types.STRING},
+        {name: 'idSolicitante', value: idSolicitante, type: self.model.types.INT},
+        {name: 'idTipoNotJerarquizada', value: idTipoNotificacion, type: self.model.types.INT},
+        {name: 'descripcion', value: descripcion, type: self.model.types.STRING},
+        {name: 'idEmpresa', value: idEmpresa, type: self.model.types.INT},
+        {name: 'idSucursal', value: idSucursal, type: self.model.types.INT},
+        {name: 'idDepartamento', value: departamentoId, type: self.model.types.INT},
+        {name: 'linkBPRO', value: linkBPRO, type: self.model.types.STRING},
+        {name: 'notAdjunto', value: notAdjunto, type: self.model.types.STRING},
+        {name: 'notAdjuntoTipo', value: notAdjuntoTipo, type: self.model.types.STRING}
+    ];
+
+    this.model.query('Notificacion.dbo.INS_NOTIFICACION_JERARQUIZADA_INFORMA_GV', params, function(error, result){
+        console.log(result)
+        self.view.expositor(res,{
+            error:error,
+            result: result
+        });
+    });
+
+}
+
+anticipoGasto.prototype.get_UsuariosTesoreria = function(req,res, next){
+    var self = this;
+
+    var params= []
+
+    this.model.query('NOTIFICACION_TESORERIA_GV', params, function(error, result){
+        self.view.expositor(res,{
+            error:error,
+            result:result
+        })
+    })
+}
+
 module.exports = anticipoGasto;

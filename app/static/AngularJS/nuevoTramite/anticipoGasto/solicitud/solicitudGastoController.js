@@ -260,6 +260,7 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
     $scope.traeEmpleado=function(){
         anticipoGastoRepository.getidPersonabyUsuario($rootScope.usuario.usu_idusuario).then(function successCallback(response) {
             $scope.tramite.idPersona1  = response.data[0].PER_IDPERSONA;
+            localStorage.setItem('CorreoSolicitante',response.data[0].correo)
             $scope.selUsuario = response.data[0].PER_IDPERSONA;
             $scope.BuscaIne();
             if($scope.tramite.idPersona1 != 0){
@@ -1001,121 +1002,230 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
         });
     };
 
-    // $scope.verPDF = function() {
-    //     var ep = $scope.empresa;
+    function SendNotificacionPromise(asunto, body){
+        return new Promise((resolve, reject) =>{
+            var tipoNot = 1;
+            var usuario = $scope.empleados.length > 0 ? $scope.empleados[0].idUsuario : $scope.user.usu_idusuario
+            var nombreSol = $scope.empleados.length > 0 ? $scope.empleados[0].nombreEmpleado :  $rootScope.user.nombre
+            var descripcion = `<p>Favor de revisar, el usuario ${nombreSol} a solicitado un anticipo de gasto con número de tramite ${$scope.idSolicitud} para los siguientes conceptos: </p></br>`+ 
+            '<table border="1">' +
+                                '<thead><tr>' +
+                                '<td style="font-weight: bold; padding-right: 30px; text-align: center;">Concepto</td>' +
+                                '<td style="font-weight: bold; padding-right: 30px; text-align: center;">Monto Solicitado</td>' +
+                                '</tr><thead>' +
+                                '<tbody>' +
+                                $scope.listaCorreo.map(item => {
+                                    return `<tr>
+                                                <td>${item.concepto}</td>
+                                                <td style="text-align: right;">$${ formatMoney( item.importeSolicitado )}</td>
+                                            </tr>`
+                                }).join('') +
+                                '</tbody>' +
+                                '</table>'
 
-    //     var date = new Date();
-    //     var fecha = ('0' + date.getDate()).slice(-2) +' de '+ date.toLocaleString("es", { month: "long"  })+ ' de ' +  date.getFullYear();
-    //     var doc = new jsPDF('p','px','letter');
+            let correoSolicitante = $scope.empleados.length > 0 ? $scope.empleados[0].correo : $scope.correoPersona;
 
-    //     var lMargin=15; //left margin in mm
-    //     var rMargin=15; //right margin in mm
-    //     var pdfInMM=410;  
+            $scope.dominioCorreoValido = false;
+    
+            for(let i = 0 ; i < $scope.dominiosValidos.length ; i++){
+    
+                if(correoSolicitante.includes($scope.dominiosValidos[i].dominio)){
+                    $scope.dominioCorreoValido = true;
+                }
+            }
+    
+            if(!$scope.dominioCorreoValido){
+                swal('Aviso','El correo no pertenece a Grupo Andrade, es necesario levantar un ticket y solicitar su cuenta de correo institucional para poder solicitar sus gastos', 'warning');
+                return;
+            }
 
-    //     doc.setFontSize(12);
-    //     doc.text('Fecha: ' + fecha, 45,50);
-    //     doc.text(ep.nombre + ' (' + ep.nombre_corto + ')', 45 ,90);
-    //     doc.text('Razón social: ' + ep.razon_social, 45,110);
-    //     doc.text('RFC: ' + ep.registro_federal, 45,130);
-    //     doc.text('Direccion:', 45,150);
+            var notG = {
+                "identificador": parseInt($scope.idSolicitud),
+                "descripcion": descripcion, //"El usuario " + nombreSol + " a solicitado un anticipo de gasto ",
+                //" por la cantidad de $" + $scope.monto.toFixed(2) + " pesos.",
+                "idSolicitante":  usuario,
+                "idTipoNotificacion": tipoNot,
+                "linkBPRO": global_settings.urlCORS + "aprobarAnticipoGasto?idSolicitud=" + $scope.idSolicitud,
+                "notAdjunto": "",
+                "notAdjuntoTipo": "",
+                "idEmpresa": $scope.selEmpresa,
+                "idSucursal": $scope.selSucursal,
+                "departamentoId":  $scope.selDepartamento
+            };
+            
+            $scope.guardarBitacoraProceso($rootScope.user.usu_idusuario, localStorage.getItem('id_perTra'), 0, JSON.stringify(notG), 1, 1);
+     
 
-    //     var lines1=doc.splitTextToSize(ep.direccion, (pdfInMM-lMargin-rMargin));
+            anticipoGastoRepository.notGerente(notG).then(function (result) {
+                if (result.data[0].success == true) {
+        
+                    //let link = global_settings.urlApiNoty + 'api/notification/approveNotificationMailJerarquizado/?idAprobacion=' + result.data[0].apr_id + '&identificador=' + result.data[0].not_id + '&respuesta=';
+                    let link = `${global_settings.urlApiNoty}api/notification/approveNotificationMailJerarquizado/?idAprobacion=${ result.data[0].apr_id}&identificador=${result.data[0].not_id}&idUsuario=${result.data[0].idUsuario}&respuesta=`
+                   
+                    html = ` ${body}
+                    <p><a href=' ${notG.linkBPRO} ' target="_blank">Revisar Tramite</a></p>`;
+        
+                    var correoAutorizador = $scope.correoAutorizador;
+                    $scope.sendMail(correoAutorizador, asunto, html);
+                    // $scope.sendMail(correoSolicitante, asunto, body);
+                    resolve(true)
+    
+                } else {
+                    swal("Atencion!", "Servicio no disponible por el momento ...", "warning");
+                }
+            });
 
-    //     var dim = doc.getTextDimensions('Text');
-    //     var lineHeight = dim.h;
-    //     lineTop = (lineHeight/2)*lines1.length + 10;
+        })
+    }
 
-    //     for(var i=0;i<lines1.length;i++){
-    //         lineTop = (lineHeight/2) * i;
-    //         doc.text(lines1[i],45,170 + lineTop);
+    function SendNotificacionSolicitantePromise(asunto, body, tipoNot,correo='',idUsuarioAux= 0){
+        return new Promise((resolve, reject) =>{
+
+            var usuario
+            var nombreSol
+            var descripcion
+            let correoSolicitante 
+
+               
+            if(tipoNot == 3){
+
+                usuario = $scope.empleados.length > 0 ? $scope.empleados[0].idUsuario : $scope.user.usu_idusuario
+                nombreSol = $scope.empleados.length > 0 ? $scope.empleados[0].nombreEmpleado :  $rootScope.user.nombre
+                descripcion =''
+
+                correoSolicitante = $scope.empleados.length > 0 ? $scope.empleados[0].correo : $scope.correoPersona;
+
+                descripcion = body
+            }
+
+            if(tipoNot == 4){
+                descripcion = body
+                correoSolicitante = correo
+                usuario = idUsuarioAux
+            }
+
+            $scope.dominioCorreoValido = false;
+    
+            for(let i = 0 ; i < $scope.dominiosValidos.length ; i++){
+    
+                if(correoSolicitante.includes($scope.dominiosValidos[i].dominio)){
+                    $scope.dominioCorreoValido = true;
+                }
+            }
+    
+            if(!$scope.dominioCorreoValido){
+                swal('Aviso','El correo no pertenece a Grupo Andrade, es necesario levantar un ticket y solicitar su cuenta de correo institucional para poder solicitar sus gastos', 'warning');
+                return;
+            }
+
+            var notG = {
+                "identificador": parseInt($scope.idSolicitud),
+                "descripcion": descripcion, //"El usuario " + nombreSol + " a solicitado un anticipo de gasto ",
+                //" por la cantidad de $" + $scope.monto.toFixed(2) + " pesos.",
+                "idSolicitante":  usuario,
+                "idTipoNotificacion": tipoNot,
+                "linkBPRO": '',//global_settings.urlCORS + "aprobarAnticipoGasto?idSolicitud=" + $scope.idSolicitud,
+                "notAdjunto": "",
+                "notAdjuntoTipo": "",
+                "idEmpresa": $scope.selEmpresa,
+                "idSucursal": $scope.selSucursal,
+                "departamentoId":  $scope.selDepartamento
+            };
+
+            anticipoGastoRepository.notificaInformaGV(notG).then(function (result) {
+                if (result.data[0].success == true) {
+                    $scope.sendMail(correoSolicitante, asunto, body);            
+                    $scope.guardarBitacoraProceso($rootScope.user.usu_idusuario, localStorage.getItem('id_perTra'), 0, 'Se envio a aprobación a Corporativo', 1, 1);
+                    resolve(true)
+                } else {
+                    swal("Atencion!", "Servicio no disponible por el momento ...", "warning");
+                }
+            });
+
+        })
+    }
+
+    // $scope.sendNotificacion = function (asunto, body) {
+    //     $("#loading").modal("show");
+    //     var tipoNot = 1;
+
+    //     var usuario = $scope.empleados.length > 0 ? $scope.empleados[0].idUsuario : $scope.user.usu_idusuario
+    //     var nombreSol = $scope.empleados.length > 0 ? $scope.empleados[0].nombreEmpleado :  $rootScope.user.nombre
+    //     var descripcion = `<p>Favor de revisar, el usuario ${nombreSol} a solicitado un anticipo de gasto con número de tramite ${$scope.idSolicitud} para los siguientes conceptos: </p></br>`+ 
+    //     '<table border="1">' +
+    //                         '<thead><tr>' +
+    //                         '<td style="font-weight: bold; padding-right: 30px; text-align: center;">Concepto</td>' +
+    //                         '<td style="font-weight: bold; padding-right: 30px; text-align: center;">Monto Solicitado</td>' +
+    //                         '</tr><thead>' +
+    //                         '<tbody>' +
+    //                         $scope.listaCorreo.map(item => {
+    //                             return `<tr>
+    //                                         <td>${item.concepto}</td>
+    //                                         <td style="text-align: right;">$${ formatMoney( item.importeSolicitado )}</td>
+    //                                     </tr>`
+    //                         }).join('') +
+    //                         '</tbody>' +
+    //                         '</table>'
+
+    //     // $scope.listaCorreo.map(item => {
+    //     //     return `${item.concepto} $${ formatMoney( item.importeSolicitado )}`
+    //     // }).join(' ')
+
+    //     let correoSolicitante = $scope.empleados.length > 0 ? $scope.empleados[0].correo : $scope.correoPersona;
+
+    //     $scope.dominioCorreoValido = false;
+
+    //     for(let i = 0 ; i < $scope.dominiosValidos.length ; i++){
+
+    //         if(correoSolicitante.includes($scope.dominiosValidos[i].dominio)){
+    //             $scope.dominioCorreoValido = true;
+    //         }
     //     }
 
-    //     //doc.text('Página Web: ' + ep.paginaweb, 45,210);
 
-    //     doc.save(ep.nombre + '_DATOS.pdf');
-    // }
-
-    $scope.sendNotificacion = function (asunto, body) {
-        $("#loading").modal("show");
-        var tipoNot = 1;
-
-        var usuario = $scope.empleados.length > 0 ? $scope.empleados[0].idUsuario : $scope.user.usu_idusuario
-        var nombreSol = $scope.empleados.length > 0 ? $scope.empleados[0].nombreEmpleado :  $rootScope.user.nombre
-        var descripcion = `<p>Favor de revisar, el usuario ${nombreSol} a solicitado un anticipo de gasto con número de tramite ${$scope.idSolicitud} para los siguientes conceptos: </p></br>`+ 
-        '<table border="1">' +
-                            '<thead><tr>' +
-                            '<td style="font-weight: bold; padding-right: 30px; text-align: center;">Concepto</td>' +
-                            '<td style="font-weight: bold; padding-right: 30px; text-align: center;">Monto Solicitado</td>' +
-                            '</tr><thead>' +
-                            '<tbody>' +
-                            $scope.listaCorreo.map(item => {
-                                return `<tr>
-                                            <td>${item.concepto}</td>
-                                            <td style="text-align: right;">$${ formatMoney( item.importeSolicitado )}</td>
-                                        </tr>`
-                            }).join('') +
-                            '</tbody>' +
-                            '</table>'
-
-        // $scope.listaCorreo.map(item => {
-        //     return `${item.concepto} $${ formatMoney( item.importeSolicitado )}`
-        // }).join(' ')
-
-        let correoSolicitante = $scope.empleados.length > 0 ? $scope.empleados[0].correo : $scope.correoPersona;
-
-        $scope.dominioCorreoValido = false;
-
-        for(let i = 0 ; i < $scope.dominiosValidos.length ; i++){
-
-            if(correoSolicitante.includes($scope.dominiosValidos[i].dominio)){
-                $scope.dominioCorreoValido = true;
-            }
-        }
+    //     if(!$scope.dominioCorreoValido){
+    //         swal('Aviso','El correo no pertenece a Grupo Andrade, es necesario levantar un ticket y solicitar su cuenta de correo institucional para poder solicitar sus gastos', 'warning');
+    //         return;
+    //     }
 
 
-        if(!$scope.dominioCorreoValido){
-            swal('Aviso','El correo no pertenece a Grupo Andrade, es necesario levantar un ticket y solicitar su cuenta de correo institucional para poder solicitar sus gastos', 'warning');
-            return;
-        }
-
-
-        var notG = {
-            "identificador": parseInt($scope.idSolicitud),
-            "descripcion": descripcion, //"El usuario " + nombreSol + " a solicitado un anticipo de gasto ",
-            //" por la cantidad de $" + $scope.monto.toFixed(2) + " pesos.",
-            "idSolicitante":  usuario,
-            "idTipoNotificacion": tipoNot,
-            "linkBPRO": global_settings.urlCORS + "aprobarAnticipoGasto?idSolicitud=" + $scope.idSolicitud,
-            "notAdjunto": "",
-            "notAdjuntoTipo": "",
-            "idEmpresa": $scope.selEmpresa,
-            "idSucursal": $scope.selSucursal,
-            "departamentoId":  $scope.selDepartamento
-        };
+    //     var notG = {
+    //         "identificador": parseInt($scope.idSolicitud),
+    //         "descripcion": descripcion, //"El usuario " + nombreSol + " a solicitado un anticipo de gasto ",
+    //         //" por la cantidad de $" + $scope.monto.toFixed(2) + " pesos.",
+    //         "idSolicitante":  usuario,
+    //         "idTipoNotificacion": tipoNot,
+    //         "linkBPRO": global_settings.urlCORS + "aprobarAnticipoGasto?idSolicitud=" + $scope.idSolicitud,
+    //         "notAdjunto": "",
+    //         "notAdjuntoTipo": "",
+    //         "idEmpresa": $scope.selEmpresa,
+    //         "idSucursal": $scope.selSucursal,
+    //         "departamentoId":  $scope.selDepartamento
+    //     };
         
-        anticipoGastoRepository.notGerente(notG).then(function (result) {
-            if (result.data[0].success == true) {
+    //     anticipoGastoRepository.notGerente(notG).then(function (result) {
+    //         if (result.data[0].success == true) {
     
-                //let link = global_settings.urlApiNoty + 'api/notification/approveNotificationMailJerarquizado/?idAprobacion=' + result.data[0].apr_id + '&identificador=' + result.data[0].not_id + '&respuesta=';
-                let link = `${global_settings.urlApiNoty}api/notification/approveNotificationMailJerarquizado/?idAprobacion=${ result.data[0].apr_id}&identificador=${result.data[0].not_id}&idUsuario=${result.data[0].idUsuario}&respuesta=`
-                $scope.guardarBitacoraProceso($rootScope.user.usu_idusuario, localStorage.getItem('id_perTra'), 0, 'Se envio a aprobación a Corporativo', 1, 1);
-                html = ` ${body}
-                <p><a href=' ${notG.linkBPRO} ' target="_blank">Revisar Tramite</a></p>
-                <p><a href=" ${link} 1" target="_blank">Aprobar</a></p> 
-                <p><a href=" ${link} 0" target="_blank">Rechazar</a></p>`;
+    //             //let link = global_settings.urlApiNoty + 'api/notification/approveNotificationMailJerarquizado/?idAprobacion=' + result.data[0].apr_id + '&identificador=' + result.data[0].not_id + '&respuesta=';
+    //             let link = `${global_settings.urlApiNoty}api/notification/approveNotificationMailJerarquizado/?idAprobacion=${ result.data[0].apr_id}&identificador=${result.data[0].not_id}&idUsuario=${result.data[0].idUsuario}&respuesta=`
+    //             $scope.guardarBitacoraProceso($rootScope.user.usu_idusuario, localStorage.getItem('id_perTra'), 0, 'Se envio a aprobación a Corporativo', 1, 1);
+    //             html = ` ${body}
+    //             <p><a href=' ${notG.linkBPRO} ' target="_blank">Revisar Tramite</a></p>
+    //             <p><a href=" ${link} 1" target="_blank">Aprobar</a></p> 
+    //             <p><a href=" ${link} 0" target="_blank">Rechazar</a></p>`;
     
-                var correoAutorizador = $scope.correoAutorizador;
-                $scope.sendMail(correoAutorizador, asunto, html);
-                $scope.sendMail(correoSolicitante, asunto, body);
-                //$scope.sendMail("jorge.conelly@coalmx.com", asunto, html);
+    //             var correoAutorizador = $scope.correoAutorizador;
+    //             $scope.sendMail(correoAutorizador, asunto, html);
+    //             $scope.sendMail(correoSolicitante, asunto, body);
+    //             //$scope.sendMail("jorge.conelly@coalmx.com", asunto, html);
 
-                $("#loading").modal("hide");
-            } else {
-                swal("Atencion!", "Servicio no disponible por el momento ...", "warning");
-                $("#loading").modal("hide");
-            }
-        });
-    }
+    //             $("#loading").modal("hide");
+    //         } else {
+    //             swal("Atencion!", "Servicio no disponible por el momento ...", "warning");
+    //             $("#loading").modal("hide");
+    //         }
+    //     });
+    // }
 
     $scope.guardarBitacoraProceso = function (idUsuario,id_perTra,idEstatus,accion,bitacora, proceso) {
         dataSave = {
@@ -1222,7 +1332,9 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
     }; 
     /////////Se agrega verificar a qué autorizador se le va a enviar la notificación
     $scope.buscarAutorizador = async function () {
-        
+        let respuestaNotificaGte
+        let respuestaNotificaInforma
+
         $scope.existeConfiguracion = false
         
         $scope.selUsuario = $scope.empleados.length > 0 ? $scope.empleados[0].IdPersona : ($scope.tramite.idPersona1 === undefined ? $scope.tramite.idPersona : $scope.tramite.idPersona1)
@@ -1244,7 +1356,7 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
             
 
             $('#spinner-loading').modal('show');
-            anticipoGastoRepository.actualizaEstatusTramite($scope.tramite.idSolicitud, $scope.idTipoProceso).then((res) => {
+            anticipoGastoRepository.actualizaEstatusTramite($scope.tramite.idSolicitud, $scope.idTipoProceso).then(async (res) => {
                 if (res != null && res.data != null && res.data.respuesta != 0) {
                     if (res.data.idRegistro == 1) {
                         $scope.listaCorreo = $scope.conceptosSolicitud.filter(f => f.idEstatus == 0);
@@ -1273,8 +1385,17 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
                             '</tbody>' +
                             '</table>'+ $scope.html2;
                             //$scope.sendMail($scope.correoAutorizador, asunto, body);
-                            //envía notificación
-                            $scope.sendNotificacion(asunto, body);
+                            //ENVIA NOTIFICACION Y CORREO AL AUTORIZADOR
+                           respuestaNotificaGte = await SendNotificacionPromise(asunto, body)
+
+                            /**
+                             * SE ENVIA NOTIFICACION Y CORREO AL SOLICITANTE 
+                             * DE SOLICITUD DE VIATICOS
+                             * */
+                            respuestaNotificaInforma = await SendNotificacionSolicitantePromise(asunto, body,3)
+
+                            // $scope.sendNotificacion(asunto, body);
+
                         $('#spinner-loading').modal('hide');
                         swal('Anticipo de Gasto', 'Se envió la solicitud a aprobar correctamente', 'success');
                         $location.path('/misTramites');
@@ -2353,22 +2474,16 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
         )
         .then((resp) => {
           console.log(resp);
-          swal(
-            "Información",
-            "El presupuesto autorizado se ha guardado correctamente y se encuentra en revisión por Finanzas 1",
-            "success"
-          );
 
-          setTimeout(() => {
+
+          setTimeout(async () => {
             $scope.documento = { url: "", archivo: "", ext_nombre: "pdf" };
             document.getElementById("picturePresupuesto").value = null;
             $location.path("/misTramites");
             //$("#viewCargaReporte").modal("hide");
             var numTramite = $scope.tramite.idSolicitud;
             var html =
-              `
-            <div style="width: 310px; height: 140px;"><center><img style="width: 80%;" src="https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png" alt="GrupoAndrade" /></center></div>
-            <div>Favor de generar la salida de efectivo para el tramite de gasto de viaje </div>
+              `<div>Favor de generar la salida de efectivo para el tramite de gasto de viaje </div>
             <div>
                 <table>
                     <tbody>
@@ -2383,11 +2498,48 @@ registrationModule.controller('solicitudGastoController', function ($sce,$scope,
             </div>`;
 
             //$scope.sendMail( 'adriana.olivares@grupoandrade.com,roberto.almanza@coalmx.com', `Solicitud Salida de efectivo gastos de viaje ${$scope.tramite.idSolicitud}`, html )
-            $scope.sendMail(
-              resp.data[0].correoSalidaEfectivo,
-              `Solicitud Salida de efectivo gastos de viaje ${$scope.tramite.idSolicitud}`,
-              html
-            );
+            // $scope.sendMail(
+            //   resp.data[0].correoSalidaEfectivo,
+            //   `Solicitud Salida de efectivo gastos de viaje ${$scope.tramite.idSolicitud}`,
+            //   html
+            // );
+
+            let noti = await SendNotificacionSolicitantePromise(`Solicitud Salida de efectivo gastos de viaje ${$scope.tramite.idSolicitud}`,html, 4,resp.data[0].correoSalidaEfectivo,resp.data[0].idUsuarioFinanzas1)
+
+            if(noti == true){
+
+                swal(
+                    "Información",
+                    "El presupuesto autorizado se ha guardado correctamente y se encuentra en revisión por Finanzas 1",
+                    "success"
+                  );
+
+               html =
+                `<div>Se solicitó la salida de efecto al área de Finanzas 1 </div>
+                <div>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td style="text-align: right;"><span style="color: #ff0000;">Tramite:</span></td>
+                                <td>` +
+                numTramite +
+                `</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>`;
+
+                
+                let correoSolicitante = localStorage.getItem('CorreoSolicitante')
+                noti = await SendNotificacionSolicitantePromise(`Solicitud Salida de efectivo gastos de viaje ${$scope.tramite.idSolicitud}`,html, 4,correoSolicitante,$rootScope.usuario.usu_idusuario)
+             
+            }
+
+            if(noti == false){
+                swal('Aviso','No fue posible generar la notificación a Finanzas 1', 'warning')
+            }
+
+
           }, 3000);
         });
     };
