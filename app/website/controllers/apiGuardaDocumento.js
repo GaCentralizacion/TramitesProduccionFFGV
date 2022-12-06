@@ -27,6 +27,25 @@ apiGuardaDocumento.prototype.post_GuardaFactura = function(req, res, next) {
     var filePDF = data.file1.toString();
     var fileXML = data.file2.toString();
 
+    var existePDF = false;
+    var existeXML = false;
+
+    if(fs.existsSync(filePDF)){
+        existePDF = true;
+    }
+    else{
+        console.log("El archivo PDF NO EXISTE!");
+    }
+
+    if(fs.existsSync(existeXML)){
+        existeXML = true;
+    }
+    else{
+        console.log("El archivo XML NO EXISTE!");
+    }
+
+    if(existePDF && existeXML)
+    {
     var guarda = unirest('POST', 'http://192.168.20.123:4400/api/fileUpload/files/')
     .headers({'Accept': 'application/json','Content-Type': 'multipart/form-data'})
     .field('provider', data.provider.toString())
@@ -57,6 +76,11 @@ apiGuardaDocumento.prototype.post_GuardaFactura = function(req, res, next) {
 
         self.view.expositor(res, {result: response.body})
       })
+    }
+    else
+    {
+        self.view.expositor(res, {result: {error: 'error'}})
+    }  
 }
 
 apiGuardaDocumento.prototype.post_GuardaPDFVale = function(req, res, next) { 

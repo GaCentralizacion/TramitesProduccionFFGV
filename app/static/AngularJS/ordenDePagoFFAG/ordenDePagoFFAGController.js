@@ -746,6 +746,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
        }
 
 
+       $('#loading').modal('hide');
 
         //var tipoProceso = true;
         // tipoProceso = await promiseInsertaDatos($rootScope.user.usu_idusuario, $scope.idSucursal, 15,'AG', $scope.monto,'AC', $scope.nombreDep, $scope.idPerTra,banco,'');
