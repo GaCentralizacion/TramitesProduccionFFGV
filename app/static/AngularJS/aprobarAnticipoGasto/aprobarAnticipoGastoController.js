@@ -1271,7 +1271,7 @@ registrationModule.controller('aprobarAnticipoGastoController', function ($scope
                 }
 
                 if($scope.idEstatusConcepto === 10){
-                    EnviaCorreoRechazoComprobacion();
+                    EnviaCorreoRechazoComprobacion(data);
                 }
 
     };
@@ -2406,17 +2406,21 @@ return x;
         $scope.sendMail($scope.tramite.correoSolicitante, 'Presupuesto autorizado pendiente de subir, Anticipo de Gasto', html1);
     }
 
-    function EnviaCorreoRechazoComprobacion(){
+        async function  EnviaCorreoRechazoComprobacion(data){
 
+        let respAprobarRechazar = await aprobarRechazarArchivo(data)
         let usuarioSolicitante = $scope.empleadoSolicitante;
-        let concepto = $scope.conceptosSolicitud.filter(x=>x.idConceptoContable === $scope.archivos[0].idConceptoContable)[0]
+        let concepto = $scope.conceptosSolicitud.filter(x=>Number(x.idConceptoContable) === $scope.archivos[0].idConceptoContable)[0]
 
         let html1= ` <div style="width: 310px; height: 140px;"><center><img style="width: 80%;" src="https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png" alt="GrupoAndrade" /></center></div>
         <div>
             Estimado usuario(a)  ${$scope.empleadoSolicitante}:  
             <p>La comprobación para el concepto ${concepto.concepto} con un importe comprobado por $${formatMoney($scope.archivos[0].total)} ha sido rechazada, es necesario que vuelva a hacer la comprobación.</p>
         </div>`;
+        $scope.archivos = []
+        swal('AVISO','Se rechazo la comprobación correctamente.','info')
         $scope.sendMail($scope.tramite.correoSolicitante, 'Comprobación gastos de viaje rechazada', html1);
+        $('#spinner-loading').modal('hide');        
     }
 
     $scope.OrdenMasivaSalidaAnticipo = function( parametros ){
