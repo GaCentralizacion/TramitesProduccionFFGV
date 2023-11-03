@@ -325,6 +325,43 @@ reportesContraloria.prototype.get_responsableArqueo = function(req, res, next){
     });
 }
 
+reportesContraloria.prototype.get_getusuarioDig = function(req, res, next){
+    var self = this;
+
+    var usuarioDig = req.query.usuarioDig;
+
+    var params = [
+        { name: 'usuarioDig', value: usuarioDig, type: self.model.types.STRING }
+    ];
+
+    this.model.query('SEL_USUARIODIGITALIZACION_SP', params, function(error, result){
+        self.view.expositor(res,{
+            error:error,
+            result: result
+        });
+    });
+}
+
+reportesContraloria.prototype.post_guardarUsuarioEspejo = function(req, res, next) {
+    var self = this;
+	var idUsuario = req.body.usu_idusuario;
+    var idUsuarioEspejo = req.body.idUsuarioEspejo;
+    var idfondofijo  = req.body.fondofijo;
+    var params = [
+        { name: 'idUsuarioEspejo', value: idUsuarioEspejo, type: self.model.types.INT },
+        { name: 'idfondofijo', value: idfondofijo, type: self.model.types.INT },
+        { name: 'idUsuario', value: idUsuario, type: self.model.types.INT }
+    ];
+    
+    this.model.query('INS_USUARIOESPEJO_SP', params, function(error, result) {
+        self.view.expositor(res,{
+            error:error,
+            result: result
+        });
+    });
+};
+
+
 /**
  * End / Region Administrador de Cumplimiento
  */

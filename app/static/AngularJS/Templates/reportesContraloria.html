@@ -33,7 +33,8 @@
                         <button class="btn btnNuevos" style="border-radius: 50px !important;border:none; width: 90%"
                         ng-click="openModalEstatusVales()">Estatus Vales</button>
                     </div>
-                    <div ng-show = "dataUsuario.idRol == 10 || dataUsuario.idRol == 1 || dataUsuario.idRol == 13" class="col-sm-2">
+                    <!-- <div ng-show = "dataUsuario.idRol == 10 || dataUsuario.idRol == 1 || dataUsuario.idRol == 13" class="col-sm-2"> -->
+                        <div ng-show = "autoriza == 1" class="col-sm-2">
                         <button class="btn btnNuevos" style="border-radius: 50px !important;border:none; width: 95%"
                         ng-click="openModalCajeroEspejo()">Cajero Espejo</button>
                     </div>
@@ -1113,8 +1114,51 @@
                 <h4 class="modal-title text-white" style="color: white;">Configuración Cajero Espejo</h4>
             </div>
             <div class="modal-body" id="body" style="max-height: auto;">
+                <div class="row">  
+                    <div class="form-group col-md-12">
+                        <div class="col-md-2">
+                            <label class="form-label">Usuario Digitalizacion:</label>
+                            <input  class="form-control" type="text" ng-model="usuarioDig" >
+                        </div>
+                        <div class="col-md-2">
+                            <label  class="form-label">Usuario :</label>
+                            <input disabled class="form-control" type="text" ng-model="nombreUsuario" >
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">  </label>
+                            <button type="button" class="form-control btn btn-info btn-icon" ng-click="buscarUsuario()" data-toggle="tooltip" title="Buscar Usuario"><i class="fa fa-search"></i></button>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Empresa:</label>
+                            <select class="form-control" ng-model="empresa"
+                            ng-options="empresa.emp_idempresa as empresa.emp_nombre for empresa in empresas"
+                            ng-change="traeSucursales()">
+                            <option value="">Seleccione</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Sucursal:</label>
+                            <select  class="form-control" ng-model="sucursal"
+                            ng-options="sucursal.idSucursal as sucursal.nombre for sucursal in sucursales"
+                            ng-change="traeFondosFijos()">
+                            <option value="">Seleccione</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Fondo Fijo:</label>
+                            <select  class="form-control" ng-model="fondofijo"
+                            ng-options="fondo.id as fondo.fondoUsuario for fondo in fondosfijos">
+                            <option value="">Seleccione</option>
+                            </select>                       
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">  </label>
+                            <button type="button" class="form-control btn btn-info btn-icon" ng-click="guardarUsuarioEspejo()" data-toggle="tooltip" title="Guardar Usuario" ><i class="fa fa-save"></i></button>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">             
-                    <div class="col-11">
+                    <div class="form-group col-md-12">
                         <div  class="form-group col-sm-12" style="height:400px; overflow:auto;"> 
                         <table id="cajeroEspejo" class="table table-striped table-bordered">
                             <thead>

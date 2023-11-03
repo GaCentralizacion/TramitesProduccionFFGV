@@ -207,6 +207,33 @@ registrationModule.factory('reportesContraloriaRepository', function($http) {
                     'Content-Type': 'application/json'
                 }
             });
-        }
+        },
+        getusuarioDig:function(usuarioDig){
+            return $http({
+                url: contraloria + 'getusuarioDig/',
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                params:{
+                    'usuarioDig':usuarioDig
+                }
+
+            });
+        },
+        guardarUsuarioEspejo:(idUsuarioEspejo, fondofijo, usu_idusuario ) => {
+            return $http({
+                url: contraloria + 'guardarUsuarioEspejo',
+                method: "POST",
+                data: {
+                    idUsuarioEspejo: idUsuarioEspejo,
+                    fondofijo:fondofijo,
+                    usu_idusuario:usu_idusuario
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        },
     }
 });

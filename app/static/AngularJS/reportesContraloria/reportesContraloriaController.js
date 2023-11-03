@@ -1053,6 +1053,12 @@ registrationModule.controller('reportesContraloriaController', function ($sce, $
 
     $scope.openModalCajeroEspejo = function(){
         $scope.ConfiguracionCajeroEspejo();
+        $scope.traeEmpresas();
+        $scope.usuarioDig = '';
+        $scope.nombreUsuario = '';
+        $scope.empresa = '';
+        $scope.sucursal = '';
+        $scope.fondofijo = '';
         $("#modalCajeroEspejo").modal('show');
     };
 
@@ -1070,10 +1076,11 @@ registrationModule.controller('reportesContraloriaController', function ($sce, $
                     autoFill: false,
                     fixedColumns: false,
                     pageLength: 15, 
-                    "order": [[0, "desc"]],
+                    //"order": [[5, "asc"]],
+                    "aaSorting": [],
                     "language": {
                         search: '<i class="fa fa-search" aria-hidden="true"></i>',
-                        searchPlaceholder: 'Search',
+                        searchPlaceholder: 'Buscar',
                         oPaginate: {
                             sNext: '<i class="fa fa-caret-right" aria-hidden="true"></i>',
                             sPrevious: '<i class="fa fa-caret-left" aria-hidden="true"></i>'
@@ -1108,8 +1115,16 @@ registrationModule.controller('reportesContraloriaController', function ($sce, $
                 $("#modalCajeroEspejo").modal('hide');    
                 $scope.cajeroEspejo = [];  
                 fondoFijoRepository.actualizaUsuarioEspejo(dato.id, idEstatus, $scope.dataUsuario.usu_idusuario).then(function successCallback(response) {
-                    $scope.ConfiguracionCajeroEspejo();
-                    $("#modalCajeroEspejo").modal('show');
+                    if (response != null && response.data.length > 0) {
+                        $("#modalCajeroEspejo").modal('hide');
+                        swal('Ok', 'El usuario se actualizo correctamente', 'success');
+                    }
+                    else{
+                        swal('Cancelado', 'No se aplicaron los cambios', 'error');
+                    }
+                   
+                    //$scope.ConfiguracionCajeroEspejo();
+                    //$("#modalCajeroEspejo").modal('show');
                 }, function errorCallback(response) {
                 });
             } else {
@@ -1971,6 +1986,78 @@ registrationModule.controller('reportesContraloriaController', function ($sce, $
         });
 
     }
+
+    $scope.traeEmpresas=function(){
+        fondoFijoRepository.allEmpresas($scope.dataUsuario.usu_idusuario).then((res) => {
+            $scope.empresas = res.data;
+        })
+    }
+
+    $scope.traeSucursales=function(){    
+        $scope.idEmpresa = $scope.empresa;
+        fondoFijoRepository.getSucursales($scope.idEmpresa).then(function successCallback(response) {
+          $scope.sucursales = response.data;
+      }, function errorCallback(response) {
+      });
+      }
+
+      $scope.traeFondosFijos =function(){    
+        fondoFijoRepository.getlistaFondoFijoSuc($scope.sucursal).then(function successCallback(response) {
+          $scope.fondosfijos = response.data;
+      }, function errorCallback(response) {
+      });
+      }
+
+      $scope.buscarUsuario =function(){    
+        if($scope.usuarioDig == null || $scope.usuarioDig == undefined || $scope.usuarioDig == '')
+        {
+            $scope.nombreUsuario = ''
+            swal('Aviso','El usuario de digitalización es requerido.','warning')
+        }
+        else{
+        reportesContraloriaRepository.getusuarioDig($scope.usuarioDig).then(function successCallback(response) {    
+            if (response != null && response.data.length > 0) {
+                $scope.nombreUsuario = response.data[0].usuario;
+                $scope.idUsuarioEspejo = response.data[0].usu_idusuario;
+            }
+            else{
+                swal('Aviso','Usuario no localizado','warning')
+            }
+      }, function errorCallback(response) {
+      });
+        }
+      }
+
+      $scope.guardarUsuarioEspejo =function(){    
+        if($scope.usuarioDig == null || $scope.usuarioDig == undefined || $scope.usuarioDig == '')
+        {
+            $scope.nombreUsuario = ''
+            swal('Aviso','El usuario de digitalización es requerido.','warning')
+        }
+        else if($scope.fondofijo == null || $scope.fondofijo == undefined || $scope.fondofijo == '')
+        {
+            swal('Aviso','El fondo fijo es requerido.','warning')
+        }
+        else{
+        reportesContraloriaRepository.guardarUsuarioEspejo($scope.idUsuarioEspejo, $scope.fondofijo, $scope.dataUsuario.usu_idusuario ).then(function successCallback(response) {
+            console.log(response.data)
+            if (response != null && response.data.length > 0) {
+                $("#modalCajeroEspejo").modal('hide');
+                  if (response.data[0].estatus == 1) 
+                  { swal('Ok', response.data[0].msj, 'success');}
+                  else
+                  { swal('Ok', response.data[0].msj, 'success');}
+
+            }
+            else{
+                swal('Cancelado', 'No se aplicaron los cambios', 'error');
+            }
+
+      }, function errorCallback(response) {
+      });
+        }
+      }
+
 
     /**
      * End / Region Administrador de Cumplimiento
