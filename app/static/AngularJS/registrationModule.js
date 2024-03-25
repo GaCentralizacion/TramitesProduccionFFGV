@@ -1,4 +1,4 @@
-var registrationModule = angular.module("registrationModule", ["ngRoute", "colorpicker.module", "LocalStorageModule", 'ui.grid', 'ui.grid.selection', 'ui.grid.grouping', 'ui.grid.pinning', 'ui.grid.edit', 'ui.grid.moveColumns', 'angular.filter', 'ui.bootstrap', 'ui.bootstrap.modal', 'dndLists', 'rx'])
+var registrationModule = angular.module("registrationModule", ["ngRoute", "colorpicker.module", "LocalStorageModule", 'ui.grid', 'ui.grid.selection', 'ui.grid.grouping', 'ui.grid.pinning', 'ui.grid.edit', 'ui.grid.moveColumns', 'angular.filter', 'ui.bootstrap', 'ui.bootstrap.modal', 'dndLists'])
 
 .config(function($routeProvider, $locationProvider) {
 

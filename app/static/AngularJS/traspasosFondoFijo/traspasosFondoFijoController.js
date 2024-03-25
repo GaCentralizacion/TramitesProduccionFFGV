@@ -1,4 +1,4 @@
-registrationModule.controller('traspasosFondoFijoController', function ($scope, $rootScope, $location, localStorageService, traspasosFondoFijoRepository, devolucionesRepository, aprobarFondoRepository, fondoFijoRepository, anticipoGastoRepository, rx, ordenDePagoFFAGRepository,ordenDePagoFFAGRepository,apiBproRepository) {
+registrationModule.controller('traspasosFondoFijoController', function ($scope, $rootScope, $location, localStorageService, traspasosFondoFijoRepository, devolucionesRepository, aprobarFondoRepository, fondoFijoRepository, anticipoGastoRepository, ordenDePagoFFAGRepository,ordenDePagoFFAGRepository,apiBproRepository) {
 
     $scope.dataAprobar = [];
     $scope.empresas = [{

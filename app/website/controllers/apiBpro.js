@@ -72,7 +72,7 @@ apiBpro.prototype.get_GetTokenBPRO = function(req, res, next) {
     
     ajax.ajax({  
         createXHR,
-        url: 'http://192.168.20.123:7845/api/login/auth',
+        url: 'http://192.168.20.123:8032/api/login/auth',
         crossDomain: true,
         method: 'POST',
         headers: {
@@ -81,8 +81,8 @@ apiBpro.prototype.get_GetTokenBPRO = function(req, res, next) {
             'Access-Control-Allow-Headers':'*'
           },
         body: {
-            "dealerId": "100000",
-            "apiKey": "24779r0j-1802-2010-06ag-201f768348tg",
+            "dealerId": "10000",
+            "apiKey":"24779r0j-1802-2010-06ag-201f768348tg",
             "apiSecret": "xVgUwolpX8qQ75TF5Ionny6iz5vu+LbO9gm9qxTsR9nvYfJ0N8y5Bfi7L2EI2AxS6PTbNnCaGfLs+7u69UdJtODCeBO+ZJpc"
           }
     })
@@ -125,7 +125,7 @@ apiBpro.prototype.get_GeneraPolizaBPRO = function(req, res, next) {
     
     ajax.ajax({  
         createXHR,
-        url: 'http://192.168.20.123:7845/api/login/FondosFijos',
+        url: 'http://192.168.20.123:8032/api/login/FondosFijos',
         crossDomain: true,
         method: 'POST',
         headers: {
