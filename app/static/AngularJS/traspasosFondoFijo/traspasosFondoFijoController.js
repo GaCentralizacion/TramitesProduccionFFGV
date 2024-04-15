@@ -69,6 +69,10 @@ registrationModule.controller('traspasosFondoFijoController', function ($scope, 
     $scope.archivoCargado = true;
     $scope.documentos = []
     $scope.complementoPolizas = '';
+    $scope.complementoFFCE = '';
+    $scope.complementoFFCS = '';
+    $scope.complementoRFCE = '';
+    $scope.complementoRFCS = '';
     $scope.html1 = "<div style=\"width:310px;height:140px\"><center><img style=\"width: 100% \" src=\"https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png\" alt=\"GrupoAndrade\" />" +
         "</center></div><div><p><br>";
     $scope.html2 = ".</p></div>";
@@ -182,6 +186,10 @@ registrationModule.controller('traspasosFondoFijoController', function ($scope, 
                 //$scope.obtieneEvidenciasReembolso();
                 $scope.id_perTraReembolso = res.data[0].id_perTraReembolso
                 $scope.complementoPolizas = res.data[0].complementoPoliza;
+                $scope.complementoFFCE = res.data[0].complementoFFCE;
+                $scope.complementoFFCS = res.data[0].complementoFFCS;
+                $scope.complementoRFCE = res.data[0].complementoRFCE;
+                $scope.complementoRFCS = res.data[0].complementoRFCS;
                 $scope.obtieneEvidenciasReembolsoTramite();
             } 
         });
@@ -914,9 +922,9 @@ return x;
             apiJson1Detalle.IdSucursal = $scope.polizaCaja.id_Sucursal
             apiJson1Detalle.Tipo = 2
 
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = `RFCE${$scope.polizaCaja.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = $scope.complementoRFCE // `RFCE${$scope.polizaCaja.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.polizaCaja.idFondoFijo
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `RFCE${$scope.polizaCaja.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = $scope.complementoRFCE // `RFCE${$scope.polizaCaja.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = $scope.polizaCaja.idFondoFijo
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 =  $scope.polizaCaja.idFondoFijo
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].ReferenciaA = $scope.polizaCaja.id_perTraReembolso.toString()
@@ -1049,9 +1057,9 @@ return x;
             apiJson1Detalle.IdSucursal = $scope.polizaCaja.id_Sucursal
             apiJson1Detalle.Tipo = 2
 
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = `FFCE${$scope.polizaCaja.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = $scope.complementoFFCE // `FFCE${$scope.polizaCaja.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.polizaCaja.idFondoFijo
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `FFCE${$scope.polizaCaja.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = $scope.complementoFFCE // `FFCE${$scope.polizaCaja.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = $scope.polizaCaja.idFondoFijo
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 =  $scope.polizaCaja.idFondoFijo
 
@@ -1179,9 +1187,9 @@ return x;
             apiJson1Detalle.IdSucursal = $scope.polizaCaja.id_Sucursal
             apiJson1Detalle.Tipo = 2
 
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = `RFCS${$scope.polizaCaja.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = $scope.complementoRFCS // `RFCS${$scope.polizaCaja.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.polizaCaja.idFondoFijo
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `RFCS${$scope.polizaCaja.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = $scope.complementoRFCS // `RFCS${$scope.polizaCaja.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = $scope.polizaCaja.idFondoFijo
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 =  $scope.polizaCaja.idFondoFijo
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].ReferenciaA = $scope.polizaCaja.id_perTraReembolso.toString()
@@ -1320,10 +1328,9 @@ return x;
             apiJson1Detalle.IdEmpresa = $scope.polizaCaja.id_Empresa
             apiJson1Detalle.IdSucursal = $scope.polizaCaja.id_Sucursal
             apiJson1Detalle.Tipo = 2
-
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = `FFCS${$scope.polizaCaja.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = $scope.complementoFFCS // `FFCS${$scope.polizaCaja.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.polizaCaja.idFondoFijo
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `FFCS${$scope.polizaCaja.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = $scope.complementoFFCS // `FFCS${$scope.polizaCaja.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = $scope.polizaCaja.idFondoFijo
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 =  $scope.polizaCaja.idFondoFijo
 

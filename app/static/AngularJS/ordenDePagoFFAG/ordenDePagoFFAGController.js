@@ -24,6 +24,8 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
     $scope.esAGV = false;
 
     //----------BPRO ENPOINT GV------------
+    $scope.complementoFFOP = '';
+    $scope.complementoRFOP = '';
     $scope.complementoPolizas = '';
     $scope.emp_nombrecto = '';
     $scope.suc_nombrecto = '';
@@ -101,6 +103,8 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             $scope.idFondoFijo = res.data[0].idFondoFijo;
             $scope.nombreDep = res.data[0].dep_nombrecto;
             $scope.complementoPolizas = res.data[0].complementoPoliza;
+            $scope.complementoFFOP = res.data[0].complementoFFOP;
+            $scope.complementoRFOP = res.data[0].complementoRFOP;
             $scope.nombreTramite = $scope.tipo == 'FS' ? 'SALIDA FONDO FIJO' : 'REEMBOLSO FONDO FIJO'
             $scope.docsReembolso = $scope.tipo == 'FS' ? false : true;
             $scope.getNombreBanco();
@@ -150,6 +154,8 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             $scope.cajero =  res.data[0].cajero,
             $scope.correoCajero = res.data[0].correo,
             $scope.complementoPolizas = res.data[0].complementoPoliza;
+            $scope.complementoFFOP = res.data[0].complementoFFOP;
+            $scope.complementoRFOP = res.data[0].complementoRFOP;
             $scope.getNombreBanco();
             $scope.getDataClienteFA();
             $scope.getDocumentosAprobarFFTramite($scope.id_perTraFF);
@@ -251,7 +257,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
         ordenDePagoRepository.getReference(dataReferencia).then((res) => {
             if (res.data.idReferencia > 0) {
                 $scope.referencia = res.data.REFERENCIA;
-                //$('#loading').modal('hide');
+                $('#loading').modal('hide');
             } else {
                 swal('Advertencia', 'Ocurrio un error al generar el PDF', 'warning');
             }
@@ -399,43 +405,6 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
     $scope.saveDocumentosFA = (documento) => {
         $("#loading").modal("show");
         if (documento.archivo != undefined) {
-
-            /**  */
-            if($scope.idTramite == 10)
-            {
-                $scope.getDataOrdenPagoFF();
-                $scope.insertaPolizaFF(documento);
-                $scope.nombreTramite ='FONDO FIJO'
-                // $scope.avanzaReembolso();
-            }
-            if($scope.idTramite == 9)
-            {
-                if($scope.EsTGM == 1){
-                    $scope.sendPoliza();
-                    $scope.nombreTramite ='GASTOS DE MAS'
-                }
-                else{
-                    $scope.getDataOrdenPagoGV();
-                    $scope.insertaPolizaGV(documento);
-                    $scope.nombreTramite ='ANTICIPO DE GASTOS'
-                }
-            }
-            if($scope.idTramite == 16)
-            {
-                $scope.getDataOrdenPagoFFTramite();
-                $scope.insertaPolizaFF(documento);
-                $scope.nombreTramite ='FONDO FIJO'
-            }
-
-        } else {
-            $("#loading").modal("hide");
-            swal( 'Alto', `Carga el documento  "${ documento.nombreDoc }" para poder guardar.`, 'warning' );
-        }
-
-    }
-
-    function GuardarDocumento(documento){
-        return new Promise((resolve, reject) => {
             sendData = {
                 idDocumento: documento.id_documento,
                 idTramite: documento.id_tramite,
@@ -450,58 +419,25 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             setTimeout(() => {
                 ordenDePagoFFAGRepository.saveDocumentosFA(sendData).then((res) => {
                     if (res.data[0].success == 1) {
-                        resolve(true)
-                        
-                        
+                        $scope.getComprobanteFA();
+                        swal( 'Listo', ` Se guardo el documento "${ documento.nombreDoc }"`, 'success' );
+                        $("#loading").modal("hide");
                     } else {
-                        resolve(false)
                         swal( 'Alto', 'Error al guardar el documento, intentelo mas tarde', 'error' );
+                        $("#loading").modal("hide");
                     }
                 });
             }, 500);
-        })
+        } else {
+            $("#loading").modal("hide");
+            swal( 'Alto', `Guarda el documento  "${ documento.nombreDoc }" para poder guardar.`, 'warning' );
+        }
+
     }
 
     $scope.saveDocumentosFATramite = (documento) => {
         $("#loading").modal("show");
         if (documento.archivo != undefined) {
-
-            /**  */
-            if($scope.idTramite == 10)
-            {
-                $scope.getDataOrdenPagoFF();
-                $scope.insertaPolizaFF(documento);
-                $scope.nombreTramite ='FONDO FIJO'
-                // $scope.avanzaReembolso();
-            }
-            if($scope.idTramite == 9)
-            {
-                if($scope.EsTGM == 1){
-                    $scope.sendPoliza();
-                    $scope.nombreTramite ='GASTOS DE MAS'
-                }
-                else{
-                    $scope.getDataOrdenPagoGV();
-                    $scope.insertaPolizaGV(documento);
-                    $scope.nombreTramite ='ANTICIPO DE GASTOS'
-                }
-            }
-            if($scope.idTramite == 16)
-            {
-                $scope.getDataOrdenPagoFFTramite();
-                $scope.insertaPolizaFF(documento);
-                $scope.nombreTramite ='FONDO FIJO'
-            }
-
-        } else {
-            $("#loading").modal("hide");
-            swal( 'Alto', `Carga el documento  "${ documento.nombreDoc }" para poder guardar.`, 'warning' );
-        }
-
-    }
-
-    function GuardarDocumentoReembolso(documento){
-        return new Promise((resolve, reject) => {
             sendData = {
                 idDocumento: documento.id_documento,
                 idTramite: documento.id_tramite,
@@ -516,7 +452,6 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             setTimeout(() => {
                 ordenDePagoFFAGRepository.saveDocumentosFA(sendData).then((res) => {
                     if (res.data[0].success == 1) {
-                        resolve(true)
                         $scope.getComprobanteFATramite($scope.id_perTraFF);
                         let body = 
                         '<div style=\"width:310px;height:140px\"><center><img style=\"width: 100% \" src=\"https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png\" alt=\"GrupoAndrade\" /></center></div><br>' +
@@ -529,47 +464,74 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                         '<p>Número Cuenta: '+ $scope.cuenta + '</p>'+
                         '<p>Cantidad: $'+ formatMoney($scope.monto)  + '</p>';   
                         $scope.sendMail($scope.correoCajero, 'Reembolso de Efectivo por Orden de Pago, Fondo Fijo ' + $scope.idFondoFijo, body);                  
-                      // swal( 'Listo', ` Se guardo el documento "${ documento.nombreDoc }"`, 'success' );
-                      // $("#loading").modal("hide");
+                        swal( 'Listo', ` Se guardo el documento "${ documento.nombreDoc }"`, 'success' );
+                        $("#loading").modal("hide");
                     } else {
-                        resolve(false)
+                        swal( 'Alto', 'Error al guardar el documento, intentelo mas tarde', 'error' );
+                        $("#loading").modal("hide");
                     }
                 });
             }, 500);
-        })
+        } else {
+            $("#loading").modal("hide");
+            swal( 'Alto', `Guarda el documento  "${ documento.nombreDoc }" para poder guardar.`, 'warning' );
+        }
+
     }
 
-
-    // $scope.changeEstatus = function(){
+    $scope.changeEstatus = function(){
+        //TODO: changeEstatusFA SE IMPLEMENTARA CUANDO SE EJECUTE CORRECTAMENTE EL API DE BPRO
+       
+        // $('#loading').modal('show');
+       // ordenDePagoFFAGRepository.changeEstatusFA($scope.idPerTra,$scope.tipoTramite, $scope.consecutivoTramite).then((res)=>{
+        //    if( res.data[0].success == 1 ){
+        //        $('#loading').modal('hide');
+        //        swal( 'Listo', 'Se compro la orden de pago', 'success' );
         
-    //             if($scope.idTramite == 10)
-    //             {
-    //                 $scope.getDataOrdenPagoFF();
-    //                 $scope.insertaPolizaFF();
-    //                 $scope.nombreTramite ='FONDO FIJO'
-    //                 // $scope.avanzaReembolso();
-    //             }
-    //             if($scope.idTramite == 9)
-    //             {
-    //                 if($scope.EsTGM == 1){
-    //                     $scope.sendPoliza();
-    //                     $scope.nombreTramite ='GASTOS DE MAS'
-    //                 }
-    //                 else{
-    //                     $scope.getDataOrdenPagoGV();
-    //                     $scope.insertaPolizaGV();
-    //                     $scope.nombreTramite ='ANTICIPO DE GASTOS'
-    //                 }
-    //             }
-    //             if($scope.idTramite == 16)
-    //             {
-    //                 $scope.getDataOrdenPagoFFTramite();
-    //                 $scope.insertaPolizaFF();
-    //                 $scope.nombreTramite ='FONDO FIJO'
-    //                 $scope.avanzaReembolso();
-    //             }
+                if($scope.idTramite == 10)
+                {
+                    $scope.getDataOrdenPagoFF();
+                    $scope.insertaPolizaFF();
+                    $scope.nombreTramite ='FONDO FIJO'
+                    // $scope.avanzaReembolso();
+                }
+                if($scope.idTramite == 9)
+                {
+                    if($scope.EsTGM == 1){
+                        $scope.sendPoliza();
+                        $scope.nombreTramite ='GASTOS DE MAS'
+                    }
+                    else{
+                        $scope.getDataOrdenPagoGV();
+                        $scope.insertaPolizaGV();
+                        $scope.nombreTramite ='ANTICIPO DE GASTOS'
+                    }
+                }
+                if($scope.idTramite == 16)
+                {
+                    $scope.getDataOrdenPagoFFTramite();
+                    $scope.insertaPolizaFF();
+                    $scope.nombreTramite ='FONDO FIJO'
+                    $scope.avanzaReembolso();
+                }
+    //TODO SE DEBE DE EJECUTAR SI FALLA BPRO
+            // }else{
+            //     $('#loading').modal('hide');
+            //     swal( 'Alto', 'Error al compar la orden de pago', 'error' );
 
-    // };
+            //     if($scope.idTramite == 10)
+            //     {
+            //         $scope.getDataOrdenPagoFF();
+            //         $scope.nombreTramite ='FONDO FIJO'
+            //     }
+            //     if($scope.idTramite == 9)
+            //     {
+            //         $scope.getDataOrdenPagoGV();
+            //         $scope.nombreTramite ='ANTICIPO DE GASTOS'
+            //     }
+            // };
+        //});
+    };
 
     $scope.avanzaReembolso = function () {
         fondoFijoRepository.cambiaEstatusReembolso($scope.idPerTra).then((res) => {
@@ -616,7 +578,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
         $scope.razonesRechazo = '';
     }
 
-    $scope.insertaPolizaFF = async function (documento) {
+    $scope.insertaPolizaFF = async function () {
         let CCDepto = zeroDelete($scope.cuentaContable);
         let banco = zeroDelete($scope.cuentaContableSalida);
         let respRFOP
@@ -627,7 +589,7 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
         if(validaRFOP[0].success == 1)
         {
            //No existe poliza y se genera
-           respRFOP = await AplicaPolizaRFOP(documento)
+           respRFOP = await AplicaPolizaRFOP()
         }
         else
         {
@@ -642,40 +604,11 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             }) 
             if(validaRFOP[0].msg == 'La poliza se encuentra procesada')
             {
-                let respuetaDoc = false;
-
-                if($scope.idTramite == 16)
-                {
-                    respuetaDoc = await GuardarDocumentoReembolso(documento)
-                }
-                else{
-                    respuetaDoc = await GuardarDocumento(documento)
-                }
-                
-                if(respuetaDoc == true)
-                {
-                $scope.avanzaReembolso();
                 ordenDePagoFFAGRepository.changeEstatusFA($scope.idPerTra,$scope.tipoTramite, $scope.consecutivoTramite).then((res)=>{
                     if( res.data[0].success == 1 ){
-
+    
                     }
                 });
-                $("#loading").modal("hide");
-
-                $scope.nombreTramite ='REEMBOLSO ORDEN PAGO RFOP'
-                html = $scope.html1 + 'Se Proceso el Reembolso al fondo fijo:  ' + $scope.idFondoFijo +' ' + "<br><br> Se realizó reembolso por orden de pago por el monto de:  $"+ formatMoney($scope.monto) + "  " + $scope.html2;
-                //$scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', $scope.nombreTramite, html);
-                }
-                else{
-                swal( 'Alto', 'Error al guardar el documento, intentelo mas tarde', 'error' );
-                 }
-                // $scope.avanzaReembolso();
-                // ordenDePagoFFAGRepository.changeEstatusFA($scope.idPerTra,$scope.tipoTramite, $scope.consecutivoTramite).then((res)=>{
-                //     if( res.data[0].success == 1 ){
-    
-                //     }
-                // });
-
             }       
            
         }
@@ -694,11 +627,10 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
 
     }
 
-    $scope.insertaPolizaGV = async function (documento) {
+    $scope.insertaPolizaGV = async function () {
         let banco = zeroDelete($scope.cuentaContableSalida);
         let respGVOP
         let respGVTE
-        let respDocument
         let AG = `AG-${$scope.emp_nombrecto}-${$scope.suc_nombrecto}-${$scope.dep_nombrecto}-${$scope.idPerTra}-${$scope.incremental}`
 
         let existePoliza = await ValidaPolizaGV($scope.idSucursal,$scope.idPerTra,'GVOP',AG,$scope.monto)
@@ -708,14 +640,9 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             respGVOP = await AplicaPolizaGVOP(AG)
             if(respGVOP == true){
                 respGVTE = await AplicaPolizaGVTE()
-
-                if(respGVTE == true){
-                    respDocument = await GuardarDocumento(documento)
-                    $scope.getComprobanteFA();
-                }
-            }        
+            }
         }
-    
+
         /** Si success == 2 la poliza existe y esta procesada */
        if(existePoliza.success == 2 ){
 
@@ -724,11 +651,6 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
 
             if(existePoliza.success == 1){
                 respGVTE = await AplicaPolizaGVTE()
-                
-                if(respGVTE == true){
-                    respDocument = await GuardarDocumento(documento)
-                    $scope.getComprobanteFA();
-                }
             }
 
             if(existePoliza.success == 2 ){
@@ -746,7 +668,6 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
        }
 
 
-       $('#loading').modal('hide');
 
         //var tipoProceso = true;
         // tipoProceso = await promiseInsertaDatos($rootScope.user.usu_idusuario, $scope.idSucursal, 15,'AG', $scope.monto,'AC', $scope.nombreDep, $scope.idPerTra,banco,'');
@@ -833,23 +754,23 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
     }
 
 
-    function zeroDelete (item)
-    {
-        var x = '';
-        var values = item.split('-');
-        values.forEach(f => {
-            if(values[0] == f)
-            {  var str = f;
-                var res = str.split("0");
-                res.forEach(t => {
-                    if(t != "")
-                    { x+= t}
-                });
-            }
-            else
-            {x+='-' +parseFloat(f).toFixed(0)}
-        });
-        return x;
+function zeroDelete (item)
+{
+    var x = '';
+    var values = item.split('-');
+    values.forEach(f => {
+        if(values[0] == f)
+        {  var str = f;
+            var res = str.split("0");
+            res.forEach(t => {
+                if(t != "")
+                { x+= t}
+             });
+           }
+        else
+        {x+='-' +parseFloat(f).toFixed(0)}
+     });
+     return x;
     }
 
     function zfill(number, width) {
@@ -859,9 +780,9 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
         
         if (width <= length) {
             if (number < 0) {
-                    return ("-" + numberOutput.toString()); 
+                 return ("-" + numberOutput.toString()); 
             } else {
-                    return numberOutput.toString(); 
+                 return numberOutput.toString(); 
             }
         } else {
             if (number < 0) {
@@ -1044,7 +965,6 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
         //     $scope.getDataOrdenPagoGV();
         // });
     }
-
     function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
         try {
           decimalCount = Math.abs(decimalCount);
@@ -1419,8 +1339,11 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
         })
     }
 
+    $scope.AplicaPolizaRFOP = function async (){
+        
+    }
 
-    async function AplicaPolizaRFOP (documento){
+    async function AplicaPolizaRFOP (){
         return new Promise( async (resolve, reject) => {
             let SubProducto = zeroDelete($scope.cuentaContable);   
             let Origen = zeroDelete($scope.cuentaContableSalida);   
@@ -1437,9 +1360,9 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
             apiJson1Detalle.IdSucursal = $scope.idSucursal
             apiJson1Detalle.Tipo = 2
 
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = `RFOP${$scope.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Proceso = $scope.complementoRFOP // `RFOP${$scope.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].DocumentoOrigen = FF
-            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = `RFOP${$scope.complementoPolizas}`
+            apiJson1Detalle.ContabilidadMasiva.Polizas[0].Canal = $scope.complementoRFOP // `RFOP${$scope.complementoPolizas}`
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Documento = FF
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].Referencia2 =  FF
             apiJson1Detalle.ContabilidadMasiva.Polizas[0].ReferenciaA =  $scope.idPerTra.toString()
@@ -1517,25 +1440,14 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                 datalog.resuelto = 1
 
                 //respUpdate = await promiseActualizaTramite($scope.idPerTra,'GVOP', AG, $scope.consecutivoTramite,'',datalog.consPol,datalog.mesPol,datalog.anioPol)
-                //let respuetaDoc = await GuardarDocumentoReembolso(documento)
-                let respuetaDoc = false;
-                if($scope.idTramite == 16)
-                {
-                    respuetaDoc = await GuardarDocumentoReembolso(documento)
-                }
-                else{
-                    respuetaDoc = await GuardarDocumento(documento)
-                }
 
-                if(respuetaDoc == true)
-                {
                 $scope.avanzaReembolso();
+
                 ordenDePagoFFAGRepository.changeEstatusFA($scope.idPerTra,$scope.tipoTramite, $scope.consecutivoTramite).then((res)=>{
                     if( res.data[0].success == 1 ){
 
                     }
                 });
-               
 
                // $scope.getDataOrdenPagoFF();
                 $scope.nombreTramite ='REEMBOLSO ORDEN PAGO RFOP'
@@ -1543,10 +1455,6 @@ registrationModule.controller('ordenDePagoFFAGController', function ($scope, $ro
                 html = $scope.html1 + 'Se Proceso el Reembolso al fondo fijo:  ' + $scope.idFondoFijo +' ' + "<br><br> Se realizó reembolso por orden de pago por el monto de:  $"+ formatMoney($scope.monto) + "  " + $scope.html2;
                 $scope.sendMail('luis.bonnet@grupoandrade.com,eduardo.yebra@coalmx.com', $scope.nombreTramite, html);
                 //$scope.sendMail(respUpdate.correo, respUpdate.asunto, html);
-            }
-            else{
-                swal( 'Alto', 'Error al guardar el documento, intentelo mas tarde', 'error' );
-            }
                 $('#loading').modal('hide');
 
                 $('#loading').modal('hide');

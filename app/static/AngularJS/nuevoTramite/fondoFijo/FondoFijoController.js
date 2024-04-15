@@ -21,6 +21,10 @@ registrationModule.controller('FondoFijoController', function ($scope, $rootScop
     
     //----------BPRO ENPOINT GV------------
     $scope.complementoPolizas = '';
+    $scope.complementoPVFF = '';
+    $scope.complementoAVFF = '';
+    $scope.complementoCVFM = '';
+    $scope.complementoCVFR = '';
     $scope.emp_nombrecto = '';
     $scope.suc_nombrecto = '';
     $scope.dep_nombrecto = '';
@@ -1839,27 +1843,8 @@ $scope.verPdfVale = function(item) {
     var pdf = item.evidencia;
     if(item.tipoGasto == 2)
     {
-        if(item.esFactura == 'S' && item.evidenciaAPI != null)
-        {
-            apiBproRepository.RecuperaDocumento(item.evidenciaAPI).then((res) => {
-                if (res.data) {
-                   const blob = b64toBlob(res.data.file, 'application/pdf');
-                   const blobUrl = URL.createObjectURL(blob);
-                   $("<object class='lineaCaptura' data='" + blobUrl + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
-                   $("#mostrarPdf").modal("show");
-    
-               } else {
-                    swal('Alto', 'Ocurrio un error al mostrar el proceso, intento mas tarde', 'warning');
-                }
-            });
-        }
-        else
-        {  
-        $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
-        $("#mostrarPdf").modal("show");
-        }
-
- 
+    $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
+    $("#mostrarPdf").modal("show");
     }
     else
     {
@@ -3090,6 +3075,10 @@ async function verificaValesRegreso() {
                 $scope.persona1pvff             = resp.data[0].persona1pvff
                 $scope.persona2pvff             = resp.data[0].persona2pvff
                 $scope.complementoPolizas       = resp.data[0].complementoPolizas
+                $scope.complementoPVFF          = resp.data[0].complementoPVFF;
+                $scope.complementoAVFF          = resp.data[0].complementoAVFF;
+                $scope.complementoCVFM          = resp.data[0].complementoCVFM;
+                $scope.complementoCVFR          = resp.data[0].complementoCVFR;
                 resolve(true);
             }).catch(err => {
                 reject(false);
@@ -3428,6 +3417,10 @@ async function LogApiBpro(data){
             $scope.persona1pvff             = resp.data[0].persona1pvff
             $scope.persona2pvff             = resp.data[0].persona2pvff
             $scope.complementoPolizas       = resp.data[0].complementoPolizas
+            $scope.complementoPVFF          = resp.data[0].complementoPVFF;
+            $scope.complementoAVFF          = resp.data[0].complementoAVFF;
+            $scope.complementoCVFM          = resp.data[0].complementoCVFM;
+            $scope.complementoCVFR          = resp.data[0].complementoCVFR;
         });    
     }
 
@@ -3445,11 +3438,11 @@ $scope.insertaPolizaFFPVFF = async function (sendData) {
     $scope.apiJson.IdEmpresa = $scope.idEmpresa
     $scope.apiJson.IdSucursal = $scope.idSucursal
     $scope.apiJson.Tipo = 2
-    
+
     //ContabilidadMasiva
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `PVFF${$scope.complementoPolizas}`
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = $scope.complementoPVFF //`PVFF${$scope.complementoPolizas}`
     $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = FFVale
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `PVFF${$scope.complementoPolizas}`
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = $scope.complementoPVFF //`PVFF${$scope.complementoPolizas}`
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = FFVale
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  FFVale
     $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA =  FFVale
@@ -3654,9 +3647,9 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
          }    
 
         //ContabilidadMasiva
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `AVFF${$scope.complementoPolizas}`
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = $scope.complementoAVFF  //`AVFF${$scope.complementoPolizas}`
         $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.datoPoliza.idComprobacionVale
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `AVFF${$scope.complementoPolizas}`
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = $scope.complementoAVFF  // `AVFF${$scope.complementoPolizas}`
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = '' //OC
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 = '' //OC        
         $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA =  $scope.datoPoliza.idComprobacionVale
@@ -3742,28 +3735,7 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
             
             console.log($scope.ordenCompraAVFF)
 
-            let tipoComprobacion = await ValidaTipoComprobacion($scope.datoPoliza.idComprobacionVale);
-            if (tipoComprobacion[0].esFactura == 1)
-            {
-            sendData = 
-            {
-                "provider": $rootScope.user.usu_idusuario,
-                "rfc":'',
-                "folio":  $scope.ordenCompraAVFF,
-                "idRol": 2,
-                "rfcProvider":tipoComprobacion[0].rfcEmisor,
-                "fechaOC": `${dia}/${mes}/${anio}`,
-                "tipoDocumento": 1,
-                "file1": tipoComprobacion[0].rutaPDF,
-                "file2": tipoComprobacion[0].rutaXML 
-
-            }
-            let respFactura = await  subirFacturaAPI(sendData);
-
-            let respLogDocumento = await promiseLogGuardaFactura(0, $scope.datoPoliza.idComprobacionVale , JSON.stringify(sendData), JSON.stringify(respFactura.data), $scope.ordenCompraAVFF)
-
-            }
-
+           
             $('#loading').modal('hide');
 
             swal({
@@ -3845,7 +3817,6 @@ $scope.insertaPolizaFrontAPIGastos = async function () {
             }
 };
 
-
 $scope.insertaPolizaFrontAPIGastosInventario = async function () {
     let AuthToken;
     let FFVale = $scope.nombreVale 
@@ -3888,9 +3859,9 @@ $scope.insertaPolizaFrontAPIGastosInventario = async function () {
 
     //ContabilidadMasiva
 
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `AVFF${$scope.complementoPolizas}`
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = $scope.complementoAVFF //`AVFF${$scope.complementoPolizas}`
     $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.datoPoliza.idComprobacionVale
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `AVFF${$scope.complementoPolizas}`
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = $scope.complementoAVFF //`AVFF${$scope.complementoPolizas}`
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = $scope.datoPoliza.InventarioOC //OC
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  $scope.datoPoliza.InventarioOC //OC
     $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA =  $scope.datoPoliza.idComprobacionVale
@@ -4097,12 +4068,11 @@ $scope.insertaPolizaFrontCVFR = async function () {
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado =  FF //OC
             $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = $scope.ordenCompraAVFF
         }
-        
            
         //ContabilidadMasiva
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `CVFR${$scope.complementoPolizas}`
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = $scope.complementoCVFR // `CVFR${$scope.complementoPolizas}`
         $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.datoPoliza.idComprobacionVale
-        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `CVFR${$scope.complementoPolizas}`
+        $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = $scope.complementoCVFR // `CVFR${$scope.complementoPolizas}`
         $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA = $scope.datoPoliza.idComprobacionVale
     
         $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.datoPoliza.idComprobacionVale
@@ -4411,9 +4381,9 @@ $scope.insertaPolizaFrontCVFRInventario = async function () {
      
 
     //ContabilidadMasiva
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `CVFR${$scope.complementoPolizas}`
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = $scope.complementoCVFR // `CVFR${$scope.complementoPolizas}`
     $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.datoPoliza.idComprobacionVale
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `CVFR${$scope.complementoPolizas}`
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = $scope.complementoCVFR // `CVFR${$scope.complementoPolizas}`
     // $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = 'OC' //OC
     // $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  'OC' //OC
     $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA =  $scope.datoPoliza.idComprobacionVale
@@ -4588,11 +4558,11 @@ $scope.insertaPolizaFFCVFM = async function () {
     $scope.apiJson.IdEmpresa = $scope.idEmpresa
     $scope.apiJson.IdSucursal = $scope.idSucursal
     $scope.apiJson.Tipo = 2
-    
+
     //ContabilidadMasiva
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `CVFM${$scope.complementoPolizas}`
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = $scope.complementoCVFM // `CVFM${$scope.complementoPolizas}`
     $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = FFVale
-    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = `CVFM${$scope.complementoPolizas}`
+    $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal = $scope.complementoCVFM // `CVFM${$scope.complementoPolizas}`
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = FFVale
     $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 =  FFVale
     $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA =  FFVale
@@ -4752,38 +4722,5 @@ async function ValidaPolizaCaja (idsucursal, id_perTraReembolso, tipoPol) {
     });
 });
 }
-
-async function ValidaTipoComprobacion (idComprobacion) {
-    return new Promise((resolve, reject) => {
-        fondoFijoRepository.validaTipoComprobacion(idComprobacion).then(function (result) {
-        if (result.data.length > 0) {
-            resolve(result.data);
-        }
-    });
-});
-}
-
-async function subirFacturaAPI (data) {
-    return new Promise((resolve, reject) => {
-        apiBproRepository.GuardaDocumentoFactura(data).then(resp => {
-            console.log('respuesta fac: ',resp);
-            resolve(resp)
-        }).catch(error=>{
-            reject(error)
-        })
-});
-}
-
-function promiseLogGuardaFactura(idPertra,idVale,jsonDatos,respuesta,oc){
-    return new Promise((resolve, reject) => {
-        apiBproRepository.InsertaLogDocumento(idPertra,idVale,jsonDatos,respuesta,oc).then(resp => {
-            console.log('respuesta log: ',resp);
-            resolve(resp)
-        }).catch(error=>{
-            reject(error)
-        })
-    })
-}
-
 
 });
