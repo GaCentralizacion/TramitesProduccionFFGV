@@ -17,6 +17,7 @@
     $scope.disableDepartamentos = true;
     $scope.depVale = null;
     $scope.departamentosArea = 0;
+    $scope.complementoPolizas = '';
     $scope.html1 = "<div style=\"width:310px;height:140px\"><center><img style=\"width: 100% \" src=\"https://cdn.discordapp.com/attachments/588785789438001183/613027505137516599/logoA.png\" alt=\"GrupoAndrade\" />" +
         "</center></div><div><p><br>";
     $scope.html2 = ".</p></div>";
@@ -473,7 +474,7 @@
         doc.save('Vale.pdf');
       };
 
-      $scope.modalEvidencias = function (data, accion) {
+      $scope.modalEvidencias = async function (data, accion) {
         document.getElementById("frm_subir_factura").reset();
         $scope.EvidenciaXML = undefined;
         $scope.EvidenciaPDF = undefined;
@@ -516,6 +517,8 @@
         }
         else
         {
+        var datoPoliza = await verificaDatosPolizaApi($scope.idVale,data.idValeEvidencia);
+        $scope.datoPoliza = datoPoliza;  
         $scope.datosEvidencia = data;
         $scope.verCombo = false
         $scope.accion = accion;
@@ -1117,7 +1120,7 @@
     }
 
     
-    $scope.renunciaEvidencia =  function () {
+    $scope.renunciaEvidencia = function () {
         swal({
             title: '¿Deseas renunciar a esta Comprobación?',
             text: 'Se rechazara esta Comprobación',
@@ -1133,10 +1136,18 @@
         function(isConfirm) {
           if (isConfirm) {
               $('#loading').modal('show');           
-              misTramitesValesRepository.renunciaEvidencia($scope.datosEvidencia.idValeEvidencia).then(function (result) {
+              misTramitesValesRepository.renunciaEvidencia($scope.datosEvidencia.idValeEvidencia).then(async function (result) {
                 if (result.data != undefined) {
-                    //log.console(result)
-                    $('#loading').modal('hide');   
+                    //log.console(result)   
+                    if($scope.datosEvidencia.idGastoFondoFijo == 2)  
+                     {
+                        $scope.insertaPolizaFrontAPIGastos(); 
+                     }
+                     else
+                     {
+                        $('#loading').modal('hide');  
+                     }
+                    
                     $("#actualizaEvidencia").modal("hide");
                     $scope.regresarmisVales(1);
                 }
@@ -1240,27 +1251,27 @@
         var pdf = item.evidencia;
         if(item.tipoGasto == 2)
         {
-            if(item.esFactura == 'S' && item.evidenciaAPI != null)
-            {
-                apiBproRepository.RecuperaDocumento(item.evidenciaAPI).then((res) => {
-                    if (res.data) {
-                       const blob = b64toBlob(res.data.file, 'application/pdf');
-                       const blobUrl = URL.createObjectURL(blob);
-                       $("<object class='lineaCaptura' data='" + blobUrl + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
-                       $("#mostrarPdf").modal("show");
+            // if(item.esFactura == 'S' && item.evidenciaAPI != null)
+            // {
+            //     apiBproRepository.RecuperaDocumento(item.evidenciaAPI).then((res) => {
+            //         if (res.data) {
+            //            const blob = b64toBlob(res.data.file, 'application/pdf');
+            //            const blobUrl = URL.createObjectURL(blob);
+            //            $("<object class='lineaCaptura' data='" + blobUrl + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
+            //            $("#mostrarPdf").modal("show");
         
-                   } else {
-                        swal('Alto', 'Ocurrio un error al mostrar el proceso, intento mas tarde', 'warning');
-                    }
-                });
-            }
-            else
-            {  
-            $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
-            $("#mostrarPdf").modal("show");
-            }
+            //        } else {
+            //             swal('Alto', 'Ocurrio un error al mostrar el proceso, intento mas tarde', 'warning');
+            //         }
+            //     });
+            // }
+            // else
+            // {  
             // $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
             // $("#mostrarPdf").modal("show");
+            // }
+             $("<object class='lineaCaptura' data='" + pdf + "' width='100%' height='480px' >").appendTo('#pdfReferenceContent');
+             $("#mostrarPdf").modal("show");
         }
         else
         {
@@ -3088,4 +3099,208 @@ $scope.buscarOrdenesProveedor=function(idProveedor){
             });
         };
     
+        $scope.insertaPolizaFrontAPIGastos = async function () {
+            let AuthToken;
+            let FFVale = $scope.datosEvidencia.nombreVale 
+            let FF = $scope.datosEvidencia.idFondoFijo 
+            let resPoliza
+    
+            //Encabezado
+            $scope.apiJson = structuredClone(apiJsonBPRO2detallesRenuncia)
+            
+            $scope.apiJson.IdEmpresa = $scope.datoPoliza.idEmpresa
+            $scope.apiJson.IdSucursal = $scope.datoPoliza.idSucursal
+            $scope.apiJson.Tipo = 4
+    
+            //DatosOrdenesCompra
+            $scope.apiJson.CancelarOrdenCompra.FolioOrden = $scope.datoPoliza.referencia1
+    
+    
+            //ContabilidadMasiva
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Proceso = `DAVFF${$scope.datosEvidencia.complemento}`
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].DocumentoOrigen = $scope.datoPoliza.idComprobacionVale
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Canal =  `DAVFF${$scope.datosEvidencia.complemento}`
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Documento = '' //OC
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Referencia2 = '' //OC        
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].ReferenciaA =  ''
+    
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoOrigen= $scope.datoPoliza.idComprobacionVale
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Partida = '1'
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoProducto = $scope.datosEvidencia.departamento
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].SubProducto = 'DD'
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Origen = 'FAC'
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Moneda = 'PE'
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].TipoCambio = '1'
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].VentaUnitario = $scope.datoPoliza.monto
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].IVA = $scope.datoPoliza.montoIVA
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Persona1 = $scope.datoPoliza.PER_IDPERSONA    
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].DocumentoAfectado = FFVale 
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[0].Referencia2 = $scope.datoPoliza.idComprobacionVale
+    
+    
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoOrigen= $scope.datoPoliza.idComprobacionVale
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Partida = '2'
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoProducto = $scope.datosEvidencia.departamento
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].SubProducto = 'PA'
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Origen = 'FAC'
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Moneda = 'PE'
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].TipoCambio = '1'
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].VentaUnitario = $scope.datoPoliza.monto
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].IVA = $scope.datoPoliza.montoIVA
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Persona1 =  $scope.datosEvidencia.idProveedor
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].DocumentoAfectado = ''
+            $scope.apiJson.ContabilidadMasiva.Polizas[0].Deta[1].Referencia2 = $scope.datoPoliza.idComprobacionVale
+    
+            console.log(JSON.stringify($scope.apiJson))
+    
+            let datalog = structuredClone(datalogAPI)
+        
+                datalog.idSucursal = $scope.datoPoliza.idSucursal
+                datalog.idVale = $scope.idVale
+                datalog.opcion = 1        
+    
+                AuthToken = await promiseAutBPRO();
+    
+                datalog.tokenGenerado = AuthToken.Token
+                datalog.unniqIdGenerado = AuthToken.UnniqId
+                datalog.jsonEnvio = JSON.stringify($scope.apiJson)
+    
+            let respLog = await LogApiBpro(datalog)
+    
+                console.log(datalog)
+                console.log(respLog)
+    
+                datalog.consecutivo = respLog.folio
+                datalog.opcion = 2
+    
+            
+            resPoliza = await GeneraPolizaBPRO(AuthToken.Token,JSON.stringify($scope.apiJson))
+    
+            if(resPoliza.Codigo === '200 OK'){
+                datalog.anioPol = resPoliza.Poliza[0].añoPoliza
+                datalog.consPol = resPoliza.Poliza[0].ConsecutivoPoliza
+                datalog.empresaPol = resPoliza.Poliza[0].EmpresaPoliza
+                datalog.mesPol =  resPoliza.Poliza[0].MesPoliza
+                datalog.tipoPol = resPoliza.Poliza[0].TipoPoliza
+                datalog.jsonRespuesta = JSON.stringify(resPoliza.Poliza[0])
+                datalog.codigo = resPoliza.Codigo
+                datalog.resuelto = 1
+                datalog.ordenCompra = resPoliza.Folio
+    
+                $scope.ordenCompraAVFF =  resPoliza.Folio
+                   
+                $('#loading').modal('hide');
+    
+                swal({
+                    title:"Aviso",
+                    type:"success",
+                    icon: "success",
+                    width: 1000,
+                    text:`Se proceso con éxito la cancelación: ` + $scope.datoPoliza.idComprobacionVale  + `
+                    
+                    Año póliza: ${datalog.anioPol}
+                    Mes póliza: ${datalog.mesPol}
+                    Cons póliza: ${datalog.consPol}
+                    Tipo póliza: ${datalog.tipoPol}
+                    
+                    No olvide dar seguimiento.`,
+                    showConfirmButton: true,
+                    showCloseButton:  false
+                    //timer:10000         
+    
+                })
+                
+            }else{
+                $('#loading').modal('hide');
+                datalog.jsonRespuesta = JSON.stringify(resPoliza)
+    
+                if(resPoliza.data !== undefined){
+                    datalog.mensajeError = resPoliza.data.Message 
+                    datalog.codigo = resPoliza.status.toString()
+                    datalog.resuelto = 0
+                }else{
+                    datalog.mensajeError = resPoliza.Mensaje
+                    datalog.codigo = resPoliza.Codigo
+                    datalog.resuelto = 0
+                }
+                if(datalog.mensajeError.includes('interbloqueo'))
+                {
+                    swal({
+                        title:"Aviso",
+                        type:"error",
+                        width: 1000,
+                        text: `Se presento un problema al procesar la póliza en BPRO
+                        No ha sido procesado. Por favor intente nuevamente`,
+                        showConfirmButton: true,
+                        showCloseButton:  false
+                        //timer:10000
+                    })
+                }
+                else{
+                swal({
+                    title:"Aviso",
+                    type:"error",
+                    width: 1000,
+                    text: `Se presento un problema al procesar la póliza en BPRO
+                    No ha sido procesado, favor de notificar al área de sistemas 
+                    
+                    Codigo: ${datalog.codigo }
+                    Respuesta BPRO:  ${datalog.mensajeError}
+                    vale: ${ $scope.datoPoliza.idComprobacionVale }
+                    
+                    Reitentar cuando se le notifique la solución a la incidencia`,
+                    showConfirmButton: true,
+                    showCloseButton:  false
+                    //timer:10000
+                })
+            }
+            }
+    
+            respLog = await LogApiBpro(datalog)
+    
+            $('#loading').modal('hide');
+    
+            };
+
+            async function promiseAutBPRO(){
+                return new Promise((resolve, reject) => {
+                    apiBproRepository.GetTokenBPRO().then(resp =>{
+                        console.log('token: ',resp.data)
+                        resolve(resp.data)
+                    })
+                })
+            }
+            
+            async function GeneraPolizaBPRO(token, data){
+                return new Promise((resolve, reject) => {
+                    apiBproRepository.GeneraPolizaBPRO(token, data).then(resp =>{
+                        console.log('respuesta: ',resp.data)
+                        resolve(resp.data)
+                    }).catch(error => {
+                        resolve(error)
+                    })
+                })
+            }
+            
+            async function LogApiBpro(data){
+                return new Promise((resolve, reject) => {
+                    apiBproRepository.LogApiBpro(data).then(resp =>{
+                        console.log('resp: ',resp)
+                        resolve(resp.data[0])
+                    })
+                })
+            }
+
+            async function verificaDatosPolizaApi(idVale,idValeEvidencia) {
+                return new Promise((resolve, reject) => {
+                    fondoFijoRepository.verificaDatosPolizaApi(idVale,idValeEvidencia).then(function (result) {
+                        if (result.data != undefined) {
+                            resolve(result.data[0]);
+                        }
+                    }).catch(err => {
+                        reject(false);
+                    });
+            
+                });
+            }
 });

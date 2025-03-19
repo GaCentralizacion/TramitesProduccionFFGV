@@ -187,3 +187,66 @@ var apiJsonBPRO2detalles = {
     resuelto: 0,
     ordenCompra:''
 }
+
+var apiJsonBPRO2detallesRenuncia = {
+  "IdEmpresa": 0,
+  "IdSucursal": 0,
+  "Tipo": 0,
+  "CancelarOrdenCompra":
+  {
+    "FolioOrden": ""
+  },
+  "ContabilidadMasiva": {
+    "Polizas": [
+      {
+        "Proceso": "",
+        "DocumentoOrigen": "",
+        "Canal": "",
+        "NumeroControl": "",
+        "Documento": "",
+        "Referencia2": "",
+        "ReferenciaA": "",
+        "Deta": [
+          {
+            "DocumentoOrigen": "",
+            "Partida": "",
+            "TipoProducto": "",
+            "SubProducto": "",
+            "Origen": "",
+            "Destino": "",
+            "Moneda": "",
+            "TipoCambio": "",
+            "CostoUnitario": 0,
+            "VentaUnitario": 0,
+            "DescuentoUnitario": 0,
+            "TasaIva": 0,
+            "IVA": 0,
+            "Persona1": 0,
+            "Persona2": "0",
+            "DocumentoAfectado": "",
+            "Referencia2": ""
+          },
+          {
+            "DocumentoOrigen": "",
+            "Partida": "",
+            "TipoProducto": "",
+            "SubProducto": "",
+            "Origen": "",
+            "Destino": "",
+            "Moneda": "",
+            "TipoCambio": "",
+            "CostoUnitario": 0,
+            "VentaUnitario": 0,
+            "DescuentoUnitario": 0,
+            "TasaIva": 0,
+            "IVA": 0,
+            "Persona1": 0,
+            "Persona2": "0",
+            "DocumentoAfectado": "",
+            "Referencia2": ""
+          }
+        ]
+      }
+    ]
+  }
+}
